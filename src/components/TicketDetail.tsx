@@ -2,6 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useState, type CSSProperties } from 'react'
 import { db, deleteTicket, type Ticket } from '@/db/db'
 import { useBackClose } from '@/hooks/useBackClose'
+import { useScrollLock } from '@/hooks/useScrollLock'
 import { useObjectUrl } from '@/hooks/useObjectUrl'
 import { canShareFiles, download, isShareCancel } from '@/lib/download'
 import { renderTicketImage, ticketFileName } from '@/lib/ticketImage'
@@ -19,6 +20,7 @@ interface TicketDetailProps {
 
 export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProps) {
   useBackClose(onClose)
+  useScrollLock()
   // undefined: 읽는 중, null: 포스터 없음
   const poster = useLiveQuery(async () => (await db.posters.get(ticket.id)) ?? null, [ticket.id])
   // 본체를 읽는 동안에는 작은 포스터를 먼저 보여준다
@@ -80,7 +82,7 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
 
   return (
     <div className="detail" role="dialog" aria-modal="true" aria-label={`${ticket.title} 티켓`} onClick={onClose}>
-      <div className="detail__scroll">
+      <div className="detail__stage">
         <div className="detail__ticket" style={origin as CSSProperties} onClick={(e) => e.stopPropagation()}>
           <TicketView ticket={ticket} posterUrl={posterUrl} onPosterOpen={() => setPosterOpen(true)} />
         </div>

@@ -45,10 +45,12 @@ function place(ticket: Ticket, index: number): Placement {
 
 interface SkyProps {
   tickets: Ticket[]
+  /** 방금 상세보기를 닫은 별 — 잠깐 밝혀 자리를 알려준다 */
+  returning?: string | null
   onOpen: (ticket: Ticket, from: DOMRect) => void
 }
 
-export function Sky({ tickets, onOpen }: SkyProps) {
+export function Sky({ tickets, returning, onOpen }: SkyProps) {
   const years = useMemo(() => {
     const groups = new Map<string, Ticket[]>()
     for (const ticket of tickets) {
@@ -78,7 +80,13 @@ export function Sky({ tickets, onOpen }: SkyProps) {
             </header>
             <Constellation list={list} />
             {list.map((ticket, i) => (
-              <Star key={ticket.id} ticket={ticket} placement={place(ticket, i)} onOpen={onOpen} />
+              <Star
+                key={ticket.id}
+                ticket={ticket}
+                placement={place(ticket, i)}
+                returning={ticket.id === returning}
+                onOpen={onOpen}
+              />
             ))}
           </section>
         ))}
@@ -110,10 +118,11 @@ function Constellation({ list }: { list: Ticket[] }) {
 interface StarProps {
   ticket: Ticket
   placement: Placement
+  returning: boolean
   onOpen: (ticket: Ticket, from: DOMRect) => void
 }
 
-function Star({ ticket, placement, onOpen }: StarProps) {
+function Star({ ticket, placement, returning, onOpen }: StarProps) {
   const url = useObjectUrl(ticket.thumb)
   const glow = ticket.glow ?? categoryOf(ticket.category).glow
 
@@ -128,7 +137,7 @@ function Star({ ticket, placement, onOpen }: StarProps) {
 
   return (
     <button
-      className="star"
+      className={`star${returning ? ' is-returning' : ''}`}
       style={style}
       onClick={(e) => onOpen(ticket, e.currentTarget.querySelector('.star__orb')!.getBoundingClientRect())}
       aria-label={`${ticket.title} 티켓 보기`}

@@ -2,6 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useRef, useState, type ChangeEvent } from 'react'
 import { db } from '@/db/db'
 import { useBackClose } from '@/hooks/useBackClose'
+import { useScrollLock } from '@/hooks/useScrollLock'
 import { applyBackup, createBackup, lastBackupAt, markBackedUp, readBackup, type RestorePreview } from '@/lib/backup'
 import { download } from '@/lib/download'
 import { formatBytes } from '@/lib/image'
@@ -13,6 +14,7 @@ const formatWhen = (ms: number) =>
 /** 보관함: 백업 파일 만들기와 백업에서 불러오기 */
 export function BackupSheet({ onClose }: { onClose: () => void }) {
   useBackClose(onClose)
+  useScrollLock()
   const toast = useToast()
   const inputRef = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState<'backup' | 'read' | 'restore' | null>(null)
