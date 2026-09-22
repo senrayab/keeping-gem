@@ -83,7 +83,32 @@ button {
 /* ───────── 머리말 ───────── */
 
 .app-header {
+  position: relative;
   padding: calc(env(safe-area-inset-top) + 28px) 24px 8px;
+}
+
+.app-header__vault {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 22px);
+  right: 16px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--glass-line);
+  border-radius: 50%;
+  background: var(--glass);
+}
+
+.app-header__vault svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .app-header__eyebrow {
@@ -861,6 +886,67 @@ svg.dock__icon {
   border-color: rgb(var(--amber));
   background: rgb(var(--amber) / 0.18);
   color: rgb(var(--amber));
+}
+
+/* ───────── 보관함 ───────── */
+
+.vault {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid var(--glass-line);
+  border-radius: 20px;
+  background: var(--glass);
+}
+
+.vault h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.vault__big {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.vault__big strong {
+  color: rgb(var(--amber));
+}
+
+.vault__big small {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.vault__note,
+.vault__meta,
+.vault__preview p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+.vault__note strong,
+.vault__preview strong {
+  color: var(--ink);
+}
+
+.vault__preview {
+  display: grid;
+  gap: 12px;
+}
+
+.vault__row {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 8px;
+}
+
+.vault__row .btn--glow {
+  min-height: 48px;
 }
 
 /* ───────── 버튼 ───────── */
