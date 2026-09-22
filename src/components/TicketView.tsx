@@ -16,9 +16,11 @@ interface TicketViewProps {
   posterUrl?: string
   /** 있으면 포스터를 눌러 크게 볼 수 있다. 화면에서는 포스터를 잘라 짧게 보여주기 때문이다. */
   onPosterOpen?: () => void
+  /** 좌표가 있는 장소라면, 눌러서 지도를 열 수 있다 */
+  onVenueOpen?: () => void
 }
 
-export function TicketView({ ticket, posterUrl, onPosterOpen }: TicketViewProps) {
+export function TicketView({ ticket, posterUrl, onPosterOpen, onVenueOpen }: TicketViewProps) {
   const category = categoryOf(ticket.category)
   const glow = ticket.glow ?? category.glow
 
@@ -46,7 +48,18 @@ export function TicketView({ ticket, posterUrl, onPosterOpen }: TicketViewProps)
         )}
         <div className="ticket__head">
           <h2 className="ticket__title">{ticket.title}</h2>
-          {ticket.venue && <p className="ticket__venue">{ticket.venue}</p>}
+          {ticket.venue &&
+            (onVenueOpen && ticket.lat != null ? (
+              <button type="button" className="ticket__venue ticket__venue--map" onClick={onVenueOpen}>
+                {ticket.venue}
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
+                  <circle cx="12" cy="10" r="2.5" />
+                </svg>
+              </button>
+            ) : (
+              <p className="ticket__venue">{ticket.venue}</p>
+            ))}
         </div>
       </div>
 
