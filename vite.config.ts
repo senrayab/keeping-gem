@@ -4,11 +4,11 @@ import { VitePWA } from 'vite-plugin-pwa'
 import { fileURLToPath, URL } from 'node:url'
 
 // GitHub Pages는 https://senrayab.github.io/keeping-gem/ 하위에서 서비스된다.
-// 개발 중에는 루트가 편하므로 빌드할 때만 붙인다.
+// 개발 중에는 루트가 편하므로 빌드(와 빌드 결과를 띄우는 preview)에만 붙인다.
 const BASE = '/keeping-gem/'
 
-export default defineConfig(({ command }) => ({
-  base: command === 'build' ? BASE : '/',
+export default defineConfig(({ command, isPreview }) => ({
+  base: command === 'build' || isPreview ? BASE : '/',
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
