@@ -11,6 +11,7 @@ import { today } from '@/lib/format'
 import { searchPlaces } from '@/lib/kakao'
 import { processImage, type ProcessedImage } from '@/lib/image'
 import type { KakaoPlace } from '@/types/kakao'
+import { ClearInput } from './ClearInput'
 import { useToast } from './Toast'
 
 interface TicketFormProps {
@@ -91,18 +92,25 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
       setPlaces([])
       return
     }
+    // 먼저 보낸 검색이 늦게 도착해 이미 지운 칸에 목록을 다시 채우는 일이 없게 한다
+    let alive = true
     const timer = window.setTimeout(() => {
       searchPlaces(query)
         .then((found) => {
+          if (!alive) return
           setPlaces(found)
           setPlaceError(undefined)
         })
         .catch((e: Error) => {
+          if (!alive) return
           setPlaces([])
           setPlaceError(e.message)
         })
     }, 350)
-    return () => window.clearTimeout(timer)
+    return () => {
+      alive = false
+      window.clearTimeout(timer)
+    }
   }, [venue])
 
   const pickPlace = (place: KakaoPlace) => {
@@ -224,7 +232,16 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
 
         <label className="field">
           <span>제목</span>
-          <input ref={titleRef} value={title} onChange={(e) => setFields({ title: e.target.value })} placeholder="어떤 공연이었나요?" />
+          <ClearInput
+            inputRef={titleRef}
+            value={title}
+            onChange={(e) => setFields({ title: e.target.value })}
+            onClear={() => {
+              setFields({ title: '' })
+              titleRef.current?.focus()
+            }}
+            placeholder="어떤 공연이었나요?"
+          />
         </label>
 
         <div className="field">
@@ -256,12 +273,17 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
 
         <div className="field">
           <span>장소</span>
-          <input
+          <ClearInput
             value={venue}
             onChange={(e) => {
               typingVenue.current = true
               // 직접 고쳐 적으면 앞서 고른 장소의 좌표는 더 맞지 않는다
               setFields({ venue: e.target.value, lat: undefined, lng: undefined, address: undefined })
+            }}
+            onClear={() => {
+              typingVenue.current = false
+              setPlaces([])
+              setFields({ venue: '', lat: undefined, lng: undefined, address: undefined })
             }}
             placeholder="공연장 이름을 치면 찾아드려요"
             aria-label="장소"
@@ -286,7 +308,12 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
         <div className="field-row">
           <label className="field">
             <span>좌석</span>
-            <input value={seat} onChange={(e) => setFields({ seat: e.target.value })} placeholder="1층 A구역 12열 7번" />
+            <ClearInput
+              value={seat}
+              onChange={(e) => setFields({ seat: e.target.value })}
+              onClear={() => setFields({ seat: '' })}
+              placeholder="1층 A구역 12열 7번"
+            />
           </label>
           <div className="field">
             <span>금액</span>
