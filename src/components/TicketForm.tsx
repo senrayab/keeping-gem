@@ -114,13 +114,27 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
         </header>
 
         <div className="poster-pick">
-          <div className="poster-pick__frame">
+          {/* 포스터 칸 자체를 누르면 바로 앨범이 열린다 */}
+          <button
+            type="button"
+            className="poster-pick__frame"
+            onClick={() => albumRef.current?.click()}
+            disabled={converting}
+            aria-label={previewUrl ? '앨범에서 포스터 바꾸기' : '앨범에서 포스터 고르기'}
+          >
             {previewUrl ? (
               <img src={previewUrl} alt="포스터 미리보기" />
             ) : (
-              <span className="poster-pick__hint">{converting ? '변환 중…' : '포스터를 넣어 주세요'}</span>
+              <span className="poster-pick__hint">
+                {converting ? '변환 중…' : (
+                  <>
+                    눌러서 포스터 고르기
+                    <small>앨범이 열려요</small>
+                  </>
+                )}
+              </span>
             )}
-          </div>
+          </button>
           <div className="poster-pick__actions">
             <button type="button" className="btn btn--ghost btn--small" onClick={() => cameraRef.current?.click()}>
               촬영
