@@ -1,8 +1,9 @@
-import { useMemo, type CSSProperties } from 'react'
+import type { CSSProperties } from 'react'
 import type { Ticket } from '@/db/db'
 import { categoryOf } from '@/lib/categories'
 import { formatDate, formatPrice } from '@/lib/format'
-import { barcodeBars, ticketNumber } from '@/lib/seed'
+// barcodeBars는 저장 이미지(lib/ticketImage.ts)와, 아래 주석 처리된 Barcode가 쓴다
+import { ticketNumber } from '@/lib/seed'
 
 /**
  * 상세보기의 티켓 한 장.
@@ -71,7 +72,12 @@ export function TicketView({ ticket, posterUrl, onPosterOpen }: TicketViewProps)
       </div>
 
       <div className="tk-part tk-part--top ticket__stub">
-        <Barcode seed={ticket.id} />
+        {/*
+         * 바코드는 뜻이 없는 장식이라 화면에서는 숨긴다 — 상세보기를 한 화면에 담기 위해.
+         * 저장·공유하는 이미지에는 그대로 들어간다(lib/ticketImage.ts).
+         * 되살리려면 아래 주석을 풀고 Barcode 함수의 주석도 함께 푼다.
+         */}
+        {/* <Barcode seed={ticket.id} /> */}
         <div className="ticket__stub-row">
           <span>{number}</span>
           <span>ADMIT ONE</span>
@@ -81,6 +87,7 @@ export function TicketView({ ticket, posterUrl, onPosterOpen }: TicketViewProps)
   )
 }
 
+/*
 /** 티켓마다 모양이 다른 바코드. 읽히는 바코드는 아니고 장식이다. */
 function Barcode({ seed }: { seed: string }) {
   const bars = useMemo(() => barcodeBars(seed), [seed])
@@ -93,3 +100,4 @@ function Barcode({ seed }: { seed: string }) {
     </svg>
   )
 }
+*/
