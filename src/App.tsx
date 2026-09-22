@@ -2,6 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useMemo, useState } from 'react'
 import { db, type Ticket } from './db/db'
 import { formatPrice } from './lib/format'
+import { BackupSheet } from './components/BackupSheet'
 import { DbNotice } from './components/DbNotice'
 import { EMPTY_FILTER, matches, SearchPanel, type Filter } from './components/SearchPanel'
 import { Sky } from './components/Sky'
@@ -18,6 +19,7 @@ export function App() {
   const [opened, setOpened] = useState<{ id: string; from?: DOMRect } | null>(null)
   const [editing, setEditing] = useState<Editing>(null)
   const [searching, setSearching] = useState(false)
+  const [vault, setVault] = useState(false)
   const [filter, setFilter] = useState<Filter>(EMPTY_FILTER)
 
   const filtering = searching && (filter.query.trim() !== '' || filter.category !== 'all')
@@ -44,6 +46,12 @@ export function App() {
       <Starfield />
 
       <header className={`app-header${searching ? ' is-searching' : ''}`}>
+        <button className="app-header__vault" onClick={() => setVault(true)} aria-label="보관함 (백업·복원)">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3.5" y="4" width="17" height="5" rx="1.5" />
+            <path d="M5 9v9.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9M10 13h4" />
+          </svg>
+        </button>
         <p className="app-header__eyebrow">Keeping Gem</p>
         <h1 className="app-header__title">추억의 밤하늘</h1>
         {tickets && tickets.length > 0 && (
@@ -128,6 +136,8 @@ export function App() {
           }}
         />
       )}
+
+      {vault && <BackupSheet onClose={() => setVault(false)} />}
 
       <UpdateToast />
       <DbNotice />
