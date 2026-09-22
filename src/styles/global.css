@@ -265,32 +265,17 @@ button {
 }
 
 /*
- * 상세보기를 닫고 돌아왔을 때, 방금 본 별에서 둥근 테두리가 한 번 퍼져 자리를 알려준다.
- * 그림자 크기를 바꾸면 매 프레임 다시 그려야 해서 별이 깜빡일 수 있다.
- * 크기와 투명도만 바꾸면 다시 그리지 않고 흐르듯 움직인다.
+ * 상세보기를 닫고 돌아왔을 때, 방금 본 별이 한 번 환해져 자리를 알려준다.
+ * (퍼져나가는 테두리도 써 봤지만 과했다 — 빛이 살짝 세지는 정도가 이 하늘에 어울린다)
  */
-.star.is-returning::before {
-  content: '';
-  position: absolute;
-  /* 별은 동그랗게 잘라내는 영역이라, 테두리는 그 바깥(별 버튼)에 그린다 */
-  left: calc((128px - var(--size)) / 2 - 5px);
-  top: calc(var(--size) / -2 - 5px);
-  width: calc(var(--size) + 10px);
-  height: calc(var(--size) + 10px);
-  border: 2px solid rgb(var(--glow) / 0.9);
-  border-radius: 50%;
-  animation: returning-ring 1.3s ease-out;
+.star.is-returning .star__orb {
+  animation: returning 1.4s ease-out;
 }
 
-@keyframes returning-ring {
-  from {
-    opacity: 0.95;
-    transform: scale(0.92);
-  }
-  to {
-    opacity: 0;
-    transform: scale(1.8);
-  }
+@keyframes returning {
+  0% { box-shadow: 0 0 18px 2px rgb(var(--glow) / 0.55), 0 0 56px 8px rgb(var(--glow) / 0.28); }
+  35% { box-shadow: 0 0 26px 6px rgb(var(--glow) / 0.85), 0 0 80px 22px rgb(var(--glow) / 0.55); }
+  100% { box-shadow: 0 0 18px 2px rgb(var(--glow) / 0.55), 0 0 56px 8px rgb(var(--glow) / 0.28); }
 }
 
 .star:active .star__orb {
