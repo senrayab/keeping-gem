@@ -195,11 +195,13 @@ export async function renderTicketImage(ticket: Ticket, poster?: Blob): Promise<
   const memoLines = ticket.memo ? wrap(ctx, ticket.memo, inner - 72, 6) : []
   const memoY = gridEnd + 10
   const memoH = memoLines.length ? memoLines.length * 54 + 64 : 0
-  const perf2 = (memoLines.length ? memoY + memoH + 50 : gridEnd + 30) + 10
+  const bottom = memoLines.length ? memoY + memoH + 40 : gridEnd + 40
 
-  const stubH = 250
-  const bottom = perf2 + stubH
-  const H = bottom + 190
+  // 바코드는 티켓에서 떼어 낸 흰 조각으로 아래에 따로 둔다
+  const stubGap = 34
+  const stubH = 200
+  const stubY = bottom + stubGap
+  const H = stubY + stubH + 170
 
   canvas.width = W
   canvas.height = H
@@ -230,29 +232,9 @@ export async function renderTicketImage(ticket: Ticket, poster?: Blob): Promise<
   ctx.save()
   ctx.shadowColor = rgba(glow, 0.5)
   ctx.shadowBlur = 90
-  ticketPath(ctx, top, bottom, [perf1, perf2])
+  ticketPath(ctx, top, bottom, [perf1])
   ctx.fillStyle = PAPER
   ctx.fill()
-  ctx.restore()
-
-  ctx.save()
-  ticketPath(ctx, top, bottom, [perf1, perf2])
-  ctx.clip()
-
-  // 반권: 홀로그램 종이
-  const holo = ctx.createLinearGradient(TICKET_X, perf2, TICKET_X + TICKET_W, bottom)
-  holo.addColorStop(0, '#c9f1ff')
-  holo.addColorStop(0.35, '#e4d4ff')
-  holo.addColorStop(0.65, '#ffd9ec')
-  holo.addColorStop(1, '#fff4c8')
-  ctx.fillStyle = holo
-  ctx.fillRect(TICKET_X, perf2, TICKET_W, stubH)
-  const sheen = ctx.createLinearGradient(TICKET_X, perf2, TICKET_X + TICKET_W, bottom)
-  sheen.addColorStop(0.3, rgba('255 255 255', 0))
-  sheen.addColorStop(0.48, rgba('255 255 255', 0.6))
-  sheen.addColorStop(0.62, rgba('255 255 255', 0))
-  ctx.fillStyle = sheen
-  ctx.fillRect(TICKET_X, perf2, TICKET_W, stubH)
   ctx.restore()
 
   // ── 4. 포스터 ──
@@ -329,32 +311,39 @@ export async function renderTicketImage(ticket: Ticket, poster?: Blob): Promise<
     memoLines.forEach((line, i) => ctx.fillText(line, TICKET_X + PAD + 36, memoY + 32 + 38 + i * 54))
   }
 
-  perforation(ctx, perf2)
+  // ── 8. 티켓에서 떼어 낸 바코드 조각 ──
+  ctx.save()
+  ctx.shadowColor = rgba('0 0 0', 0.45)
+  ctx.shadowBlur = 40
+  ctx.shadowOffsetY = 12
+  roundRect(ctx, TICKET_X, stubY, TICKET_W, stubH, 28)
+  ctx.fillStyle = '#ffffff'
+  ctx.fill()
+  ctx.restore()
 
-  // ── 8. 바코드와 일련번호 ──
   const barX = TICKET_X + PAD
-  const barY = perf2 + 56
+  const barY = stubY + 44
   const unit = inner / 200
   ctx.fillStyle = INK
-  for (const bar of barcodeBars(ticket.id)) ctx.fillRect(barX + bar.x * unit, barY, bar.w * unit, 110)
+  for (const bar of barcodeBars(ticket.id)) ctx.fillRect(barX + bar.x * unit, barY, bar.w * unit, 96)
 
   font(ctx, 500, 26, MONO)
   spacing(ctx, 3)
   ctx.fillStyle = '#4a4658'
   ctx.textAlign = 'left'
   // 'ADMIT ONE'은 뜻 없는 문구라 넣지 않는다. 일련번호만 바코드 아래에 남긴다.
-  ctx.fillText(ticketNumber(ticket.id, ticket.date), barX, barY + 160)
+  ctx.fillText(ticketNumber(ticket.id, ticket.date), barX, barY + 142)
 
   // ── 9. 서명 ──
   ctx.textAlign = 'center'
   ctx.fillStyle = rgba('255 196 110', 0.85)
   font(ctx, 700, 26)
   spacing(ctx, 8)
-  ctx.fillText('KEEPING GEM', W / 2, bottom + 100)
+  ctx.fillText('KEEPING GEM', W / 2, stubY + stubH + 84)
   spacing(ctx, 0)
   ctx.fillStyle = rgba('244 240 255', 0.45)
   font(ctx, 500, 26)
-  ctx.fillText('추억의 밤하늘', W / 2, bottom + 142)
+  ctx.fillText('추억의 밤하늘', W / 2, stubY + stubH + 126)
 
   return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('이미지를 만들지 못했습니다.'))), 'image/png')
