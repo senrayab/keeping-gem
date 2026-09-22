@@ -64,7 +64,7 @@ export function App() {
         {tickets && tickets.length > 0 && (
           <p className="app-header__stats">
             {oldest}년부터 별 {tickets.length}개
-            {total && <span className="app-header__spend"> · {total}어치의 추억</span>}
+            {total && <span className="app-header__spend"> · {total}</span>}
           </p>
         )}
       </header>
