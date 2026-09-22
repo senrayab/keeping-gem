@@ -633,10 +633,13 @@ button {
   font-size: 17px;
 }
 
+/* 아래에 붙어 따라오는 저장 버튼. 뒤의 입력칸이 비쳐 보이지 않게 하늘색으로 받친다 */
 .sheet__foot {
   position: sticky;
-  bottom: calc(env(safe-area-inset-bottom) + 12px);
-  padding-top: 8px;
+  bottom: 0;
+  margin: 0 -20px calc(-1 * (env(safe-area-inset-bottom) + 24px));
+  padding: 16px 20px calc(env(safe-area-inset-bottom) + 16px);
+  background: linear-gradient(180deg, rgb(7 6 13 / 0), var(--night-0) 30%);
 }
 
 .poster-pick {
@@ -819,6 +822,42 @@ button {
   background: var(--night-1);
   color: #fff;
   font-weight: 600;
+}
+
+/* ───────── 저장소 안내 ───────── */
+
+/* 입력 시트(30)보다 위 — 저장이 멈춘 바로 그 화면에서 보여야 한다 */
+.db-notice {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  top: calc(env(safe-area-inset-top) + 12px);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 14px 14px 16px;
+  border-radius: 16px;
+  background: #fff4dc;
+  color: #3a2a08;
+  font-size: 13px;
+  line-height: 1.5;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.45);
+}
+
+.db-notice p {
+  flex: 1;
+  margin: 0;
+}
+
+.db-notice button {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--night-1);
+  color: #fff;
+  font-weight: 700;
 }
 
 @media (prefers-reduced-motion: reduce) {

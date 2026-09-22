@@ -58,6 +58,43 @@ class KeepingGemDB extends Dexie {
 
 export const db = new KeepingGemDB()
 
+/*
+ * 저장소 구조를 바꾸는(버전을 올리는) 새 버전은, 옛 버전이 저장소를 붙잡고 있으면
+ * 그게 놓아줄 때까지 기다린다. 안드로이드는 뒤에 둔 탭을 얼려 두므로 옛 탭은 끝내
+ * 놓아주지 않고, 새 버전의 저장은 '저장 중…'에서 멈춘 채 아무 말이 없다.
+ * 그래서 두 쪽 모두 화면에 알린다 (DbNotice.tsx).
+ */
+export type DbNotice = 'blocked' | 'outdated' | null
+
+/** 마지막 안내. 화면이 뜨기 전에 온 안내도 놓치지 않도록 남겨 둔다. */
+export let dbNotice: DbNotice = null
+
+function notify(next: DbNotice) {
+  dbNotice = next
+  window.dispatchEvent(new CustomEvent<DbNotice>('db-notice', { detail: next }))
+}
+
+// 이쪽이 새 버전: 다른 곳에 열린 옛 버전 때문에 열지 못하고 기다리는 중
+db.on('blocked', () => notify('blocked'))
+/*
+ * 기다리는 중에 새로고침하면 브라우저가 blocked를 다시 알려주지 않는다 — 앞서 떠난
+ * 페이지의 요청 뒤에 줄만 선다. 그래서 몇 초가 지나도 열리지 않으면 같은 까닭으로 본다.
+ */
+const OPEN_PATIENCE = 3000
+void db.open().catch(() => {})
+window.setTimeout(() => {
+  if (!db.isOpen() && dbNotice === null) notify('blocked')
+}, OPEN_PATIENCE)
+db.on('ready', () => {
+  if (dbNotice === 'blocked') notify(null)
+})
+// 이쪽이 옛 버전: 새 버전이 열리려 한다. 바로 놓아주고 새로고침을 권한다.
+db.on('versionchange', () => {
+  db.close()
+  notify('outdated')
+  return false
+})
+
 const uid = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`
 
 /**
