@@ -22,7 +22,11 @@ export function ConfirmDialog({ title, message, danger, confirmLabel, onConfirm,
   useScrollLock()
 
   return (
-    <div className="confirm" role="dialog" aria-modal="true" aria-label={title} onClick={onCancel}>
+    <div className="confirm" role="dialog" aria-modal="true" aria-label={title} onClick={(e) => {
+        // 이 화면은 상세보기 안에 들어 있다 — 막지 않으면 상세보기까지 함께 닫힌다
+        e.stopPropagation()
+        onCancel()
+      }}>
       <div className="confirm__box" onClick={(e) => e.stopPropagation()}>
         <h2>{title}</h2>
         {message && <p>{message}</p>}
