@@ -132,6 +132,11 @@ button {
   color: var(--ink-soft);
 }
 
+/* 금액은 연도 옆 'N개의 별'과 같은 옅은 글씨 — 별 개수보다 한 걸음 뒤로 물러나 있게 */
+.app-header__spend {
+  color: var(--ink-faint);
+}
+
 .app-main {
   padding-bottom: calc(env(safe-area-inset-bottom) + 110px);
 }
