@@ -1,6 +1,7 @@
 import type { Ticket } from '@/db/db'
 import { categoryOf } from './categories'
-import { formatDate, formatPrice } from './format'
+import { formatMoney } from './currencies'
+import { formatDate } from './format'
 import { barcodeBars, seeded, ticketNumber } from './seed'
 
 /*
@@ -299,7 +300,7 @@ export async function renderTicketImage(ticket: Ticket, poster?: Blob): Promise<
     ['DATE', formatDate(ticket.date)],
     ['TIME', ticket.time ?? '—'],
     ['SEAT', ticket.seat || '—'],
-    ['PRICE', ticket.price != null ? formatPrice(ticket.price) : '—'],
+    ['PRICE', ticket.price != null ? formatMoney(ticket.price, ticket.currency) : '—'],
   ]
   const colW = inner / 2 - 12
   cells.forEach(([label, value], i) => {
