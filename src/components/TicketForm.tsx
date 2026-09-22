@@ -2,6 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { db, saveTicket, type Ticket } from '@/db/db'
 import { useBackClose } from '@/hooks/useBackClose'
+import { useDraft } from '@/hooks/useDraft'
 import { useObjectUrl } from '@/hooks/useObjectUrl'
 import { CATEGORIES, type CategoryId } from '@/lib/categories'
 import { today } from '@/lib/format'
@@ -19,14 +20,18 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
   useBackClose(onClose)
   const toast = useToast()
 
-  const [title, setTitle] = useState(ticket?.title ?? '')
-  const [category, setCategory] = useState<CategoryId>(ticket?.category ?? 'concert')
-  const [date, setDate] = useState(ticket?.date ?? today())
-  const [time, setTime] = useState(ticket?.time ?? '')
-  const [venue, setVenue] = useState(ticket?.venue ?? '')
-  const [seat, setSeat] = useState(ticket?.seat ?? '')
-  const [price, setPrice] = useState(ticket?.price != null ? String(ticket.price) : '')
-  const [memo, setMemo] = useState(ticket?.memo ?? '')
+  // 새 티켓이면 쓰던 내용을 기기에 맡겨 두고, 다시 열면 이어서 쓴다
+  const [fields, setFields, clearDraft] = useDraft(!ticket, {
+    title: ticket?.title ?? '',
+    category: (ticket?.category ?? 'concert') as CategoryId,
+    date: ticket?.date ?? today(),
+    time: ticket?.time ?? '',
+    venue: ticket?.venue ?? '',
+    seat: ticket?.seat ?? '',
+    price: ticket?.price != null ? String(ticket.price) : '',
+    memo: ticket?.memo ?? '',
+  })
+  const { title, category, date, time, venue, seat, price, memo } = fields
 
   // undefined: 그대로, null: 지움, 값: 새 포스터
   const [poster, setPoster] = useState<ProcessedImage | null | undefined>(undefined)
@@ -85,6 +90,7 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
         poster,
         ticket?.id,
       )
+      if (!ticket) clearDraft()
       toast(ticket ? '티켓을 고쳤어요.' : '새 별이 떠올랐어요.')
       onSaved(id)
     } catch (e) {
@@ -134,7 +140,7 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
 
         <label className="field">
           <span>제목</span>
-          <input ref={titleRef} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="어떤 공연이었나요?" />
+          <input ref={titleRef} value={title} onChange={(e) => setFields({ title: e.target.value })} placeholder="어떤 공연이었나요?" />
         </label>
 
         <div className="field">
@@ -145,7 +151,7 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
                 type="button"
                 key={c.id}
                 className={`chip${c.id === category ? ' is-active' : ''}`}
-                onClick={() => setCategory(c.id)}
+                onClick={() => setFields({ category: c.id })}
               >
                 {c.label}
               </button>
@@ -156,30 +162,30 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
         <div className="field-row">
           <label className="field">
             <span>날짜</span>
-            <input type="date" value={date} required onChange={(e) => setDate(e.target.value)} />
+            <input type="date" value={date} required onChange={(e) => setFields({ date: e.target.value })} />
           </label>
           <label className="field">
             <span>시간</span>
-            <input type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+            <input type="time" value={time} onChange={(e) => setFields({ time: e.target.value })} />
           </label>
         </div>
 
         <label className="field">
           <span>장소</span>
-          <input value={venue} onChange={(e) => setVenue(e.target.value)} placeholder="올림픽공원 KSPO DOME" />
+          <input value={venue} onChange={(e) => setFields({ venue: e.target.value })} placeholder="올림픽공원 KSPO DOME" />
         </label>
 
         <div className="field-row">
           <label className="field">
             <span>좌석</span>
-            <input value={seat} onChange={(e) => setSeat(e.target.value)} placeholder="1층 A구역 12열 7번" />
+            <input value={seat} onChange={(e) => setFields({ seat: e.target.value })} placeholder="1층 A구역 12열 7번" />
           </label>
           <label className="field">
             <span>금액</span>
             <input
               inputMode="numeric"
               value={priceDisplay}
-              onChange={(e) => setPrice(e.target.value.replace(/\D/g, ''))}
+              onChange={(e) => setFields({ price: e.target.value.replace(/\D/g, '') })}
               placeholder="0"
             />
           </label>
@@ -187,7 +193,7 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
 
         <label className="field">
           <span>그날의 한마디</span>
-          <textarea value={memo} rows={3} onChange={(e) => setMemo(e.target.value)} placeholder="앵콜 때 다 같이 떼창한 순간" />
+          <textarea value={memo} rows={3} onChange={(e) => setFields({ memo: e.target.value })} placeholder="앵콜 때 다 같이 떼창한 순간" />
         </label>
 
         <div className="sheet__foot">

@@ -2,6 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useState } from 'react'
 import { db, type Ticket } from './db/db'
 import { formatPrice } from './lib/format'
+import { DbNotice } from './components/DbNotice'
 import { Sky } from './components/Sky'
 import { Starfield } from './components/Starfield'
 import { TicketDetail } from './components/TicketDetail'
@@ -90,6 +91,7 @@ export function App() {
       )}
 
       <UpdateToast />
+      <DbNotice />
     </ToastProvider>
   )
 }
