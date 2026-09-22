@@ -2,8 +2,7 @@ import type { CSSProperties } from 'react'
 import type { Ticket } from '@/db/db'
 import { categoryOf } from '@/lib/categories'
 import { formatDate, formatPrice } from '@/lib/format'
-// barcodeBars는 저장 이미지(lib/ticketImage.ts)와, 아래 주석 처리된 Barcode가 쓴다
-import { ticketNumber } from '@/lib/seed'
+// 일련번호·바코드는 저장 이미지(lib/ticketImage.ts)와 아래 주석 처리된 조각이 쓴다
 
 /**
  * 상세보기의 티켓 한 장.
@@ -21,7 +20,6 @@ interface TicketViewProps {
 export function TicketView({ ticket, posterUrl, onPosterOpen }: TicketViewProps) {
   const category = categoryOf(ticket.category)
   const glow = ticket.glow ?? category.glow
-  const number = ticketNumber(ticket.id, ticket.date)
 
   return (
     <article className="ticket" style={{ '--glow': glow } as CSSProperties}>
@@ -49,7 +47,7 @@ export function TicketView({ ticket, posterUrl, onPosterOpen }: TicketViewProps)
         </div>
       </div>
 
-      <div className="tk-part tk-part--top tk-part--bottom">
+      <div className="tk-part tk-part--top">
         <dl className="ticket__grid">
           <div>
             <dt>DATE</dt>
@@ -71,18 +69,20 @@ export function TicketView({ ticket, posterUrl, onPosterOpen }: TicketViewProps)
         {ticket.memo && <p className="ticket__memo">{ticket.memo}</p>}
       </div>
 
+      {/*
+       * 홀로그램 반권(일련번호·ADMIT ONE·바코드)은 뜻이 없는 장식이라 화면에서는 두지 않는다.
+       * 마지막 조각은 아래를 둥글게 마감한다. 저장·공유 이미지에는 반권이 그대로 들어간다
+       * (lib/ticketImage.ts). 되살리려면 아래 주석을 푼다.
+       */}
+      {/*
       <div className="tk-part tk-part--top ticket__stub">
-        {/*
-         * 바코드는 뜻이 없는 장식이라 화면에서는 숨긴다 — 상세보기를 한 화면에 담기 위해.
-         * 저장·공유하는 이미지에는 그대로 들어간다(lib/ticketImage.ts).
-         * 되살리려면 아래 주석을 풀고 Barcode 함수의 주석도 함께 푼다.
-         */}
-        {/* <Barcode seed={ticket.id} /> */}
+        <Barcode seed={ticket.id} />
         <div className="ticket__stub-row">
           <span>{number}</span>
           <span>ADMIT ONE</span>
         </div>
       </div>
+      */}
     </article>
   )
 }
