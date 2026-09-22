@@ -750,9 +750,10 @@ svg.dock__icon {
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgb(7 6 13 / 0.72);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  /* 뒤의 티켓이 살짝 비치도록 얕게만 흐린다 */
+  background: rgb(7 6 13 / 0.5);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   animation: fade-in 0.18s ease-out;
 }
 
@@ -763,9 +764,14 @@ svg.dock__icon {
   padding: 22px 20px 16px;
   border: 1px solid var(--glass-line);
   border-radius: 22px;
-  /* 밤하늘 보랏빛을 섞지 않은 검은 바탕 — 확인창은 잠깐 멈춰 읽는 곳이라 조용해야 한다 */
-  background: #0a0a0c;
-  box-shadow: 0 20px 50px rgb(0 0 0 / 0.55);
+  /*
+   * 서리 낀 유리. 뒤가 비치되 글씨는 또렷해야 하므로,
+   * 검은 기운을 얇게 깔고 뒤를 세게 흐린다. 색은 섞지 않는다(밤하늘 보랏빛 없이).
+   */
+  background: rgb(12 12 14 / 0.62);
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  box-shadow: 0 20px 50px rgb(0 0 0 / 0.55), inset 0 1px 0 rgb(255 255 255 / 0.08);
   text-align: center;
 }
 
