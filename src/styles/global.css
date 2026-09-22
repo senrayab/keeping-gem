@@ -681,6 +681,12 @@ svg.dock__icon {
   padding: calc(env(safe-area-inset-top) + 14px) 16px 12px;
 }
 
+/* 제목 칸이 남는 자리를 다 쓰게 해 닫기 버튼을 오른쪽 끝으로 민다 */
+.map-viewer__head > div {
+  flex: 1;
+  min-width: 0;
+}
+
 .map-viewer__head h2 {
   margin: 0;
   font-size: 17px;
