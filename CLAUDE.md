@@ -4,14 +4,28 @@
 사용자는 휴대폰에서 배포 URL을 열고 홈 화면에 설치해서 확인한다.
 구성은 senrayab/poca-archive와 같다: Vite + React + TypeScript + vite-plugin-pwa.
 
+## 앱 개요: 추억의 밤하늘
+
+공연·콘서트·전시 등의 티켓을 보관하는 앱. 티켓 한 장이 밤하늘의 별 하나다.
+
+- 홈(`Sky.tsx`): 연도별 하늘이 위(최근)→아래(과거)로 이어지고, 별은 포스터를 품은 빛나는 구슬.
+  같은 해의 별은 날짜 순으로 점선(별자리)으로 이어진다. 오른쪽 연도 줄로 해를 건너뛴다.
+  **달력 화면은 쓰지 않는다** — 지난 추억을 찾기 어려워진다는 이유로 사용자가 원치 않음.
+- 별을 누르면 그 자리에서 티켓이 펼쳐진다(`TicketDetail.tsx`, `TicketView.tsx`):
+  포스터 + 제목·장소 + 절취선 + 날짜·시간·좌석·금액·한마디 + 홀로그램 반권(바코드).
+- 별똥별 버튼: 무작위 추억 하나를 펼친다. `+` 버튼: 티켓 추가(`TicketForm.tsx`).
+- 디자인 톤: 어두운 밤하늘 + 따뜻한 빛번짐(보케), 유리구슬 질감, 종이 티켓 + 홀로그램.
+
 ## 프로젝트 구조
 
-- `src/main.tsx`, `src/App.tsx` — 앱 진입점
-- `src/components/` — 화면 조각 (`UpdateToast.tsx`: 새 배포 새로고침 안내)
-- `src/lib/` — 화면과 무관한 로직 (`image.ts`: 사진 → WebP 변환, 긴 변 2000px)
-- `src/db/` — IndexedDB(Dexie). 사진은 서버로 보내지 않고 기기 안에만 저장한다
-- `src/hooks/` — React 훅
-- `src/styles/global.css` — 전역 스타일
+- `src/main.tsx`, `src/App.tsx` — 앱 진입점, 화면 상태(열린 티켓·입력 시트)
+- `src/components/` — 화면 조각 (`UpdateToast.tsx`: 새 배포 새로고침 안내, `Toast.tsx`: 짧은 안내)
+- `src/db/db.ts` — IndexedDB(Dexie). `tickets`(목록용, 썸네일 포함) / `posters`(포스터 원본) 분리.
+  사진은 서버로 보내지 않고 기기 안에만 저장한다. 스키마를 바꾸면 `version()`을 올린다.
+- `src/lib/image.ts` — 포스터 → WebP 변환(긴 변 2000px), 대표색(별 빛깔) 추출
+- `src/lib/seed.ts` — 티켓 id 기반 고정 난수(별 자리·크기·바코드가 늘 같게)
+- `src/hooks/useBackClose.ts` — 뒤로 가기로 겹친 화면 닫기. 새 오버레이는 반드시 이 훅을 쓴다
+- `src/styles/global.css` — 전역 스타일(밤하늘 테마 토큰은 `:root`)
 - `public/` — 그대로 복사되는 파일 (아이콘)
 - `vite.config.ts` — 빌드·PWA(manifest, 서비스 워커) 설정
 - `.github/workflows/deploy.yml` — `main`에 푸시되면 빌드 후 GitHub Pages에 배포
@@ -20,6 +34,7 @@
 
 - `npm run dev` — 개발 서버 (같은 Wi-Fi의 휴대폰에서 `http://<PC IP>:5173` 접속 가능)
 - `npm run build` — 타입 검사 + 빌드 (`dist/`)
+- `npm run preview` — 빌드 결과를 `/keeping-gem/` 경로로 띄워 확인
 - `npm run typecheck` — 타입 검사만
 
 ## 개발 원칙

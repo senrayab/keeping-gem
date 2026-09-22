@@ -20,11 +20,11 @@ export default defineConfig(({ command, isPreview }) => ({
       registerType: 'prompt',
       includeAssets: ['apple-touch-icon.png'],
       manifest: {
-        name: 'Keeping Gem',
+        name: 'Keeping Gem - 추억의 밤하늘',
         short_name: 'Keeping Gem',
         lang: 'ko',
-        theme_color: '#5b3cc4',
-        background_color: '#f7f6fb',
+        theme_color: '#07060d',
+        background_color: '#07060d',
         display: 'standalone',
         orientation: 'portrait',
         // start_url/scope는 base에서 채워진다. '/'로 고정하면 도메인 루트가 열린다.

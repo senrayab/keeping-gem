@@ -1,171 +1,804 @@
+/*
+ * 밤하늘 테마. 앱 전체가 늘 밤이다 — 별(티켓)이 빛나 보이려면 하늘이 어두워야 한다.
+ * 티켓 자체는 종이처럼 밝게 두어 하늘과 대비를 준다.
+ */
 :root {
-  --bg: #f7f6fb;
-  --fg: #1c1a24;
-  --muted: #6e6a7c;
-  --accent: #5b3cc4;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #14121a;
-    --fg: #eeecf4;
-    --muted: #9a96a8;
-    --accent: #9b85f0;
-  }
+  --night-0: #07060d;
+  --night-1: #110d22;
+  --night-2: #1d1538;
+  --ink: #f4f0ff;
+  --ink-soft: rgb(244 240 255 / 0.62);
+  --ink-faint: rgb(244 240 255 / 0.34);
+  --glass: rgb(255 255 255 / 0.08);
+  --glass-line: rgb(255 255 255 / 0.14);
+  --amber: 255 196 110;
+  --paper: #fbfaf7;
+  --paper-ink: #1b1826;
+  --paper-soft: #8a8598;
+  --mono: ui-monospace, 'SF Mono', 'Roboto Mono', Menlo, monospace;
+  color-scheme: dark;
 }
 
 * {
   box-sizing: border-box;
 }
 
+/* 배경색은 html에만 둔다 — body에도 칠하면 뒤에 깔린 밤하늘(.starfield)을 덮는다 */
+html {
+  background: var(--night-0);
+}
+
 html,
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--fg);
-  font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  min-height: 100%;
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard', 'Noto Sans KR', sans-serif;
   -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
 }
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* ───────── 배경 하늘 ───────── */
+
+.starfield {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: radial-gradient(120% 70% at 50% 0%, var(--night-2) 0%, var(--night-1) 45%, var(--night-0) 100%);
+}
+
+.dot {
+  position: absolute;
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  background: #fff;
+  animation: twinkle 4s ease-in-out infinite;
+  animation-delay: var(--delay);
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.8; }
+}
+
+.bokeh {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.35;
+}
+
+.bokeh--1 { width: 220px; height: 220px; left: -60px; top: 18%; background: rgb(var(--amber)); opacity: 0.18; }
+.bokeh--2 { width: 180px; height: 180px; right: -50px; top: 52%; background: #8f6bff; }
+.bokeh--3 { width: 140px; height: 140px; left: 30%; bottom: -40px; background: #ff7a8a; opacity: 0.2; }
+
+/* ───────── 머리말 ───────── */
 
 .app-header {
-  padding: calc(env(safe-area-inset-top) + 12px) 16px 12px;
+  padding: calc(env(safe-area-inset-top) + 28px) 24px 8px;
 }
 
-.app-header h1 {
+.app-header__eyebrow {
+  margin: 0 0 6px;
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgb(var(--amber));
+}
+
+.app-header__title {
   margin: 0;
-  font-size: 22px;
-  color: var(--accent);
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.app-header__stats {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--ink-soft);
 }
 
 .app-main {
-  /* 하단 버튼 바에 가리지 않도록 그 높이만큼 비운다 */
-  padding: 0 16px calc(env(safe-area-inset-bottom) + 96px);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 110px);
 }
+
+/* ───────── 빈 하늘 ───────── */
 
 .empty {
-  color: var(--muted);
-  text-align: center;
-  margin-top: 30vh;
-  line-height: 1.6;
-}
-
-.grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
+  justify-items: center;
+  gap: 20px;
+  margin-top: 22vh;
+  text-align: center;
+  color: var(--ink-soft);
+  line-height: 1.7;
 }
 
-.grid__item {
-  aspect-ratio: 1;
+.empty p {
+  margin: 0;
+}
+
+.empty__star {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff 0%, rgb(var(--amber)) 45%, rgb(var(--amber) / 0) 72%);
+  box-shadow: 0 0 40px 10px rgb(var(--amber) / 0.35);
+  animation: float 6s ease-in-out infinite;
+}
+
+/* ───────── 연도 하늘 ───────── */
+
+.band {
+  position: relative;
+}
+
+/* 마지막 해도 화면 맨 위까지 올라올 수 있게 — 연도 줄에서 눌렀을 때 그해가 제자리에 선다 */
+.band:last-child {
+  min-height: 100vh;
+}
+
+.band__head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: calc(env(safe-area-inset-top) + 14px) 24px 10px;
+  pointer-events: none;
+}
+
+.band__year {
+  margin: 0;
+  font-size: 56px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  /* 하늘에 새겨진 글씨처럼 옅게 — 별을 가리지 않는다 */
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(255 255 255 / 0.22);
+}
+
+.band__count {
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+
+.band__lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.band__lines polyline {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.14);
+  stroke-width: 1;
+  stroke-dasharray: 2 5;
+}
+
+/* ───────── 별 (티켓) ───────── */
+
+.star {
+  position: absolute;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  width: 128px;
+  margin-left: -64px;
   padding: 0;
   border: 0;
-  border-radius: 6px;
-  overflow: hidden;
-  background: rgb(127 127 127 / 0.15);
+  background: none;
+  animation: float var(--duration) ease-in-out infinite;
+  animation-delay: var(--delay);
 }
 
-.grid__item img {
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+.star__orb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--size);
+  height: var(--size);
+  margin-top: calc(var(--size) / -2);
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(circle at 35% 30%, rgb(var(--glow) / 0.9), rgb(var(--glow) / 0.35) 70%);
+  box-shadow:
+    0 0 18px 2px rgb(var(--glow) / 0.55),
+    0 0 56px 8px rgb(var(--glow) / 0.28);
+  transition: transform 0.2s ease;
+}
+
+.star:active .star__orb {
+  transform: scale(0.94);
+}
+
+.star__orb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
 }
+
+/* 유리구슬처럼 위쪽에 맺히는 하이라이트 */
+.star__orb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 22%, rgb(255 255 255 / 0.55) 0%, rgb(255 255 255 / 0) 32%),
+    radial-gradient(circle at 50% 50%, rgb(255 255 255 / 0) 58%, rgb(var(--glow) / 0.5) 100%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.25);
+}
+
+.star__initial {
+  font-size: calc(var(--size) * 0.38);
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 1px 8px rgb(0 0 0 / 0.25);
+}
+
+.star__label {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  max-width: 100%;
+}
+
+.star__title {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 6px rgb(0 0 0 / 0.6);
+}
+
+.star__date {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+/* ───────── 연도 줄 ───────── */
+
+.rail {
+  position: fixed;
+  top: 50%;
+  right: 6px;
+  z-index: 5;
+  display: grid;
+  gap: 2px;
+  padding: 6px 2px;
+  border-radius: 999px;
+  background: var(--glass);
+  border: 1px solid var(--glass-line);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transform: translateY(-50%);
+}
+
+.rail__year {
+  min-width: 34px;
+  min-height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+.rail__year.is-active {
+  color: var(--night-0);
+  background: rgb(var(--amber));
+  box-shadow: 0 0 12px rgb(var(--amber) / 0.6);
+}
+
+/* ───────── 하단 도크 ───────── */
+
+.dock {
+  position: fixed;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom) + 18px);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 999px;
+  background: rgb(20 16 38 / 0.72);
+  border: 1px solid var(--glass-line);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.4);
+  transform: translateX(-50%);
+}
+
+.dock__btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.dock__btn:disabled {
+  opacity: 0.4;
+}
+
+.dock__icon--comet {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 70% 30%, #fff 0 22%, rgb(var(--amber)) 40%, rgb(var(--amber) / 0) 70%);
+  box-shadow: -6px 6px 10px -2px rgb(var(--amber) / 0.5);
+}
+
+.dock__add {
+  width: 52px;
+  height: 52px;
+  border: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff3dc, rgb(var(--amber)) 60%);
+  color: var(--night-0);
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1;
+  box-shadow: 0 0 22px rgb(var(--amber) / 0.55);
+}
+
+/* ───────── 상세보기 ───────── */
+
+.detail {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgb(7 6 13 / 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  animation: fade-in 0.25s ease-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+}
+
+.detail__scroll {
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: calc(env(safe-area-inset-top) + 28px) 20px calc(env(safe-area-inset-bottom) + 28px);
+}
+
+/* 누른 별 자리에서 작게 시작해 화면 가운데로 펼쳐진다 */
+.detail__ticket {
+  width: min(340px, 100%);
+  margin: 0 auto;
+  animation: unfold 0.5s cubic-bezier(0.2, 0.9, 0.25, 1.1);
+}
+
+@keyframes unfold {
+  from {
+    opacity: 0;
+    transform: translate(var(--from-x, 0), var(--from-y, 40px)) scale(0.18) rotate(-6deg);
+  }
+  60% { opacity: 1; }
+}
+
+.detail__actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+  animation: fade-in 0.4s 0.25s ease-out backwards;
+}
+
+/* ───────── 티켓 ───────── */
+
+.ticket {
+  --notch: 13px;
+  display: grid;
+  filter: drop-shadow(0 0 28px rgb(var(--glow) / 0.35)) drop-shadow(0 18px 30px rgb(0 0 0 / 0.45));
+  color: var(--paper-ink);
+}
+
+/*
+ * 조각마다 모서리를 반원으로 파낸다. 네 귀퉁이를 각각 한 장의 마스크로 맡겨
+ * 필요한 쪽만 판다 — 위아래 조각의 반원이 만나 절취선 끝의 둥근 구멍이 된다.
+ */
+.tk-part {
+  --tl: 0px;
+  --tr: 0px;
+  --bl: 0px;
+  --br: 0px;
+  position: relative;
+  background: var(--paper);
+  border-radius: 20px;
+  -webkit-mask:
+    radial-gradient(circle var(--tl) at 0 0, #0000 98%, #000) top left / 51% 51% no-repeat,
+    radial-gradient(circle var(--tr) at 100% 0, #0000 98%, #000) top right / 51% 51% no-repeat,
+    radial-gradient(circle var(--bl) at 0 100%, #0000 98%, #000) bottom left / 51% 51% no-repeat,
+    radial-gradient(circle var(--br) at 100% 100%, #0000 98%, #000) bottom right / 51% 51% no-repeat;
+  mask:
+    radial-gradient(circle var(--tl) at 0 0, #0000 98%, #000) top left / 51% 51% no-repeat,
+    radial-gradient(circle var(--tr) at 100% 0, #0000 98%, #000) top right / 51% 51% no-repeat,
+    radial-gradient(circle var(--bl) at 0 100%, #0000 98%, #000) bottom left / 51% 51% no-repeat,
+    radial-gradient(circle var(--br) at 100% 100%, #0000 98%, #000) bottom right / 51% 51% no-repeat;
+}
+
+.tk-part--top {
+  --tl: var(--notch);
+  --tr: var(--notch);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.tk-part--bottom {
+  --bl: var(--notch);
+  --br: var(--notch);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* 절취선 */
+.tk-part--top::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: calc(var(--notch) + 8px);
+  right: calc(var(--notch) + 8px);
+  border-top: 2px dashed #dedbe6;
+}
+
+.ticket__poster {
+  display: block;
+  width: calc(100% - 20px);
+  max-height: 62vh;
+  margin: 10px 10px 0;
+  border-radius: 14px;
+  object-fit: cover;
+}
+
+.ticket__poster--empty {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 3 / 4;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 30% 25%, rgb(255 255 255 / 0.7), rgb(255 255 255 / 0) 40%),
+    linear-gradient(160deg, rgb(var(--glow)), rgb(var(--glow) / 0.45));
+  color: #fff;
+  font-size: 26px;
+  font-weight: 900;
+  text-align: center;
+  word-break: keep-all;
+  text-shadow: 0 2px 12px rgb(0 0 0 / 0.2);
+}
+
+.ticket__head {
+  padding: 16px 22px 22px;
+  text-align: center;
+}
+
+.ticket__chip {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgb(var(--glow) / 0.2);
+  color: #4a3f63;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ticket__title {
+  margin: 10px 0 0;
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  word-break: keep-all;
+}
+
+.ticket__venue {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--paper-soft);
+}
+
+.ticket__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 12px;
+  margin: 0;
+  padding: 22px 24px;
+}
+
+.ticket__grid div:nth-child(even) {
+  text-align: right;
+}
+
+.ticket__grid dt {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--paper-soft);
+}
+
+.ticket__grid dd {
+  margin: 4px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+  word-break: keep-all;
+}
+
+.ticket__memo {
+  margin: -4px 24px 22px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f1eff5;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #4a4658;
+  white-space: pre-wrap;
+}
+
+/* 반권: 홀로그램 종이 */
+.ticket__stub {
+  padding: 20px 24px 18px;
+  background:
+    linear-gradient(115deg, rgb(255 255 255 / 0) 30%, rgb(255 255 255 / 0.55) 48%, rgb(255 255 255 / 0) 62%) 0 0 / 250% 100%,
+    linear-gradient(120deg, #c9f1ff 0%, #e4d4ff 35%, #ffd9ec 65%, #fff4c8 100%);
+  animation: sheen 5s ease-in-out infinite;
+}
+
+@keyframes sheen {
+  0%, 100% { background-position: 100% 0, 0 0; }
+  50% { background-position: 0% 0, 0 0; }
+}
+
+.ticket__barcode {
+  display: block;
+  width: 100%;
+  height: 44px;
+  fill: var(--paper-ink);
+}
+
+.ticket__stub-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: #4a4658;
+}
+
+/* ───────── 입력 시트 ───────── */
+
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: linear-gradient(180deg, var(--night-2), var(--night-0) 60%);
+  animation: rise 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+@keyframes rise {
+  from { transform: translateY(100%); }
+}
+
+.sheet__body {
+  display: grid;
+  gap: 18px;
+  padding: calc(env(safe-area-inset-top) + 8px) 20px calc(env(safe-area-inset-bottom) + 24px);
+}
+
+.sheet__head {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  justify-items: start;
+}
+
+.sheet__head h2 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.sheet__foot {
+  position: sticky;
+  bottom: calc(env(safe-area-inset-bottom) + 12px);
+  padding-top: 8px;
+}
+
+.poster-pick {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+
+.poster-pick__frame {
+  display: grid;
+  place-items: center;
+  width: 150px;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--glass);
+  border: 1px dashed var(--glass-line);
+}
+
+.poster-pick__frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.poster-pick__hint {
+  padding: 16px;
+  font-size: 13px;
+  color: var(--ink-faint);
+  text-align: center;
+}
+
+.poster-pick__actions {
+  display: flex;
+  gap: 6px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.field > span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid var(--glass-line);
+  border-radius: 14px;
+  background: var(--glass);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px; /* 16px 미만이면 iOS가 입력할 때 화면을 확대한다 */
+  outline: none;
+}
+
+.field input:focus,
+.field textarea:focus {
+  border-color: rgb(var(--amber) / 0.7);
+  box-shadow: 0 0 0 3px rgb(var(--amber) / 0.15);
+}
+
+.field textarea {
+  resize: none;
+  line-height: 1.5;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid var(--glass-line);
+  border-radius: 999px;
+  background: var(--glass);
+  font-size: 14px;
+}
+
+.chip.is-active {
+  border-color: rgb(var(--amber));
+  background: rgb(var(--amber) / 0.18);
+  color: rgb(var(--amber));
+}
+
+/* ───────── 버튼 ───────── */
 
 .btn {
   min-height: 48px;
-  padding: 0 16px;
-  border: 1px solid rgb(127 127 127 / 0.3);
-  border-radius: 12px;
-  background: var(--bg);
-  color: var(--fg);
-  font: inherit;
+  padding: 0 20px;
+  border: 1px solid transparent;
+  border-radius: 999px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .btn:disabled {
   opacity: 0.5;
 }
 
-.btn--primary {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: #fff;
+.btn--small {
+  min-height: 40px;
+  padding: 0 14px;
+  font-size: 14px;
 }
 
-.btn--danger {
-  border-color: #d64545;
-  background: #d64545;
-  color: #fff;
+.btn--ghost {
+  border-color: var(--glass-line);
+  background: var(--glass);
 }
 
-.add-bar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  padding: 12px 16px calc(env(safe-area-inset-bottom) + 12px);
-  background: var(--bg);
-  border-top: 1px solid rgb(127 127 127 / 0.2);
+.btn--light {
+  background: var(--paper);
+  color: var(--paper-ink);
 }
 
-.viewer {
-  position: fixed;
-  inset: 0;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background: #000;
-}
-
-.viewer__img {
-  flex: 1;
-  min-height: 0;
+.btn--glow {
   width: 100%;
-  object-fit: contain;
-  padding-top: env(safe-area-inset-top);
+  min-height: 54px;
+  background: radial-gradient(circle at 30% 20%, #fff3dc, rgb(var(--amber)) 70%);
+  color: var(--night-0);
+  font-size: 16px;
+  box-shadow: 0 0 26px rgb(var(--amber) / 0.45);
 }
 
-.viewer__bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px calc(env(safe-area-inset-bottom) + 12px);
-  color: #fff;
-}
+/* ───────── 토스트 ───────── */
 
-.viewer__info {
-  flex: 1;
-  font-size: 13px;
-}
-
-.viewer__info small {
-  opacity: 0.6;
-}
-
-/* 하단 버튼 바 위에 뜬다 */
+/* 위쪽에 띄운다 — 아래엔 도크가, 가운데엔 티켓이 있다 */
 .toast {
   position: fixed;
   left: 16px;
   right: 16px;
-  bottom: calc(env(safe-area-inset-bottom) + 88px);
-  z-index: 20;
+  top: calc(env(safe-area-inset-top) + 12px);
+  z-index: 40;
   display: flex;
   align-items: center;
   gap: 12px;
   min-height: 48px;
   padding: 8px 8px 8px 16px;
-  border-radius: 14px;
-  background: var(--fg);
-  color: var(--bg);
+  border-radius: 16px;
+  background: rgb(244 240 255 / 0.94);
+  color: var(--night-0);
   font-size: 14px;
-  box-shadow: 0 8px 24px rgb(0 0 0 / 0.2);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
   opacity: 0;
-  transform: translateY(16px);
+  transform: translateY(-16px);
   transition: opacity 0.2s ease-out, transform 0.25s ease-out;
 }
 
@@ -182,9 +815,17 @@ body {
   min-height: 44px;
   padding: 0 14px;
   border: 0;
-  border-radius: 10px;
-  background: var(--accent);
+  border-radius: 12px;
+  background: var(--night-1);
   color: #fff;
-  font: inherit;
   font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
