@@ -1,6 +1,7 @@
 import Dexie, { type Table } from 'dexie'
 import type { ProcessedImage } from '@/lib/image'
 import type { CategoryId } from '@/lib/categories'
+import type { CurrencyId } from '@/lib/currencies'
 
 /**
  * 티켓 한 장. 밤하늘을 그릴 때는 이것만 읽는다 —
@@ -16,8 +17,9 @@ export interface Ticket {
   time?: string
   venue?: string
   seat?: string
-  /** 원 단위 */
   price?: number
+  /** 금액의 통화. 없으면 원화 (v1 시절 티켓) */
+  currency?: CurrencyId
   memo?: string
   /** 별 안에 비치는 작은 포스터 */
   thumb?: Blob
@@ -34,7 +36,10 @@ export interface Poster {
   blob: Blob
 }
 
-export type TicketInput = Pick<Ticket, 'title' | 'category' | 'date' | 'time' | 'venue' | 'seat' | 'price' | 'memo'>
+export type TicketInput = Pick<
+  Ticket,
+  'title' | 'category' | 'date' | 'time' | 'venue' | 'seat' | 'price' | 'currency' | 'memo'
+>
 
 class KeepingGemDB extends Dexie {
   tickets!: Table<Ticket, string>

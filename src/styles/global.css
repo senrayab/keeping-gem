@@ -1108,6 +1108,46 @@ svg.dock__icon {
   line-height: 1.5;
 }
 
+/* 금액 칸: 통화 고르기 + 숫자 입력이 한 칸처럼 보이게 */
+.money {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  border: 1px solid var(--glass-line);
+  border-radius: 14px;
+  background: var(--glass);
+}
+
+.money:focus-within {
+  border-color: rgb(var(--amber) / 0.7);
+  box-shadow: 0 0 0 3px rgb(var(--amber) / 0.15);
+}
+
+.money__currency {
+  flex: none;
+  height: 46px;
+  padding: 0 2px 0 10px;
+  border: 0;
+  background: none;
+  color: rgb(var(--amber));
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  outline: none;
+}
+
+.money__input {
+  flex: 1;
+  min-width: 0;
+  padding: 0 12px 0 4px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+}
+
 .field-row {
   display: grid;
   grid-template-columns: 1fr 1fr;

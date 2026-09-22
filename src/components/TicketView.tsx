@@ -1,7 +1,8 @@
 import type { CSSProperties } from 'react'
 import type { Ticket } from '@/db/db'
 import { categoryOf } from '@/lib/categories'
-import { formatDate, formatPrice } from '@/lib/format'
+import { formatMoney } from '@/lib/currencies'
+import { formatDate } from '@/lib/format'
 // 일련번호·바코드는 저장 이미지(lib/ticketImage.ts)와 아래 주석 처리된 조각이 쓴다
 
 /**
@@ -65,7 +66,7 @@ export function TicketView({ ticket, posterUrl, onPosterOpen }: TicketViewProps)
           </div>
           <div>
             <dt>PRICE</dt>
-            <dd>{ticket.price != null ? formatPrice(ticket.price) : '—'}</dd>
+            <dd>{ticket.price != null ? formatMoney(ticket.price, ticket.currency) : '—'}</dd>
           </div>
         </dl>
         {ticket.memo && <p className="ticket__memo">{ticket.memo}</p>}

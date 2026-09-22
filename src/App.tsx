@@ -1,7 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useMemo, useState } from 'react'
 import { db, type Ticket } from './db/db'
-import { formatPrice } from './lib/format'
+import { sumByCurrency } from './lib/currencies'
 import { BackupSheet } from './components/BackupSheet'
 import { DbNotice } from './components/DbNotice'
 import { EMPTY_FILTER, matches, SearchPanel, type Filter } from './components/SearchPanel'
@@ -45,7 +45,7 @@ export function App() {
     setOpened({ id: pick.id })
   }
 
-  const total = tickets?.reduce((sum, t) => sum + (t.price ?? 0), 0) ?? 0
+  const total = sumByCurrency(tickets ?? [])
   const oldest = tickets?.[tickets.length - 1]?.date.slice(0, 4)
 
   return (
@@ -64,7 +64,7 @@ export function App() {
         {tickets && tickets.length > 0 && (
           <p className="app-header__stats">
             {oldest}년부터 별 {tickets.length}개
-            {total > 0 && <span className="app-header__spend"> · {formatPrice(total)}어치의 추억</span>}
+            {total && <span className="app-header__spend"> · {total}어치의 추억</span>}
           </p>
         )}
       </header>

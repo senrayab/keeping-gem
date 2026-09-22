@@ -6,6 +6,7 @@ import { useScrollLock } from '@/hooks/useScrollLock'
 import { useDraft } from '@/hooks/useDraft'
 import { useObjectUrl } from '@/hooks/useObjectUrl'
 import { CATEGORIES, type CategoryId } from '@/lib/categories'
+import { CURRENCIES, currencyOf, DEFAULT_CURRENCY, type CurrencyId } from '@/lib/currencies'
 import { today } from '@/lib/format'
 import { processImage, type ProcessedImage } from '@/lib/image'
 import { useToast } from './Toast'
@@ -31,9 +32,10 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
     venue: ticket?.venue ?? '',
     seat: ticket?.seat ?? '',
     price: ticket?.price != null ? String(ticket.price) : '',
+    currency: (ticket?.currency ?? DEFAULT_CURRENCY) as CurrencyId,
     memo: ticket?.memo ?? '',
   })
-  const { title, category, date, time, venue, seat, price, memo } = fields
+  const { title, category, date, time, venue, seat, price, currency, memo } = fields
 
   // undefined: 그대로, null: 지움, 값: 새 포스터
   const [poster, setPoster] = useState<ProcessedImage | null | undefined>(undefined)
@@ -77,7 +79,7 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
     }
     setSaving(true)
     try {
-      const digits = price.replace(/\D/g, '')
+      const amount = Number(price)
       const id = await saveTicket(
         {
           title: title.trim(),
@@ -86,7 +88,8 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
           time: time || undefined,
           venue: venue.trim() || undefined,
           seat: seat.trim() || undefined,
-          price: digits ? Number(digits) : undefined,
+          price: price && Number.isFinite(amount) ? amount : undefined,
+          currency: price ? currency : undefined,
           memo: memo.trim() || undefined,
         },
         poster,
@@ -102,7 +105,22 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
     }
   }
 
-  const priceDisplay = price ? Number(price.replace(/\D/g, '') || 0).toLocaleString('ko-KR') : ''
+  /*
+   * 금액 입력: 숫자와(통화에 따라) 소수점만 받는다.
+   * 정수 부분에만 천 단위 쉼표를 넣고, 찍는 중인 소수점('12.')은 그대로 둔다.
+   */
+  const decimals = currencyOf(currency).decimals
+  const onPrice = (value: string) => {
+    let next = value.replace(decimals > 0 ? /[^\d.]/g : /\D/g, '')
+    const dot = next.indexOf('.')
+    // 소수점은 하나만, 소수 자릿수는 통화에 맞춰 자른다
+    if (dot >= 0) next = `${next.slice(0, dot)}.${next.slice(dot + 1).replace(/\./g, '').slice(0, decimals)}`
+    setFields({ price: next })
+  }
+  const [whole, fraction] = price.split('.')
+  const priceDisplay = price
+    ? Number(whole || 0).toLocaleString('ko-KR') + (fraction === undefined ? '' : `.${fraction}`)
+    : ''
 
   return (
     <div className="sheet" role="dialog" aria-modal="true" aria-label={ticket ? '티켓 수정' : '티켓 추가'}>
@@ -197,15 +215,31 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
             <span>좌석</span>
             <input value={seat} onChange={(e) => setFields({ seat: e.target.value })} placeholder="1층 A구역 12열 7번" />
           </label>
-          <label className="field">
+          <div className="field">
             <span>금액</span>
-            <input
-              inputMode="numeric"
-              value={priceDisplay}
-              onChange={(e) => setFields({ price: e.target.value.replace(/\D/g, '') })}
-              placeholder="0"
-            />
-          </label>
+            <div className="money">
+              <select
+                className="money__currency"
+                value={currency}
+                onChange={(e) => setFields({ currency: e.target.value as CurrencyId })}
+                aria-label="통화"
+              >
+                {CURRENCIES.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.symbol}
+                  </option>
+                ))}
+              </select>
+              <input
+                className="money__input"
+                inputMode={decimals > 0 ? 'decimal' : 'numeric'}
+                value={priceDisplay}
+                onChange={(e) => onPrice(e.target.value)}
+                placeholder="0"
+                aria-label="금액"
+              />
+            </div>
+          </div>
         </div>
 
         <label className="field">

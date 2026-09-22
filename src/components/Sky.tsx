@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import type { Ticket } from '@/db/db'
 import { useObjectUrl } from '@/hooks/useObjectUrl'
 import { categoryOf } from '@/lib/categories'
-import { formatPrice, formatShortDate } from '@/lib/format'
+import { sumByCurrency } from '@/lib/currencies'
+import { formatShortDate } from '@/lib/format'
 import { seeded } from '@/lib/seed'
 
 /*
@@ -96,10 +97,10 @@ export function Sky({ tickets, returning, onOpen }: SkyProps) {
   )
 }
 
-/** 그해 티켓 금액의 합. 금액을 적은 티켓이 없으면 아무것도 보이지 않는다. */
+/** 그해 티켓 금액의 합. 통화가 섞이면 통화별로 나란히 적는다. */
 function YearSpend({ list }: { list: Ticket[] }) {
-  const total = list.reduce((sum, t) => sum + (t.price ?? 0), 0)
-  return total > 0 ? <> · {formatPrice(total)}</> : null
+  const total = sumByCurrency(list)
+  return total ? <> · {total}</> : null
 }
 
 /** 같은 해의 별을 날짜 순으로 잇는 옅은 선 */
