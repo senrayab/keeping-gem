@@ -757,7 +757,8 @@ svg.dock__icon {
   padding: 22px 20px 16px;
   border: 1px solid var(--glass-line);
   border-radius: 22px;
-  background: linear-gradient(180deg, var(--night-2), var(--night-1));
+  /* 밤하늘 보랏빛을 섞지 않은 검은 바탕 — 확인창은 잠깐 멈춰 읽는 곳이라 조용해야 한다 */
+  background: #0a0a0c;
   box-shadow: 0 20px 50px rgb(0 0 0 / 0.55);
   text-align: center;
 }
