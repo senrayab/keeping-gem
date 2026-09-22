@@ -680,6 +680,12 @@ svg.dock__icon {
   --tr: var(--notch);
   border-top-left-radius: 0;
   border-top-right-radius: 0;
+  /*
+   * 위 조각과 1px 겹쳐 둔다.
+   * 조각은 따로 그려지므로 화면 배율에 따라 사이에 1px 틈이 생기고,
+   * 그 틈으로 뒤의 밤하늘이 비쳐 점선이 들떠 보였다. 겹쳐 두면 틈이 생기지 않는다.
+   */
+  margin-top: -1px;
 }
 
 .tk-part--bottom {
@@ -693,7 +699,8 @@ svg.dock__icon {
 .tk-part--top::before {
   content: '';
   position: absolute;
-  top: 0;
+  /* 1px 겹친 만큼 내려 점선이 두 조각의 경계 한가운데 오게 한다 */
+  top: 1px;
   left: calc(var(--notch) + 8px);
   right: calc(var(--notch) + 8px);
   border-top: 2px dashed #dedbe6;
