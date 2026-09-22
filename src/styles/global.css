@@ -902,6 +902,11 @@ svg.dock__icon {
   justify-items: start;
 }
 
+/* 오른쪽 칸에 온 것은 오른쪽 끝에 붙인다 */
+.sheet__head > :last-child {
+  justify-self: end;
+}
+
 .sheet__head h2 {
   margin: 0;
   font-size: 17px;
