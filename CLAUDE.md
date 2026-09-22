@@ -8,7 +8,9 @@
 
 - `src/main.tsx`, `src/App.tsx` — 앱 진입점
 - `src/components/` — 화면 조각 (`UpdateToast.tsx`: 새 배포 새로고침 안내)
-- `src/lib/` — 화면과 무관한 로직
+- `src/lib/` — 화면과 무관한 로직 (`image.ts`: 사진 → WebP 변환, 긴 변 2000px)
+- `src/db/` — IndexedDB(Dexie). 사진은 서버로 보내지 않고 기기 안에만 저장한다
+- `src/hooks/` — React 훅
 - `src/styles/global.css` — 전역 스타일
 - `public/` — 그대로 복사되는 파일 (아이콘)
 - `vite.config.ts` — 빌드·PWA(manifest, 서비스 워커) 설정
