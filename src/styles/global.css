@@ -501,11 +501,31 @@ svg.dock__icon {
 }
 
 .detail__actions {
+  display: grid;
+  gap: 10px;
+  width: min(340px, 100%);
+  margin: 22px auto 0;
+  animation: fade-in 0.4s 0.25s ease-out backwards;
+}
+
+.detail__share {
+  display: flex;
+  gap: 8px;
+}
+
+.detail__share .btn--glow {
+  flex: 1;
+  width: auto;
+}
+
+.detail__row {
   display: flex;
   justify-content: center;
   gap: 8px;
-  margin-top: 20px;
-  animation: fade-in 0.4s 0.25s ease-out backwards;
+}
+
+.detail__row .btn {
+  flex: 1;
 }
 
 /* ───────── 티켓 ───────── */

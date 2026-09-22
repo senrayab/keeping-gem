@@ -23,3 +23,16 @@ export function ticketNumber(id: string, date: string): string {
   const tail = Array.from({ length: 6 }, () => Math.floor(rand() * 10)).join('')
   return `KG${date.replaceAll('-', '')}${tail}`
 }
+
+/** 티켓마다 모양이 다른 바코드 막대(가로 200칸 기준). 화면과 저장 이미지가 같은 모양을 쓴다. */
+export function barcodeBars(key: string): { x: number; w: number }[] {
+  const rand = seeded(key)
+  const bars: { x: number; w: number }[] = []
+  let x = 0
+  while (x < 200) {
+    const w = 1 + Math.floor(rand() * 3)
+    bars.push({ x, w })
+    x += w + 1 + Math.floor(rand() * 3)
+  }
+  return bars
+}
