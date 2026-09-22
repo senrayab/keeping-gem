@@ -312,9 +312,8 @@ export async function renderTicketImage(ticket: Ticket, poster?: Blob): Promise<
   spacing(ctx, 3)
   ctx.fillStyle = '#4a4658'
   ctx.textAlign = 'left'
+  // 'ADMIT ONE'은 뜻 없는 문구라 넣지 않는다. 일련번호만 바코드 아래에 남긴다.
   ctx.fillText(ticketNumber(ticket.id, ticket.date), barX, barY + 160)
-  ctx.textAlign = 'right'
-  ctx.fillText('ADMIT ONE', TICKET_X + TICKET_W - PAD, barY + 160)
 
   // ── 9. 서명 ──
   ctx.textAlign = 'center'
