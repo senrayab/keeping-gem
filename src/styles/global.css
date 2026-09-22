@@ -908,42 +908,52 @@ svg.dock__icon {
 /* 위쪽에 띄운다 — 아래엔 도크가, 가운데엔 티켓이 있다 */
 .toast {
   position: fixed;
-  left: 16px;
-  right: 16px;
-  top: calc(env(safe-area-inset-top) + 12px);
+  left: 50%;
+  top: calc(env(safe-area-inset-top) + 10px);
   z-index: 40;
   display: flex;
   align-items: center;
-  gap: 12px;
-  min-height: 48px;
-  padding: 8px 8px 8px 16px;
-  border-radius: 16px;
-  background: rgb(244 240 255 / 0.94);
+  gap: 8px;
+  /* 글자만큼만 차지하는 작은 알약 — 화면을 가로로 덮지 않는다 */
+  width: max-content;
+  max-width: calc(100% - 32px);
+  min-height: 34px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgb(244 240 255 / 0.92);
   color: var(--night-0);
-  font-size: 14px;
-  box-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.3);
   opacity: 0;
-  transform: translateY(-16px);
+  transform: translate(-50%, -12px);
   transition: opacity 0.2s ease-out, transform 0.25s ease-out;
 }
 
 .toast.show {
   opacity: 1;
-  transform: translateY(0);
+  transform: translate(-50%, 0);
 }
 
 .toast span {
   flex: 1;
 }
 
+/* 버튼이 붙은 토스트(새 버전 안내)는 버튼 쪽 여백을 줄여 알약 모양을 유지한다 */
+.toast:has(button) {
+  padding-right: 4px;
+}
+
 .toast button {
-  min-height: 44px;
-  padding: 0 14px;
+  min-height: 28px;
+  padding: 0 12px;
   border: 0;
-  border-radius: 12px;
+  border-radius: 999px;
   background: var(--night-1);
   color: #fff;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 /* ───────── 저장소 안내 ───────── */
