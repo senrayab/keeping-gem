@@ -79,11 +79,12 @@ export function BackupSheet({ onClose }: { onClose: () => void }) {
     <div className="sheet" role="dialog" aria-modal="true" aria-label="보관함">
       <div className="sheet__body">
         <header className="sheet__head">
+          {/* 닫기는 여는 버튼(머리말 오른쪽 위)과 같은 쪽에 둔다 */}
+          <span />
+          <h2>보관함</h2>
           <button type="button" className="btn btn--ghost btn--small" onClick={onClose}>
             닫기
           </button>
-          <h2>보관함</h2>
-          <span />
         </header>
 
         <section className="vault">
