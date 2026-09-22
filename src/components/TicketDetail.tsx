@@ -5,6 +5,7 @@ import { useBackClose } from '@/hooks/useBackClose'
 import { useObjectUrl } from '@/hooks/useObjectUrl'
 import { canShareFiles, download, isShareCancel } from '@/lib/download'
 import { renderTicketImage, ticketFileName } from '@/lib/ticketImage'
+import { PosterViewer } from './PosterViewer'
 import { TicketView } from './TicketView'
 import { useToast } from './Toast'
 
@@ -45,6 +46,7 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
   }, [ticket, poster])
 
   const shareable = image !== null && canShareFiles(image)
+  const [posterOpen, setPosterOpen] = useState(false)
 
   const share = async () => {
     if (!image) return
@@ -80,32 +82,47 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
     <div className="detail" role="dialog" aria-modal="true" aria-label={`${ticket.title} 티켓`} onClick={onClose}>
       <div className="detail__scroll">
         <div className="detail__ticket" style={origin as CSSProperties} onClick={(e) => e.stopPropagation()}>
-          <TicketView ticket={ticket} posterUrl={posterUrl} />
-        </div>
-        <div className="detail__actions" onClick={(e) => e.stopPropagation()}>
-          <div className="detail__share">
-            <button className="btn btn--glow" disabled={!image} onClick={save}>
-              {image ? '이미지 저장' : '이미지 만드는 중…'}
-            </button>
-            {shareable && (
-              <button className="btn btn--light" onClick={() => void share()}>
-                공유하기
-              </button>
-            )}
-          </div>
-          <div className="detail__row">
-            <button className="btn btn--ghost" onClick={() => void remove()}>
-              삭제
-            </button>
-            <button className="btn btn--ghost" onClick={onEdit}>
-              수정
-            </button>
-            <button className="btn btn--ghost" onClick={onClose}>
-              닫기
-            </button>
-          </div>
+          <TicketView ticket={ticket} posterUrl={posterUrl} onPosterOpen={() => setPosterOpen(true)} />
         </div>
       </div>
+
+      {/* 스크롤하지 않아도 늘 보이도록 아래에 붙인 버튼 줄 */}
+      <nav className="detail__actions" aria-label="티켓 동작" onClick={(e) => e.stopPropagation()}>
+        <button className="action action--primary" disabled={!image} onClick={save}>
+          <Icon d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14" />
+          {image ? '이미지 저장' : '만드는 중…'}
+        </button>
+        {shareable && (
+          <button className="action" onClick={() => void share()}>
+            <Icon d="M12 15V4m0 0L8 8m4-4 4 4M6 12v6.5A1.5 1.5 0 0 0 7.5 20h9a1.5 1.5 0 0 0 1.5-1.5V12" />
+            공유
+          </button>
+        )}
+        <button className="action" onClick={onEdit}>
+          <Icon d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4Z" />
+          수정
+        </button>
+        <button className="action" onClick={() => void remove()}>
+          <Icon d="M5 7h14M10 11v6m4-6v6M6 7l1 12.5A1.5 1.5 0 0 0 8.5 21h7a1.5 1.5 0 0 0 1.5-1.5L18 7M9 7V4.5h6V7" />
+          삭제
+        </button>
+        <button className="action" onClick={onClose}>
+          <Icon d="M6 6l12 12M18 6 6 18" />
+          닫기
+        </button>
+      </nav>
+
+      {posterOpen && posterUrl && (
+        <PosterViewer url={posterUrl} title={ticket.title} onClose={() => setPosterOpen(false)} />
+      )}
     </div>
+  )
+}
+
+function Icon({ d }: { d: string }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d={d} />
+    </svg>
   )
 }

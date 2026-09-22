@@ -507,7 +507,8 @@ svg.dock__icon {
   height: 100%;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: calc(env(safe-area-inset-top) + 28px) 20px calc(env(safe-area-inset-bottom) + 28px);
+  /* 아래 버튼 줄(약 64px)에 티켓 끝이 가리지 않도록 그만큼 비운다 */
+  padding: calc(env(safe-area-inset-top) + 20px) 20px calc(env(safe-area-inset-bottom) + 96px);
 }
 
 /* 누른 별 자리에서 작게 시작해 화면 가운데로 펼쳐진다 */
@@ -526,31 +527,80 @@ svg.dock__icon {
 }
 
 .detail__actions {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(env(safe-area-inset-bottom) + 12px);
+  display: flex;
+  gap: 2px;
+  padding: 5px;
+  border-radius: 22px;
+  background: rgb(20 16 38 / 0.82);
+  border: 1px solid var(--glass-line);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.45);
+  animation: fade-in 0.4s 0.2s ease-out backwards;
+}
+
+.action {
+  flex: 1;
   display: grid;
-  gap: 10px;
-  width: min(340px, 100%);
-  margin: 22px auto 0;
-  animation: fade-in 0.4s 0.25s ease-out backwards;
+  justify-items: center;
+  gap: 3px;
+  min-height: 52px;
+  padding: 7px 2px 6px;
+  border: 0;
+  border-radius: 16px;
+  background: none;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
-.detail__share {
-  display: flex;
-  gap: 8px;
+.action:active {
+  background: var(--glass);
 }
 
-.detail__share .btn--glow {
-  flex: 1;
-  width: auto;
+.action:disabled {
+  opacity: 0.45;
 }
 
-.detail__row {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
+.action svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.detail__row .btn {
-  flex: 1;
+/* 저장이 가장 자주 쓰는 동작 — 앱의 빛 색으로 도드라지게 */
+.action--primary {
+  flex: 1.4;
+  background: rgb(var(--amber) / 0.16);
+  color: rgb(var(--amber));
+}
+
+/* ───────── 포스터 크게 보기 ───────── */
+
+.poster-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  display: grid;
+  place-items: center;
+  padding: calc(env(safe-area-inset-top) + 16px) 12px calc(env(safe-area-inset-bottom) + 16px);
+  background: rgb(0 0 0 / 0.92);
+  animation: fade-in 0.2s ease-out;
+}
+
+.poster-viewer img {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 12px;
+  object-fit: contain;
 }
 
 /* ───────── 티켓 ───────── */
@@ -610,19 +660,53 @@ svg.dock__icon {
   border-top: 2px dashed #dedbe6;
 }
 
-.ticket__poster {
+/*
+ * 화면에서는 포스터를 화면 높이의 38%까지만 보여준다(가운데 윗부분 위주로 잘림).
+ * 포스터를 다 보이면 티켓이 한 화면을 훌쩍 넘어 스크롤이 길어진다.
+ * 전체는 눌러서 크게 보거나, 저장한 이미지에서 볼 수 있다.
+ */
+.ticket__poster-btn {
+  position: relative;
   display: block;
   width: calc(100% - 20px);
-  max-height: 62vh;
   margin: 10px 10px 0;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.ticket__poster {
+  display: block;
+  width: 100%;
+  height: min(38vh, 330px);
   border-radius: 14px;
   object-fit: cover;
+  object-position: center 30%;
+}
+
+.ticket__poster--empty {
+  width: calc(100% - 20px);
+  margin: 10px 10px 0;
+}
+
+.ticket__poster-hint {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.5);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 .ticket__poster--empty {
   display: grid;
   place-items: center;
-  aspect-ratio: 3 / 4;
+  height: min(26vh, 220px);
   padding: 24px;
   background:
     radial-gradient(circle at 30% 25%, rgb(255 255 255 / 0.7), rgb(255 255 255 / 0) 40%),
@@ -636,7 +720,7 @@ svg.dock__icon {
 }
 
 .ticket__head {
-  padding: 16px 22px 22px;
+  padding: 12px 20px 16px;
   text-align: center;
 }
 
@@ -651,15 +735,15 @@ svg.dock__icon {
 }
 
 .ticket__title {
-  margin: 10px 0 0;
-  font-size: 21px;
+  margin: 8px 0 0;
+  font-size: 20px;
   font-weight: 800;
   letter-spacing: -0.02em;
   word-break: keep-all;
 }
 
 .ticket__venue {
-  margin: 6px 0 0;
+  margin: 4px 0 0;
   font-size: 13px;
   color: var(--paper-soft);
 }
@@ -667,9 +751,9 @@ svg.dock__icon {
 .ticket__grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px 12px;
+  gap: 12px 12px;
   margin: 0;
-  padding: 22px 24px;
+  padding: 16px 22px;
 }
 
 .ticket__grid div:nth-child(even) {
@@ -691,8 +775,8 @@ svg.dock__icon {
 }
 
 .ticket__memo {
-  margin: -4px 24px 22px;
-  padding: 12px 14px;
+  margin: -2px 22px 16px;
+  padding: 10px 12px;
   border-radius: 12px;
   background: #f1eff5;
   font-size: 13px;
@@ -703,7 +787,7 @@ svg.dock__icon {
 
 /* 반권: 홀로그램 종이 */
 .ticket__stub {
-  padding: 20px 24px 18px;
+  padding: 14px 22px 12px;
   background:
     linear-gradient(115deg, rgb(255 255 255 / 0) 30%, rgb(255 255 255 / 0.55) 48%, rgb(255 255 255 / 0) 62%) 0 0 / 250% 100%,
     linear-gradient(120deg, #c9f1ff 0%, #e4d4ff 35%, #ffd9ec 65%, #fff4c8 100%);
@@ -718,14 +802,14 @@ svg.dock__icon {
 .ticket__barcode {
   display: block;
   width: 100%;
-  height: 44px;
+  height: 34px;
   fill: var(--paper-ink);
 }
 
 .ticket__stub-row {
   display: flex;
   justify-content: space-between;
-  margin-top: 8px;
+  margin-top: 6px;
   font-family: var(--mono);
   font-size: 10px;
   letter-spacing: 0.12em;
