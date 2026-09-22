@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import type { Ticket } from '@/db/db'
 import { useObjectUrl } from '@/hooks/useObjectUrl'
 import { categoryOf } from '@/lib/categories'
-import { formatShortDate } from '@/lib/format'
+import { formatPrice, formatShortDate } from '@/lib/format'
 import { seeded } from '@/lib/seed'
 
 /*
@@ -71,7 +71,10 @@ export function Sky({ tickets, onOpen }: SkyProps) {
           >
             <header className="band__head">
               <h2 className="band__year">{year}</h2>
-              <span className="band__count">{list.length}개의 별</span>
+              <span className="band__count">
+                {list.length}개의 별
+                <YearSpend list={list} />
+              </span>
             </header>
             <Constellation list={list} />
             {list.map((ticket, i) => (
@@ -83,6 +86,12 @@ export function Sky({ tickets, onOpen }: SkyProps) {
       {years.length > 1 && <YearRail years={years.map(([year]) => year)} />}
     </>
   )
+}
+
+/** 그해 티켓 금액의 합. 금액을 적은 티켓이 없으면 아무것도 보이지 않는다. */
+function YearSpend({ list }: { list: Ticket[] }) {
+  const total = list.reduce((sum, t) => sum + (t.price ?? 0), 0)
+  return total > 0 ? <> · {formatPrice(total)}</> : null
 }
 
 /** 같은 해의 별을 날짜 순으로 잇는 옅은 선 */

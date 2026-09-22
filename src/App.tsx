@@ -56,7 +56,8 @@ export function App() {
         <h1 className="app-header__title">추억의 밤하늘</h1>
         {tickets && tickets.length > 0 && (
           <p className="app-header__stats">
-            {oldest}년부터 별 {tickets.length}개{total > 0 && ` · ${formatPrice(total)}어치의 추억`}
+            {oldest}년부터 별 {tickets.length}개
+            {total > 0 && <span className="app-header__spend"> · {formatPrice(total)}어치의 추억</span>}
           </p>
         )}
       </header>
