@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { db, type Ticket } from './db/db'
 import { formatPrice } from './lib/format'
 import { BackupSheet } from './components/BackupSheet'
@@ -20,6 +20,13 @@ export function App() {
   const [editing, setEditing] = useState<Editing>(null)
   const [searching, setSearching] = useState(false)
   const [vault, setVault] = useState(false)
+  // 상세보기를 닫고 돌아왔을 때 잠깐 밝혀 둘 별
+  const [returning, setReturning] = useState<string | null>(null)
+  useEffect(() => {
+    if (!returning) return
+    const timer = window.setTimeout(() => setReturning(null), 1500)
+    return () => window.clearTimeout(timer)
+  }, [returning])
   const [filter, setFilter] = useState<Filter>(EMPTY_FILTER)
 
   const filtering = searching && (filter.query.trim() !== '' || filter.category !== 'all')
@@ -90,7 +97,7 @@ export function App() {
           </p>
         )}
         {visible && visible.length > 0 && (
-          <Sky tickets={visible} onOpen={(ticket, from) => setOpened({ id: ticket.id, from })} />
+          <Sky tickets={visible} returning={returning} onOpen={(ticket, from) => setOpened({ id: ticket.id, from })} />
         )}
       </main>
 
@@ -122,7 +129,10 @@ export function App() {
           ticket={openedTicket}
           from={opened.from}
           onEdit={() => setEditing({ ticket: openedTicket })}
-          onClose={() => setOpened(null)}
+          onClose={() => {
+            setReturning(openedTicket.id)
+            setOpened(null)
+          }}
         />
       )}
 

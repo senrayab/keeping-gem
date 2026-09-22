@@ -28,6 +28,13 @@ html {
   background: var(--night-0);
 }
 
+/* 겹친 화면이 떠 있는 동안 뒤의 밤하늘을 멈춘다 (useScrollLock) */
+html.is-locked,
+html.is-locked body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 html,
 body {
   margin: 0;
@@ -255,6 +262,17 @@ button {
     0 0 18px 2px rgb(var(--glow) / 0.55),
     0 0 56px 8px rgb(var(--glow) / 0.28);
   transition: transform 0.2s ease;
+}
+
+/* 상세보기를 닫고 돌아왔을 때, 방금 본 별을 잠깐 밝혀 자리를 알려준다 */
+.star.is-returning .star__orb {
+  animation: returning 1.4s ease-out;
+}
+
+@keyframes returning {
+  0% { box-shadow: 0 0 0 0 rgb(var(--glow) / 0.9), 0 0 56px 8px rgb(var(--glow) / 0.28); }
+  35% { box-shadow: 0 0 0 10px rgb(var(--glow) / 0.35), 0 0 80px 22px rgb(var(--glow) / 0.6); }
+  100% { box-shadow: 0 0 18px 2px rgb(var(--glow) / 0.55), 0 0 56px 8px rgb(var(--glow) / 0.28); }
 }
 
 .star:active .star__orb {
@@ -508,17 +526,29 @@ svg.dock__icon {
   from { opacity: 0; }
 }
 
-.detail__scroll {
+/*
+ * 상세보기는 스크롤하지 않는다. 티켓이 화면 높이에 맞춰 들어가도록
+ * 포스터가 남는 높이만큼 늘고 준다 (아래 .ticket__poster-btn).
+ */
+.detail__stage {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   height: 100%;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
   /* 아래 버튼 줄(약 64px)에 티켓 끝이 가리지 않도록 그만큼 비운다 */
-  padding: calc(env(safe-area-inset-top) + 20px) 20px calc(env(safe-area-inset-bottom) + 96px);
+  padding: calc(env(safe-area-inset-top) + 16px) 20px calc(env(safe-area-inset-bottom) + 90px);
 }
 
 /* 누른 별 자리에서 작게 시작해 화면 가운데로 펼쳐진다 */
 .detail__ticket {
+  display: flex;
+  flex-direction: column;
   width: min(340px, 100%);
+  max-height: 100%;
+  min-height: 0;
   margin: 0 auto;
   animation: unfold 0.5s cubic-bezier(0.2, 0.9, 0.25, 1.1);
 }
@@ -612,7 +642,10 @@ svg.dock__icon {
 
 .ticket {
   --notch: 13px;
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 100%;
   filter: drop-shadow(0 0 28px rgb(var(--glow) / 0.35)) drop-shadow(0 18px 30px rgb(0 0 0 / 0.45));
   color: var(--paper-ink);
 }
@@ -622,6 +655,7 @@ svg.dock__icon {
  * 필요한 쪽만 판다 — 위아래 조각의 반원이 만나 절취선 끝의 둥근 구멍이 된다.
  */
 .tk-part {
+  flex: none;
   --tl: 0px;
   --tr: 0px;
   --bl: 0px;
@@ -670,9 +704,19 @@ svg.dock__icon {
  * 포스터를 다 보이면 티켓이 한 화면을 훌쩍 넘어 스크롤이 길어진다.
  * 전체는 눌러서 크게 보거나, 저장한 이미지에서 볼 수 있다.
  */
+/* 포스터가 든 첫 조각만 줄어들 수 있다 — 화면이 작으면 포스터가 먼저 양보한다 */
+.tk-part:first-child {
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
 .ticket__poster-btn {
   position: relative;
   display: block;
+  flex: 0 1 min(38vh, 330px);
+  min-height: 96px;
   width: calc(100% - 20px);
   margin: 10px 10px 0;
   padding: 0;
@@ -683,13 +727,15 @@ svg.dock__icon {
 .ticket__poster {
   display: block;
   width: 100%;
-  height: min(38vh, 330px);
+  height: 100%;
   border-radius: 14px;
   object-fit: cover;
   object-position: center 30%;
 }
 
 .ticket__poster--empty {
+  flex: 0 1 min(26vh, 220px);
+  min-height: 80px;
   width: calc(100% - 20px);
   margin: 10px 10px 0;
 }
@@ -711,7 +757,6 @@ svg.dock__icon {
 .ticket__poster--empty {
   display: grid;
   place-items: center;
-  height: min(26vh, 220px);
   padding: 24px;
   background:
     radial-gradient(circle at 30% 25%, rgb(255 255 255 / 0.7), rgb(255 255 255 / 0) 40%),
@@ -781,13 +826,20 @@ svg.dock__icon {
 
 .ticket__memo {
   margin: -2px 22px 16px;
-  padding: 10px 12px;
+  /* 위아래 여백은 같은 색 테두리로 — 3줄에서 자를 때 4번째 줄이 여백에 비치지 않게 */
+  padding: 0 12px;
+  border-block: 10px solid #f1eff5;
   border-radius: 12px;
   background: #f1eff5;
   font-size: 13px;
   line-height: 1.6;
   color: #4a4658;
   white-space: pre-wrap;
+  /* 길어도 3줄까지만 — 스크롤 없이 한 화면에 들어가도록. 전체는 수정 화면·저장 이미지에 있다 */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
 }
 
 /* 반권: 홀로그램 종이 */

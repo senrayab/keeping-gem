@@ -2,6 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { db, saveTicket, type Ticket } from '@/db/db'
 import { useBackClose } from '@/hooks/useBackClose'
+import { useScrollLock } from '@/hooks/useScrollLock'
 import { useDraft } from '@/hooks/useDraft'
 import { useObjectUrl } from '@/hooks/useObjectUrl'
 import { CATEGORIES, type CategoryId } from '@/lib/categories'
@@ -18,6 +19,7 @@ interface TicketFormProps {
 
 export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
   useBackClose(onClose)
+  useScrollLock()
   const toast = useToast()
 
   // 새 티켓이면 쓰던 내용을 기기에 맡겨 두고, 다시 열면 이어서 쓴다
