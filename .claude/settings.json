@@ -34,7 +34,15 @@
       "PowerShell(gh pr list:*)",
       "PowerShell(gh run list:*)",
       "PowerShell(gh run watch:*)",
-      "PowerShell(gh run view:*)"
+      "PowerShell(gh run view:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run typecheck:*)",
+      "Bash(npm install:*)",
+      "Bash(npm ci:*)",
+      "PowerShell(npm run build:*)",
+      "PowerShell(npm run typecheck:*)",
+      "PowerShell(npm install:*)",
+      "PowerShell(npm ci:*)"
     ]
   }
 }

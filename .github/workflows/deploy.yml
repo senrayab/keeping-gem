@@ -15,25 +15,31 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      # 타입 오류가 있으면 여기서 멈춰 배포되지 않는다
+      - run: npm run build
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Collect site files
-        run: |
-          mkdir _site
-          cp -r index.html style.css app.js sw.js manifest.webmanifest icons _site/
-          BUILD="${GITHUB_SHA::7}"
-          echo "{\"version\":\"$BUILD\"}" > _site/version.json
-          sed -i "s/__BUILD__/$BUILD/" _site/sw.js
-
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site
       - id: deployment
         uses: actions/deploy-pages@v4

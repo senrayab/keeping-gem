@@ -1,26 +1,39 @@
 # keeping-gem
 
-모바일 전용 PWA. 서버 없이 정적 파일(HTML/CSS/JS)만으로 동작하고, GitHub Pages로 배포한다.
+모바일 전용 PWA. 서버 없이 기기 안에서만 동작하고, GitHub Pages로 배포한다.
 사용자는 휴대폰에서 배포 URL을 열고 홈 화면에 설치해서 확인한다.
+구성은 senrayab/poca-archive와 같다: Vite + React + TypeScript + vite-plugin-pwa.
 
 ## 프로젝트 구조
 
-- `index.html`, `style.css`, `app.js` — 앱 본체 (빌드 단계 없음)
-- `manifest.webmanifest` — PWA 설치 정보
-- `sw.js` — 서비스 워커 (네트워크 우선, 오프라인 시 캐시 사용)
-- `icons/` — 앱 아이콘
-- `.github/workflows/deploy.yml` — `main`에 푸시되면 GitHub Pages에 배포
+- `src/main.tsx`, `src/App.tsx` — 앱 진입점
+- `src/components/` — 화면 조각 (`UpdateToast.tsx`: 새 배포 새로고침 안내)
+- `src/lib/` — 화면과 무관한 로직
+- `src/styles/global.css` — 전역 스타일
+- `public/` — 그대로 복사되는 파일 (아이콘)
+- `vite.config.ts` — 빌드·PWA(manifest, 서비스 워커) 설정
+- `.github/workflows/deploy.yml` — `main`에 푸시되면 빌드 후 GitHub Pages에 배포
+
+## 명령
+
+- `npm run dev` — 개발 서버 (같은 Wi-Fi의 휴대폰에서 `http://<PC IP>:5173` 접속 가능)
+- `npm run build` — 타입 검사 + 빌드 (`dist/`)
+- `npm run typecheck` — 타입 검사만
 
 ## 개발 원칙
 
+- TypeScript `strict` 모드. `any`, `@ts-ignore`로 타입 오류를 덮지 않는다.
 - 모바일 화면(폭 360~430px)을 기준으로 만든다. 데스크톱 레이아웃은 신경 쓰지 않는다.
 - 터치 영역은 최소 44px, `env(safe-area-inset-*)`로 노치/홈 바 영역을 피한다.
-- 새 파일을 추가해 오프라인에서도 필요하면 `sw.js`의 `PRECACHE` 목록에 넣는다.
-- 파일 경로는 항상 상대 경로(`./...`)로 쓴다. Pages는 `/keeping-gem/` 하위 경로에서 서비스된다.
+- 앱은 `/keeping-gem/` 하위 경로에서 서비스된다. 경로는 `import.meta.env.BASE_URL` 기준으로 만든다.
 
 ## 작업 완료 후 자동 배포 절차
 
 사용자가 요청한 작업을 끝내면 **따로 묻지 않고** 아래 절차를 끝까지 진행한다.
+
+### 0. 빌드 확인
+
+커밋 전에 `npm run build`가 통과해야 한다. 실패하면 고친 뒤 진행한다.
 
 ### 1. 변경사항 묶기
 
