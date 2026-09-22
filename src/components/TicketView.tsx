@@ -10,7 +10,14 @@ import { barcodeBars, ticketNumber } from '@/lib/seed'
  * 포스터 → 공연 정보 → 절취선 → 좌석·금액 → 절취선 → 홀로그램 반권 순으로 쌓는다.
  * 조각마다 모서리에 반원 홈을 파서(mask), 이어 붙이면 절취선 양 끝에 둥근 구멍이 생긴다.
  */
-export function TicketView({ ticket, posterUrl }: { ticket: Ticket; posterUrl?: string }) {
+interface TicketViewProps {
+  ticket: Ticket
+  posterUrl?: string
+  /** 있으면 포스터를 눌러 크게 볼 수 있다. 화면에서는 포스터를 잘라 짧게 보여주기 때문이다. */
+  onPosterOpen?: () => void
+}
+
+export function TicketView({ ticket, posterUrl, onPosterOpen }: TicketViewProps) {
   const category = categoryOf(ticket.category)
   const glow = ticket.glow ?? category.glow
   const number = ticketNumber(ticket.id, ticket.date)
@@ -19,12 +26,16 @@ export function TicketView({ ticket, posterUrl }: { ticket: Ticket; posterUrl?: 
     <article className="ticket" style={{ '--glow': glow } as CSSProperties}>
       <div className="tk-part tk-part--bottom">
         {posterUrl ? (
-          <img
-            className="ticket__poster"
-            src={posterUrl}
-            alt={`${ticket.title} 포스터`}
-            style={{ aspectRatio: ticket.posterRatio ? String(ticket.posterRatio) : undefined }}
-          />
+          <button
+            type="button"
+            className="ticket__poster-btn"
+            onClick={onPosterOpen}
+            disabled={!onPosterOpen}
+            aria-label={`${ticket.title} 포스터 크게 보기`}
+          >
+            <img className="ticket__poster" src={posterUrl} alt={`${ticket.title} 포스터`} />
+            {onPosterOpen && <span className="ticket__poster-hint">크게 보기</span>}
+          </button>
         ) : (
           <div className="ticket__poster ticket__poster--empty">
             <span>{ticket.title}</span>
