@@ -214,7 +214,7 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
 
         <div className="sheet__foot">
           <button type="submit" className="btn btn--glow" disabled={saving || converting}>
-            {saving ? '저장 중…' : ticket ? '고치기' : '하늘에 띄우기'}
+            {saving ? '저장 중…' : ticket ? '수정 완료' : '하늘에 띄우기'}
           </button>
         </div>
       </form>
