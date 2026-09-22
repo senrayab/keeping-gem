@@ -6,6 +6,7 @@ import { useScrollLock } from '@/hooks/useScrollLock'
 import { useObjectUrl } from '@/hooks/useObjectUrl'
 import { canShareFiles, download, isShareCancel } from '@/lib/download'
 import { renderTicketImage, ticketFileName } from '@/lib/ticketImage'
+import { ConfirmDialog } from './ConfirmDialog'
 import { PosterViewer } from './PosterViewer'
 import { TicketView } from './TicketView'
 import { useToast } from './Toast'
@@ -73,8 +74,10 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
       }
     : {}
 
+  const [confirming, setConfirming] = useState(false)
+
   const remove = async () => {
-    if (!window.confirm(`'${ticket.title}' 티켓을 삭제할까요?`)) return
+    setConfirming(false)
     await deleteTicket(ticket.id)
     onClose()
     toast('별 하나를 떠나보냈어요.')
@@ -104,7 +107,7 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
           <Icon d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4Z" />
           수정
         </button>
-        <button className="action" onClick={() => void remove()}>
+        <button className="action" onClick={() => setConfirming(true)}>
           <Icon d="M5 7h14M10 11v6m4-6v6M6 7l1 12.5A1.5 1.5 0 0 0 8.5 21h7a1.5 1.5 0 0 0 1.5-1.5L18 7M9 7V4.5h6V7" />
           삭제
         </button>
@@ -113,6 +116,17 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
           닫기
         </button>
       </nav>
+
+      {confirming && (
+        <ConfirmDialog
+          title="이 티켓을 삭제할까요?"
+          message={`'${ticket.title}'과 포스터가 함께 지워져요. 되돌릴 수 없어요.`}
+          danger
+          confirmLabel="삭제"
+          onConfirm={() => void remove()}
+          onCancel={() => setConfirming(false)}
+        />
+      )}
 
       {posterOpen && posterUrl && (
         <PosterViewer url={posterUrl} title={ticket.title} onClose={() => setPosterOpen(false)} />

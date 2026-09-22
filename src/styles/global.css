@@ -618,6 +618,64 @@ svg.dock__icon {
   color: rgb(var(--amber));
 }
 
+/* ───────── 확인창 ───────── */
+
+.confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(7 6 13 / 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: fade-in 0.18s ease-out;
+}
+
+.confirm__box {
+  display: grid;
+  gap: 10px;
+  width: min(320px, 100%);
+  padding: 22px 20px 16px;
+  border: 1px solid var(--glass-line);
+  border-radius: 22px;
+  background: linear-gradient(180deg, var(--night-2), var(--night-1));
+  box-shadow: 0 20px 50px rgb(0 0 0 / 0.55);
+  text-align: center;
+}
+
+.confirm__box h2 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.confirm__box p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  word-break: keep-all;
+}
+
+.confirm__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.confirm__row .btn--glow {
+  width: auto;
+  min-height: 48px;
+  font-size: 15px;
+}
+
+.btn--danger {
+  background: #d64545;
+  color: #fff;
+}
+
 /* ───────── 포스터 크게 보기 ───────── */
 
 .poster-viewer {
