@@ -87,17 +87,15 @@ export function TicketView({ ticket, posterUrl, onPosterOpen }: TicketViewProps)
   )
 }
 
-/*
-/** 티켓마다 모양이 다른 바코드. 읽히는 바코드는 아니고 장식이다. */
-function Barcode({ seed }: { seed: string }) {
-  const bars = useMemo(() => barcodeBars(seed), [seed])
-
-  return (
-    <svg className="ticket__barcode" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
-      {bars.map((bar) => (
-        <rect key={bar.x} x={bar.x} y={0} width={bar.w} height={40} />
-      ))}
-    </svg>
-  )
-}
-*/
+// /** 티켓마다 모양이 다른 바코드. 읽히는 바코드는 아니고 장식이다. */
+// function Barcode({ seed }: { seed: string }) {
+//   const bars = useMemo(() => barcodeBars(seed), [seed])
+//
+//   return (
+//     <svg className="ticket__barcode" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
+//       {bars.map((bar) => (
+//         <rect key={bar.x} x={bar.x} y={0} width={bar.w} height={40} />
+//       ))}
+//     </svg>
+//   )
+// }
