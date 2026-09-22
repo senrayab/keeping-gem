@@ -799,6 +799,7 @@ svg.dock__icon {
 }
 
 .ticket__poster--empty {
+  position: relative;
   flex: 0 1 min(26vh, 220px);
   min-height: 80px;
   width: calc(100% - 20px);
@@ -835,22 +836,57 @@ svg.dock__icon {
 }
 
 .ticket__head {
-  padding: 12px 20px 16px;
+  padding: 14px 20px 16px;
   text-align: center;
 }
 
+/*
+ * 종류 라벨은 포스터 왼쪽 아래를 '파낸 자리'에 앉는다.
+ *
+ * 파낸 자리는 티켓 종이와 같은 색이라, 종이 한 장이 포스터를 베어 문 것처럼 보인다.
+ * 파낸 자리가 포스터와 만나는 두 지점(::before, ::after)은 원호로 오목하게 이어,
+ * 직각이 하나도 남지 않게 한다.
+ */
 .ticket__chip {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 999px;
-  background: rgb(var(--glow) / 0.2);
+  --cut: 12px; /* 오목하게 이어지는 부분의 반지름 */
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 14px 0 12px;
+  border-top-right-radius: 16px;
+  background: var(--paper);
   color: #4a3f63;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
 }
 
+.ticket__chip::before,
+.ticket__chip::after {
+  content: '';
+  position: absolute;
+  width: var(--cut);
+  height: var(--cut);
+  /* 네모에서 원 하나를 도려낸 모양 — 남은 쪽이 종이다 */
+  background: radial-gradient(circle var(--cut) at top right, #0000 98%, var(--paper) 100%);
+}
+
+/* 파낸 자리 위쪽(포스터 왼쪽 변과 만나는 곳) */
+.ticket__chip::before {
+  left: 0;
+  bottom: 100%;
+}
+
+/* 파낸 자리 오른쪽(포스터 아래 변과 만나는 곳) */
+.ticket__chip::after {
+  left: 100%;
+  bottom: 0;
+}
+
 .ticket__title {
-  margin: 8px 0 0;
+  margin: 0;
   font-size: 20px;
   font-weight: 800;
   letter-spacing: -0.02em;

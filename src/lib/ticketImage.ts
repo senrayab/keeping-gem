@@ -124,6 +124,42 @@ function drawCover(ctx: Ctx, img: ImageBitmap, x: number, y: number, w: number, 
   ctx.drawImage(img, (img.width - sw) / 2, (img.height - sh) / 2, sw, sh, x, y, w, h)
 }
 
+/**
+ * 포스터 왼쪽 아래를 종류 라벨 크기만큼 파낸다.
+ *
+ * 파낸 자리는 티켓 종이 색으로 채우고, 포스터와 만나는 두 지점은 원호로 오목하게 이어
+ * 직각이 남지 않게 한다. 화면(TicketView)의 라벨과 같은 모양이다.
+ */
+function chipNotch(ctx: Ctx, x: number, y: number, w: number, h: number, label: string) {
+  font(ctx, 700, 30)
+  const W = ctx.measureText(label).width + 56
+  const H = 86
+  const R = 30 // 파낸 자리 안쪽 모서리(볼록)
+  const r = 22 // 포스터와 만나는 곳(오목)
+  const bottom = y + h
+
+  ctx.save()
+  ctx.beginPath()
+  ctx.moveTo(x, bottom - H - r)
+  ctx.arc(x + r, bottom - H - r, r, Math.PI, Math.PI / 2, true)
+  ctx.lineTo(x + W - R, bottom - H)
+  ctx.arcTo(x + W, bottom - H, x + W, bottom - H + R, R)
+  ctx.lineTo(x + W, bottom - r)
+  ctx.arc(x + W + r, bottom - r, r, Math.PI, Math.PI / 2, true)
+  ctx.lineTo(x, bottom)
+  ctx.closePath()
+  ctx.fillStyle = PAPER
+  ctx.fill()
+
+  ctx.fillStyle = '#4a3f63'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(label, x + W / 2, bottom - H / 2)
+  ctx.restore()
+  // w는 포스터 폭 — 파낸 자리가 포스터를 넘지 않는지 확인용
+  if (W + r > w) console.warn('종류 라벨이 포스터보다 넓습니다')
+}
+
 export async function renderTicketImage(ticket: Ticket, poster?: Blob): Promise<Blob> {
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
@@ -144,9 +180,8 @@ export async function renderTicketImage(ticket: Ticket, poster?: Blob): Promise<
 
   font(ctx, 800, 60)
   const titleLines = wrap(ctx, ticket.title, inner, 3)
-  // 세로 위치는 모두 글자의 기준선(baseline)이다
-  const chipY = posterY + posterH + 56
-  const titleY = chipY + 56 + 72
+  // 세로 위치는 모두 글자의 기준선(baseline)이다. 종류 라벨은 포스터 위에 얹으므로 자리를 차지하지 않는다.
+  const titleY = posterY + posterH + 96
   const titleEnd = titleY + (titleLines.length - 1) * 76
   const venueY = titleEnd + 62
   const perf1 = (ticket.venue ? venueY : titleEnd) + 64
@@ -243,17 +278,11 @@ export async function renderTicketImage(ticket: Ticket, poster?: Blob): Promise<
   }
   ctx.restore()
 
-  // ── 5. 종류·제목·장소 ──
+  chipNotch(ctx, posterX, posterY, posterW, posterH, category.label)
+
+  // ── 5. 제목·장소 ──
   ctx.textAlign = 'center'
   ctx.textBaseline = 'alphabetic'
-  font(ctx, 700, 30)
-  const chipW = ctx.measureText(category.label).width + 56
-  ctx.fillStyle = rgba(glow, 0.22)
-  roundRect(ctx, W / 2 - chipW / 2, chipY, chipW, 56, 28)
-  ctx.fill()
-  ctx.fillStyle = '#4a3f63'
-  ctx.fillText(category.label, W / 2, chipY + 39)
-
   ctx.fillStyle = INK
   font(ctx, 800, 60)
   titleLines.forEach((line, i) => ctx.fillText(line, W / 2, titleY + i * 76))

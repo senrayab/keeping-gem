@@ -33,15 +33,17 @@ export function TicketView({ ticket, posterUrl, onPosterOpen }: TicketViewProps)
             aria-label={`${ticket.title} 포스터 크게 보기`}
           >
             <img className="ticket__poster" src={posterUrl} alt={`${ticket.title} 포스터`} />
+            {/* 포스터 왼쪽 아래를 라벨 크기만큼 파낸 자리 — 파인 자리의 모서리는 모두 둥글다 */}
+            <span className="ticket__chip">{category.label}</span>
             {onPosterOpen && <span className="ticket__poster-hint">크게 보기</span>}
           </button>
         ) : (
           <div className="ticket__poster ticket__poster--empty">
             <span>{ticket.title}</span>
+            <span className="ticket__chip">{category.label}</span>
           </div>
         )}
         <div className="ticket__head">
-          <span className="ticket__chip">{category.label}</span>
           <h2 className="ticket__title">{ticket.title}</h2>
           {ticket.venue && <p className="ticket__venue">{ticket.venue}</p>}
         </div>
