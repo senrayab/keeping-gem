@@ -7,6 +7,7 @@ import { useObjectUrl } from '@/hooks/useObjectUrl'
 import { canShareFiles, download, isShareCancel } from '@/lib/download'
 import { renderTicketImage, ticketFileName } from '@/lib/ticketImage'
 import { ConfirmDialog } from './ConfirmDialog'
+import { MapViewer } from './MapViewer'
 import { PosterViewer } from './PosterViewer'
 import { TicketView } from './TicketView'
 import { useToast } from './Toast'
@@ -50,6 +51,7 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
 
   const shareable = image !== null && canShareFiles(image)
   const [posterOpen, setPosterOpen] = useState(false)
+  const [mapOpen, setMapOpen] = useState(false)
 
   const share = async () => {
     if (!image) return
@@ -87,7 +89,12 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
     <div className="detail" role="dialog" aria-modal="true" aria-label={`${ticket.title} 티켓`} onClick={onClose}>
       <div className="detail__stage">
         <div className="detail__ticket" style={origin as CSSProperties} onClick={(e) => e.stopPropagation()}>
-          <TicketView ticket={ticket} posterUrl={posterUrl} onPosterOpen={() => setPosterOpen(true)} />
+          <TicketView
+            ticket={ticket}
+            posterUrl={posterUrl}
+            onPosterOpen={() => setPosterOpen(true)}
+            onVenueOpen={() => setMapOpen(true)}
+          />
         </div>
       </div>
 
@@ -125,6 +132,16 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
           confirmLabel="삭제"
           onConfirm={() => void remove()}
           onCancel={() => setConfirming(false)}
+        />
+      )}
+
+      {mapOpen && ticket.lat != null && ticket.lng != null && (
+        <MapViewer
+          venue={ticket.venue ?? ''}
+          address={ticket.address}
+          lat={ticket.lat}
+          lng={ticket.lng}
+          onClose={() => setMapOpen(false)}
         />
       )}
 

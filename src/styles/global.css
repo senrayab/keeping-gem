@@ -618,6 +618,123 @@ svg.dock__icon {
   color: rgb(var(--amber));
 }
 
+/* ───────── 장소 찾기 ───────── */
+
+.field__hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-faint);
+}
+
+.suggest {
+  display: grid;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border: 1px solid var(--glass-line);
+  border-radius: 14px;
+  background: rgb(20 16 38 / 0.96);
+}
+
+.suggest button {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  text-align: left;
+}
+
+.suggest button:active {
+  background: var(--glass);
+}
+
+.suggest strong {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.suggest span {
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+
+/* ───────── 지도 ───────── */
+
+.map-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 26;
+  display: flex;
+  flex-direction: column;
+  background: var(--night-0);
+  animation: fade-in 0.2s ease-out;
+}
+
+.map-viewer__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: calc(env(safe-area-inset-top) + 14px) 16px 12px;
+}
+
+.map-viewer__head h2 {
+  margin: 0;
+  font-size: 17px;
+  word-break: keep-all;
+}
+
+.map-viewer__head p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.map-viewer__head .btn {
+  flex: none;
+}
+
+.map-viewer__stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  margin: 0 12px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--glass);
+}
+
+.map-viewer__map {
+  width: 100%;
+  height: 100%;
+}
+
+.map-viewer__error {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 24px;
+  font-size: 14px;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.map-viewer__foot {
+  display: grid;
+  padding: 12px 12px calc(env(safe-area-inset-bottom) + 12px);
+}
+
+.map-viewer__foot .btn {
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+}
+
 /* ───────── 확인창 ───────── */
 
 .confirm {
@@ -891,6 +1008,31 @@ svg.dock__icon {
   font-weight: 800;
   letter-spacing: -0.02em;
   word-break: keep-all;
+}
+
+/* 좌표가 있는 장소는 눌러서 지도를 열 수 있다 */
+.ticket__venue--map {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 0 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b6480;
+  text-decoration: underline;
+  text-decoration-color: rgb(107 100 128 / 0.4);
+  text-underline-offset: 3px;
+}
+
+.ticket__venue--map svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
 }
 
 .ticket__venue {

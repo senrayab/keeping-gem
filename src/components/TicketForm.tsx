@@ -8,7 +8,9 @@ import { useObjectUrl } from '@/hooks/useObjectUrl'
 import { CATEGORIES, type CategoryId } from '@/lib/categories'
 import { CURRENCIES, currencyOf, DEFAULT_CURRENCY, type CurrencyId } from '@/lib/currencies'
 import { today } from '@/lib/format'
+import { searchPlaces } from '@/lib/kakao'
 import { processImage, type ProcessedImage } from '@/lib/image'
+import type { KakaoPlace } from '@/types/kakao'
 import { useToast } from './Toast'
 
 interface TicketFormProps {
@@ -30,12 +32,15 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
     date: ticket?.date ?? today(),
     time: ticket?.time ?? '',
     venue: ticket?.venue ?? '',
+    lat: ticket?.lat,
+    lng: ticket?.lng,
+    address: ticket?.address,
     seat: ticket?.seat ?? '',
     price: ticket?.price != null ? String(ticket.price) : '',
     currency: (ticket?.currency ?? DEFAULT_CURRENCY) as CurrencyId,
     memo: ticket?.memo ?? '',
   })
-  const { title, category, date, time, venue, seat, price, currency, memo } = fields
+  const { title, category, date, time, venue, lat, lng, address, seat, price, currency, memo } = fields
 
   // undefined: 그대로, null: 지움, 값: 새 포스터
   const [poster, setPoster] = useState<ProcessedImage | null | undefined>(undefined)
@@ -70,6 +75,47 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
     }
   }
 
+  /*
+   * 장소 자동완성.
+   *
+   * 직접 고쳐 적기 시작했을 때만 찾는다 — 수정 화면을 열자마자 이미 적힌 장소로
+   * 검색이 돌아 목록이 튀어나오면 성가시다. 고른 장소만 좌표를 갖는다.
+   */
+  const [places, setPlaces] = useState<KakaoPlace[]>([])
+  const [placeError, setPlaceError] = useState<string>()
+  const typingVenue = useRef(false)
+
+  useEffect(() => {
+    const query = venue.trim()
+    if (!typingVenue.current || query.length < 2) {
+      setPlaces([])
+      return
+    }
+    const timer = window.setTimeout(() => {
+      searchPlaces(query)
+        .then((found) => {
+          setPlaces(found)
+          setPlaceError(undefined)
+        })
+        .catch((e: Error) => {
+          setPlaces([])
+          setPlaceError(e.message)
+        })
+    }, 350)
+    return () => window.clearTimeout(timer)
+  }, [venue])
+
+  const pickPlace = (place: KakaoPlace) => {
+    typingVenue.current = false
+    setPlaces([])
+    setFields({
+      venue: place.place_name,
+      lat: Number(place.y),
+      lng: Number(place.x),
+      address: place.road_address_name || place.address_name || undefined,
+    })
+  }
+
   const submit = async (event: FormEvent) => {
     event.preventDefault()
     if (!title.trim()) {
@@ -87,6 +133,9 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
           date,
           time: time || undefined,
           venue: venue.trim() || undefined,
+          lat: venue.trim() ? lat : undefined,
+          lng: venue.trim() ? lng : undefined,
+          address: venue.trim() ? address : undefined,
           seat: seat.trim() || undefined,
           price: price && Number.isFinite(amount) ? amount : undefined,
           currency: price ? currency : undefined,
@@ -205,10 +254,34 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
           </label>
         </div>
 
-        <label className="field">
+        <div className="field">
           <span>장소</span>
-          <input value={venue} onChange={(e) => setFields({ venue: e.target.value })} placeholder="올림픽공원 KSPO DOME" />
-        </label>
+          <input
+            value={venue}
+            onChange={(e) => {
+              typingVenue.current = true
+              // 직접 고쳐 적으면 앞서 고른 장소의 좌표는 더 맞지 않는다
+              setFields({ venue: e.target.value, lat: undefined, lng: undefined, address: undefined })
+            }}
+            placeholder="공연장 이름을 치면 찾아드려요"
+            aria-label="장소"
+          />
+          {lat != null && <p className="field__hint">{address ?? '지도에서 고른 장소예요'} · 상세보기에서 지도로 볼 수 있어요</p>}
+          {placeError && <p className="field__hint">{placeError}</p>}
+          {places.length > 0 && (
+            <ul className="suggest">
+              {places.map((place) => (
+                <li key={place.id}>
+                  {/* 손가락을 떼기 전(pointerdown)에 고른다 — 그 뒤에 목록이 닫혀도 놓치지 않게 */}
+                  <button type="button" onPointerDown={() => pickPlace(place)}>
+                    <strong>{place.place_name}</strong>
+                    <span>{place.road_address_name || place.address_name}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
         <div className="field-row">
           <label className="field">

@@ -16,6 +16,10 @@ export interface Ticket {
   /** "HH:mm" */
   time?: string
   venue?: string
+  /** 장소를 지도에서 고른 경우의 좌표·주소 (직접 적은 장소는 없다) */
+  lat?: number
+  lng?: number
+  address?: string
   seat?: string
   price?: number
   /** 금액의 통화. 없으면 원화 (v1 시절 티켓) */
@@ -38,7 +42,18 @@ export interface Poster {
 
 export type TicketInput = Pick<
   Ticket,
-  'title' | 'category' | 'date' | 'time' | 'venue' | 'seat' | 'price' | 'currency' | 'memo'
+  | 'title'
+  | 'category'
+  | 'date'
+  | 'time'
+  | 'venue'
+  | 'lat'
+  | 'lng'
+  | 'address'
+  | 'seat'
+  | 'price'
+  | 'currency'
+  | 'memo'
 >
 
 class KeepingGemDB extends Dexie {
