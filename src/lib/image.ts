@@ -25,6 +25,8 @@ export interface ProcessedImage {
   thumb: EncodedImage
   /** 변환 전 원본 바이트 (절감량 표시용) */
   originalBytes: number
+  /** 포스터의 대표색 "r g b" — 밤하늘에서 별이 이 색으로 빛난다 */
+  color: string
 }
 
 let webpSupport: boolean | null = null
@@ -94,11 +96,66 @@ export async function processImage(file: File): Promise<ProcessedImage> {
     const shrunk = shrink(bitmap, FULL_MAX_EDGE)
     const full = await encode(shrunk, FULL_QUALITY)
     // 썸네일은 이미 줄인 캔버스에서 뽑는다 — 원본을 두 번 훑지 않아도 화질 차이가 없다
-    const thumb = await encode(shrink(shrunk, THUMB_MAX_EDGE), THUMB_QUALITY)
-    return { full, thumb, originalBytes: file.size }
+    const thumbCanvas = shrink(shrunk, THUMB_MAX_EDGE)
+    const thumb = await encode(thumbCanvas, THUMB_QUALITY)
+    return { full, thumb, originalBytes: file.size, color: glowColor(thumbCanvas) }
   } finally {
     bitmap.close()
   }
+}
+
+/**
+ * 그림 전체의 평균색을 뽑아 빛나는 색으로 다듬는다.
+ *
+ * 평균색은 대개 탁한 회갈색이라 그대로 쓰면 별이 흐려 보인다.
+ * 색상(hue)만 살리고 채도와 밝기를 끌어올려 '그 포스터다운 빛'으로 만든다.
+ */
+function glowColor(canvas: HTMLCanvasElement): string {
+  const small = shrink(canvas, 24)
+  const ctx = small.getContext('2d')
+  if (!ctx) return '255 200 120'
+  const { data } = ctx.getImageData(0, 0, small.width, small.height)
+  let r = 0
+  let g = 0
+  let b = 0
+  let weight = 0
+  for (let i = 0; i < data.length; i += 4) {
+    const [pr, pg, pb] = [data[i], data[i + 1], data[i + 2]]
+    // 채도가 높은 픽셀에 무게를 더 준다 — 흰 여백이나 검은 배경에 색이 묻히지 않게
+    const w = 1 + (Math.max(pr, pg, pb) - Math.min(pr, pg, pb)) / 32
+    r += pr * w
+    g += pg * w
+    b += pb * w
+    weight += w
+  }
+  const [h, s] = rgbToHsl(r / weight, g / weight, b / weight)
+  const [or, og, ob] = hslToRgb(h, Math.max(s, 0.6), 0.62)
+  return `${or} ${og} ${ob}`
+}
+
+function rgbToHsl(r: number, g: number, b: number): [number, number, number] {
+  r /= 255
+  g /= 255
+  b /= 255
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  const l = (max + min) / 2
+  if (max === min) return [0, 0, l]
+  const d = max - min
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+  const h = max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4
+  return [h / 6, s, l]
+}
+
+function hslToRgb(h: number, s: number, l: number): [number, number, number] {
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s
+  const p = 2 * l - q
+  const channel = (t: number) => {
+    t = (t + 1) % 1
+    const v = t < 1 / 6 ? p + (q - p) * 6 * t : t < 1 / 2 ? q : t < 2 / 3 ? p + (q - p) * (2 / 3 - t) * 6 : p
+    return Math.round(v * 255)
+  }
+  return [channel(h + 1 / 3), channel(h), channel(h - 1 / 3)]
 }
 
 export function formatBytes(bytes: number): string {
