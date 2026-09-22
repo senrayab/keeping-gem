@@ -1095,12 +1095,14 @@ svg.dock__icon {
   min-height: 34px;
   padding: 6px 14px;
   border-radius: 999px;
-  background: rgb(244 240 255 / 0.92);
-  color: var(--night-0);
+  /* 불투명한 검은 알약. 밤하늘도 어두우므로 옅은 테두리로 윤곽을 준다 */
+  background: #000;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  color: #fff;
   font-size: 12.5px;
   font-weight: 600;
   line-height: 1.35;
-  box-shadow: 0 6px 18px rgb(0 0 0 / 0.3);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.5);
   opacity: 0;
   transform: translate(-50%, -12px);
   transition: opacity 0.2s ease-out, transform 0.25s ease-out;
@@ -1125,8 +1127,8 @@ svg.dock__icon {
   padding: 0 12px;
   border: 0;
   border-radius: 999px;
-  background: var(--night-1);
-  color: #fff;
+  background: rgb(var(--amber));
+  color: #000;
   font-size: 12px;
   font-weight: 700;
 }
