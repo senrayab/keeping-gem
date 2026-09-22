@@ -2,7 +2,7 @@ import { useMemo, type CSSProperties } from 'react'
 import type { Ticket } from '@/db/db'
 import { categoryOf } from '@/lib/categories'
 import { formatDate, formatPrice } from '@/lib/format'
-import { seeded, ticketNumber } from '@/lib/seed'
+import { barcodeBars, ticketNumber } from '@/lib/seed'
 
 /**
  * 상세보기의 티켓 한 장.
@@ -72,17 +72,7 @@ export function TicketView({ ticket, posterUrl }: { ticket: Ticket; posterUrl?: 
 
 /** 티켓마다 모양이 다른 바코드. 읽히는 바코드는 아니고 장식이다. */
 function Barcode({ seed }: { seed: string }) {
-  const bars = useMemo(() => {
-    const rand = seeded(seed)
-    const out: { x: number; w: number }[] = []
-    let x = 0
-    while (x < 200) {
-      const w = 1 + Math.floor(rand() * 3)
-      out.push({ x, w })
-      x += w + 1 + Math.floor(rand() * 3)
-    }
-    return out
-  }, [seed])
+  const bars = useMemo(() => barcodeBars(seed), [seed])
 
   return (
     <svg className="ticket__barcode" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
