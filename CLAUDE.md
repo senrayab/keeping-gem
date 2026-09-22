@@ -13,7 +13,10 @@
   **달력 화면은 쓰지 않는다** — 지난 추억을 찾기 어려워진다는 이유로 사용자가 원치 않음.
 - 별을 누르면 그 자리에서 티켓이 펼쳐진다(`TicketDetail.tsx`, `TicketView.tsx`):
   포스터 + 제목·장소 + 절취선 + 날짜·시간·좌석·금액·한마디 + 홀로그램 반권(바코드).
-- 별똥별 버튼: 무작위 추억 하나를 펼친다. `+` 버튼: 티켓 추가(`TicketForm.tsx`).
+- 상세보기의 **이미지 저장/공유하기**: 티켓을 1080px PNG로 그린다(`lib/ticketImage.ts`, 캔버스에 직접 그림).
+- 하단 도크: **별똥별**(무작위 추억) · **찾기**(`SearchPanel.tsx`, 제목·장소·좌석·한마디 + 종류 칩) · `+`(티켓 추가, `TicketForm.tsx`).
+- 머리말 오른쪽 **보관함**(`BackupSheet.tsx`, `lib/backup.ts`): zip 백업 저장 / 합쳐서 불러오기.
+  백업 형식(`backup.json`의 `format`)을 바꾸면 버전을 올리고, 옛 형식도 읽을 수 있게 둔다.
 - 디자인 톤: 어두운 밤하늘 + 따뜻한 빛번짐(보케), 유리구슬 질감, 종이 티켓 + 홀로그램.
 
 ## 프로젝트 구조
@@ -25,6 +28,9 @@
 - `src/lib/image.ts` — 포스터 → WebP 변환(긴 변 2000px), 대표색(별 빛깔) 추출
 - `src/lib/seed.ts` — 티켓 id 기반 고정 난수(별 자리·크기·바코드가 늘 같게)
 - `src/hooks/useBackClose.ts` — 뒤로 가기로 겹친 화면 닫기. 새 오버레이는 반드시 이 훅을 쓴다
+- `src/hooks/useDraft.ts` — 새 티켓 작성 중 내용을 기기(localStorage)에 임시 보관
+- `src/components/DbNotice.tsx` — 저장소가 옛 버전에 막혔을 때/새 버전이 열렸을 때 안내.
+  **DB 스키마(`version()`)를 올리면 다른 탭의 옛 버전이 막을 수 있다** — 이 안내가 그 경우를 다룬다
 - `src/styles/global.css` — 전역 스타일(밤하늘 테마 토큰은 `:root`)
 - `public/` — 그대로 복사되는 파일 (아이콘)
 - `vite.config.ts` — 빌드·PWA(manifest, 서비스 워커) 설정
