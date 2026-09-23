@@ -108,7 +108,8 @@ export function AlbumView({ album, onAdd, readOnly, onClose }: AlbumViewProps) {
   }
 
   // 쏟아 놓기는 자리를 직접 잡으므로 높이도 직접 알려줘야 한다
-  const pileHeight = photos?.length ? TOP + (photos.length - 1) * PILE_STEP + 240 : 0
+  // 마지막 사진이 떠 있는 단추에 가리지 않도록 아래를 넉넉히 비운다
+  const pileHeight = photos?.length ? TOP + (photos.length - 1) * PILE_STEP + 330 : 0
 
   /* 꾹 눌러 고르고 끌어서 여러 장 — 손가락 아래 사진을 자리로 찾는다 */
   const sweep = useSweepSelect({
@@ -214,11 +215,14 @@ export function AlbumView({ album, onAdd, readOnly, onClose }: AlbumViewProps) {
             </button>
           </div>
         ) : (
-          <div className="album-view__foot">
-            <button className="btn btn--glow" onClick={onAdd}>
-              사진 넣기
-            </button>
-          </div>
+          /* 아래 바로 깔면 사진을 가린다 — 떠 있는 단추로 두고, 사진은 그만큼 자리를 비운다 */
+          <button className="album-fab" onClick={onAdd} aria-label="사진 넣기">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3" y="6" width="14" height="12" rx="2.5" />
+              <path d="M6 15l3-3 2.5 2 2-1.5L17 16" />
+              <path d="M18 4.5v6M15 7.5h6" />
+            </svg>
+          </button>
         ))}
 
       {confirming && (

@@ -2094,6 +2094,11 @@ svg.dock__icon {
   box-shadow: 0 10px 26px rgb(0 0 0 / 0.5), 0 0 24px rgb(var(--amber) / 0.5);
 }
 
+/* 사진첩 화면(34) 위에 떠 있어야 한다 */
+.album-view .album-fab {
+  z-index: 35;
+}
+
 .album-fab:disabled {
   opacity: 0.5;
 }
@@ -2205,7 +2210,8 @@ svg.dock__icon {
 .album-view__desk--collage {
   columns: 3;
   column-gap: 7px;
-  padding: 6px 12px 24px;
+  /* 아래는 떠 있는 '사진 넣기' 단추 자리 */
+  padding: 6px 12px 104px;
 }
 
 /* 정돈에서는 인화지 테두리를 두르지 않는다 — 작은 사진이 촘촘히 모이면 테두리가 시끄럽다 */
@@ -2312,11 +2318,6 @@ svg.dock__icon {
   aspect-ratio: 1;
   object-fit: cover;
   border-radius: 2px;
-}
-
-.album-view__foot {
-  display: grid;
-  padding: 12px 16px calc(env(safe-area-inset-bottom) + 12px);
 }
 
 .photo-detail {
