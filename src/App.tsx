@@ -181,15 +181,7 @@ export function App() {
         />
       )}
 
-      {vault && (
-        <BackupSheet
-          onClose={() => setVault(false)}
-          onOpenAlbums={() => {
-            setVault(false)
-            setAlbums(true)
-          }}
-        />
-      )}
+      {vault && <BackupSheet onClose={() => setVault(false)} />}
 
       {albums && <AlbumsSheet onClose={() => setAlbums(false)} />}
 
