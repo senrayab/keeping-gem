@@ -2,7 +2,8 @@ import type { Ticket } from '@/db/db'
 import { categoryOf } from './categories'
 import { formatMoney } from './currencies'
 import { formatDate } from './format'
-import { barcodeBars, seeded, ticketNumber } from './seed'
+// barcodeBars·ticketNumber는 아래 주석 처리된 바코드 조각이 쓴다
+import { seeded } from './seed'
 
 /*
  * 상세보기의 티켓을 공유용 이미지로 그린다.
@@ -197,11 +198,12 @@ export async function renderTicketImage(ticket: Ticket, poster?: Blob): Promise<
   const memoH = memoLines.length ? memoLines.length * 54 + 64 : 0
   const bottom = memoLines.length ? memoY + memoH + 40 : gridEnd + 40
 
-  // 바코드는 티켓에서 떼어 낸 흰 조각으로 아래에 따로 둔다
-  const stubGap = 34
-  const stubH = 200
-  const stubY = bottom + stubGap
-  const H = stubY + stubH + 170
+  /*
+   * 바코드는 읽히는 정보가 없는 장식이라 넣지 않는다 (아래 8번 참고).
+   * 되살리려면 여기 stubGap·stubH를 되돌리고 8번의 주석을 푼다.
+   */
+  const stubY = bottom
+  const H = stubY + 170
 
   canvas.width = W
   canvas.height = H
@@ -311,39 +313,43 @@ export async function renderTicketImage(ticket: Ticket, poster?: Blob): Promise<
     memoLines.forEach((line, i) => ctx.fillText(line, TICKET_X + PAD + 36, memoY + 32 + 38 + i * 54))
   }
 
-  // ── 8. 티켓에서 떼어 낸 바코드 조각 ──
-  ctx.save()
-  ctx.shadowColor = rgba('0 0 0', 0.45)
-  ctx.shadowBlur = 40
-  ctx.shadowOffsetY = 12
-  roundRect(ctx, TICKET_X, stubY, TICKET_W, stubH, 28)
-  ctx.fillStyle = '#ffffff'
-  ctx.fill()
-  ctx.restore()
-
-  const barX = TICKET_X + PAD
-  const barY = stubY + 44
-  const unit = inner / 200
-  ctx.fillStyle = INK
-  for (const bar of barcodeBars(ticket.id)) ctx.fillRect(barX + bar.x * unit, barY, bar.w * unit, 96)
-
-  font(ctx, 500, 26, MONO)
-  spacing(ctx, 3)
-  ctx.fillStyle = '#4a4658'
-  ctx.textAlign = 'left'
-  // 'ADMIT ONE'은 뜻 없는 문구라 넣지 않는다. 일련번호만 바코드 아래에 남긴다.
-  ctx.fillText(ticketNumber(ticket.id, ticket.date), barX, barY + 142)
+  /*
+   * 티켓에서 떼어 낸 바코드 조각 — 지금은 넣지 않는다.
+   * 뜻 없는 장식이라 뺐고, 되살리려면 아래 주석을 풀고 위 stubY/H 계산을 되돌린다.
+   */
+//   // ── 8. 티켓에서 떼어 낸 바코드 조각 ──
+//   ctx.save()
+//   ctx.shadowColor = rgba('0 0 0', 0.45)
+//   ctx.shadowBlur = 40
+//   ctx.shadowOffsetY = 12
+//   roundRect(ctx, TICKET_X, stubY, TICKET_W, stubH, 28)
+//   ctx.fillStyle = '#ffffff'
+//   ctx.fill()
+//   ctx.restore()
+//
+//   const barX = TICKET_X + PAD
+//   const barY = stubY + 44
+//   const unit = inner / 200
+//   ctx.fillStyle = INK
+//   for (const bar of barcodeBars(ticket.id)) ctx.fillRect(barX + bar.x * unit, barY, bar.w * unit, 96)
+//
+//   font(ctx, 500, 26, MONO)
+//   spacing(ctx, 3)
+//   ctx.fillStyle = '#4a4658'
+//   ctx.textAlign = 'left'
+//   // 'ADMIT ONE'은 뜻 없는 문구라 넣지 않는다. 일련번호만 바코드 아래에 남긴다.
+//   ctx.fillText(ticketNumber(ticket.id, ticket.date), barX, barY + 142)
 
   // ── 9. 서명 ──
   ctx.textAlign = 'center'
   ctx.fillStyle = rgba('255 196 110', 0.85)
   font(ctx, 700, 26)
   spacing(ctx, 8)
-  ctx.fillText('KEEPING GEM', W / 2, stubY + stubH + 84)
+  ctx.fillText('KEEPING GEM', W / 2, stubY + 84)
   spacing(ctx, 0)
   ctx.fillStyle = rgba('244 240 255', 0.45)
   font(ctx, 500, 26)
-  ctx.fillText('추억의 밤하늘', W / 2, stubY + stubH + 126)
+  ctx.fillText('추억의 밤하늘', W / 2, stubY + 126)
 
   return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('이미지를 만들지 못했습니다.'))), 'image/png')
