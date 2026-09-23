@@ -353,6 +353,8 @@ function Print({
  * 미는 동안에는 사진이 손가락을 따라오고, 끝에서는 더 끌리지 않는다.
  */
 const SWIPE_DISTANCE = 56
+/** 위로 이만큼 올리면 화면을 닫는다 */
+const CLOSE_DISTANCE = 90
 
 function PhotoDetail({
   photos,
@@ -372,10 +374,12 @@ function PhotoDetail({
   const image = useLiveQuery(async () => (await db.photoImages.get(photo.id)) ?? null, [photo.id])
   const url = useObjectUrl(image?.blob ?? photo.thumb)
   const [confirming, setConfirming] = useState(false)
-  const [drag, setDrag] = useState(0)
+  const [drag, setDrag] = useState({ x: 0, y: 0 })
   const start = useRef<{ x: number; y: number } | null>(null)
   // 민 것인지 그냥 누른 것인지 — 민 손끝은 화면을 닫으면 안 된다
   const moved = useRef(false)
+  // 한 번 정해진 방향으로만 끌리게 — 옆으로 넘기다 위로 닫히면 당황스럽다
+  const axis = useRef<'x' | 'y' | null>(null)
 
   const move = (step: number) => {
     const next = index + step
@@ -386,23 +390,36 @@ function PhotoDetail({
   const onPointerDown = (e: React.PointerEvent) => {
     start.current = { x: e.clientX, y: e.clientY }
     moved.current = false
+    axis.current = null
   }
 
   const onPointerMove = (e: React.PointerEvent) => {
     if (!start.current) return
     const dx = e.clientX - start.current.x
-    if (Math.abs(dx) > 6 || Math.abs(e.clientY - start.current.y) > 6) moved.current = true
-    // 세로로 긋는 중이면 사진을 끌지 않는다
-    if (Math.abs(e.clientY - start.current.y) > Math.abs(dx)) return
-    // 끝에서는 덜 끌리게 해 더 없다는 것을 손으로 알린다
-    const atEdge = (dx > 0 && index === 0) || (dx < 0 && index === photos.length - 1)
-    setDrag(atEdge ? dx * 0.25 : dx)
+    const dy = e.clientY - start.current.y
+    if (!moved.current && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
+      moved.current = true
+      axis.current = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y'
+    }
+    if (axis.current === 'x') {
+      // 끝에서는 덜 끌리게 해 더 없다는 것을 손으로 알린다
+      const atEdge = (dx > 0 && index === 0) || (dx < 0 && index === photos.length - 1)
+      setDrag({ x: atEdge ? dx * 0.25 : dx, y: 0 })
+    } else if (axis.current === 'y') {
+      // 위로 올리면 닫힌다. 아래로는 갈 곳이 없으니 덜 끌린다
+      setDrag({ x: 0, y: dy < 0 ? dy : dy * 0.25 })
+    }
   }
 
   const onPointerUp = () => {
-    if (Math.abs(drag) > SWIPE_DISTANCE) move(drag > 0 ? -1 : 1)
+    if (axis.current === 'x' && Math.abs(drag.x) > SWIPE_DISTANCE) move(drag.x > 0 ? -1 : 1)
+    if (axis.current === 'y' && -drag.y > CLOSE_DISTANCE) {
+      onClose()
+      return
+    }
     start.current = null
-    setDrag(0)
+    axis.current = null
+    setDrag({ x: 0, y: 0 })
   }
 
   const remove = async () => {
@@ -432,7 +449,12 @@ function PhotoDetail({
           src={url}
           alt=""
           draggable={false}
-          style={{ transform: `translateX(${drag}px)`, transition: drag === 0 ? 'transform 0.2s ease-out' : 'none' }}
+          style={{
+            transform: `translate(${drag.x}px, ${drag.y}px)`,
+            // 위로 올릴수록 옅어져 닫히는 중이라는 것을 눈으로 알린다
+            opacity: drag.y < 0 ? Math.max(0.35, 1 + drag.y / 320) : 1,
+            transition: drag.x === 0 && drag.y === 0 ? 'transform 0.2s ease-out, opacity 0.2s ease-out' : 'none',
+          }}
         />
       )}
 
