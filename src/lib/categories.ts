@@ -1,5 +1,6 @@
 export const CATEGORIES = [
   { id: 'concert', label: '콘서트', glow: '255 150 110' },
+  { id: 'fanmeeting', label: '팬미팅', glow: '255 175 200' },
   { id: 'musical', label: '뮤지컬', glow: '240 120 190' },
   { id: 'play', label: '연극', glow: '200 150 255' },
   { id: 'movie', label: '영화', glow: '120 170 255' },
