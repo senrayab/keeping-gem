@@ -6,14 +6,13 @@ import { useScrollLock } from '@/hooks/useScrollLock'
 import { applyBackup, createBackup, lastBackupAt, markBackedUp, readBackup, type RestorePreview } from '@/lib/backup'
 import { download } from '@/lib/download'
 import { formatBytes } from '@/lib/image'
-import { AlbumsSheet } from './AlbumsSheet'
 import { useToast } from './Toast'
 
 const formatWhen = (ms: number) =>
   new Date(ms).toLocaleString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })
 
 /** 보관함: 백업 파일 만들기와 백업에서 불러오기 */
-export function BackupSheet({ onClose }: { onClose: () => void }) {
+export function BackupSheet({ onClose, onOpenAlbums }: { onClose: () => void; onOpenAlbums: () => void }) {
   useBackClose(onClose)
   useScrollLock()
   const toast = useToast()
@@ -21,7 +20,6 @@ export function BackupSheet({ onClose }: { onClose: () => void }) {
   const [busy, setBusy] = useState<'backup' | 'read' | 'restore' | null>(null)
   const [preview, setPreview] = useState<RestorePreview | null>(null)
   const [lastBackup, setLastBackup] = useState(lastBackupAt)
-  const [albums, setAlbums] = useState(false)
 
   const stats = useLiveQuery(async () => {
     const [tickets, posters, photos, albumCount] = await Promise.all([
@@ -122,7 +120,7 @@ export function BackupSheet({ onClose }: { onClose: () => void }) {
               ? `사진첩 ${stats.albumCount}개 · 사진 ${stats.photoCount}장`
               : '그날의 사진을 모아 두면, 티켓과 함께 그때를 다시 볼 수 있어요.'}
           </p>
-          <button className="btn btn--ghost" onClick={() => setAlbums(true)}>
+          <button className="btn btn--ghost" onClick={onOpenAlbums}>
             사진첩 열기
           </button>
         </section>
@@ -180,7 +178,6 @@ export function BackupSheet({ onClose }: { onClose: () => void }) {
         </section>
       </div>
 
-      {albums && <AlbumsSheet onClose={() => setAlbums(false)} />}
     </div>
   )
 }
