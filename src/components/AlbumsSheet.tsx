@@ -1,10 +1,11 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useRef, useState, type ChangeEvent } from 'react'
-import { addPhoto, db, deleteAlbums, type Album } from '@/db/db'
+import { addPhoto, albumFingerprints, db, deleteAlbums, type Album } from '@/db/db'
 import { useBackClose } from '@/hooks/useBackClose'
 import { useObjectUrl } from '@/hooks/useObjectUrl'
 import { useScrollLock } from '@/hooks/useScrollLock'
 import { formatDateRange } from '@/lib/format'
+import { fingerprint } from '@/lib/hash'
 import { PHOTO_MAX_EDGE, processImage } from '@/lib/image'
 import { AlbumForm } from './AlbumForm'
 import { AlbumView } from './AlbumView'
@@ -57,12 +58,22 @@ export function AlbumsSheet({ onClose }: { onClose: () => void }) {
     if (!files.length || !albumId) return
 
     let failed = 0
+    let skipped = 0
     setBusy({ done: 0, total: files.length })
+    // 이미 들어 있는 사진들의 지문 — 같은 사진을 두 번 넣지 않는다
+    const known = await albumFingerprints(albumId)
     // 한 장씩 처리한다 — 여러 장을 한꺼번에 펼치면 휴대폰 메모리가 모자랄 수 있다
     for (const [i, file] of files.entries()) {
       try {
-        // file.lastModified는 대개 사진을 찍은 때다 — 넣은 순서가 아니라 이 시각으로 늘어놓는다
-        await addPhoto(albumId, await processImage(file, PHOTO_MAX_EDGE), file.lastModified || undefined)
+        const image = await processImage(file, PHOTO_MAX_EDGE)
+        const hash = await fingerprint(image.full.blob)
+        if (hash && known.has(hash)) {
+          skipped += 1
+        } else {
+          if (hash) known.add(hash)
+          // file.lastModified는 대개 사진을 찍은 때다 — 넣은 순서가 아니라 이 시각으로 늘어놓는다
+          await addPhoto(albumId, image, file.lastModified || undefined, hash)
+        }
       } catch (e) {
         console.error(e)
         failed += 1
@@ -70,8 +81,10 @@ export function AlbumsSheet({ onClose }: { onClose: () => void }) {
       setBusy({ done: i + 1, total: files.length })
     }
     setBusy(null)
-    const saved = files.length - failed
-    toast(saved > 0 ? `사진 ${saved}장을 넣었어요.` : '사진을 넣지 못했어요.')
+
+    const saved = files.length - failed - skipped
+    const already = skipped > 0 ? ` · ${skipped}장은 이미 있어요` : ''
+    toast(saved > 0 ? `사진 ${saved}장을 넣었어요${already}` : skipped > 0 ? '이미 있는 사진이에요.' : '사진을 넣지 못했어요.')
   }
 
   const removePicked = async () => {
