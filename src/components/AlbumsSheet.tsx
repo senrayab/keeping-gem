@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useRef, useState, type ChangeEvent } from 'react'
+import { useRef, useState, type ChangeEvent, type CSSProperties } from 'react'
 import { addPhoto, albumFingerprints, db, deleteAlbums, type Album } from '@/db/db'
 import { useBackClose } from '@/hooks/useBackClose'
 import { useObjectUrl } from '@/hooks/useObjectUrl'
@@ -136,17 +136,22 @@ export function AlbumsSheet({ onClose }: { onClose: () => void }) {
           </p>
         )}
 
-        {albums?.map((album) => (
-          <AlbumCard
-            key={album.id}
-            album={album}
-            selecting={selecting}
-            checked={picked?.has(album.id) ?? false}
-            onOpen={() => (selecting ? toggle(album.id) : setOpened(album.id))}
-            onAdd={() => pickPhotos(album.id)}
-            onEdit={() => setEditing({ album })}
-          />
-        ))}
+        {albums && albums.length > 0 && (
+          <div className="album-box">
+            {albums.map((album, index) => (
+              <AlbumCard
+                key={album.id}
+                album={album}
+                index={index}
+                selecting={selecting}
+                checked={picked?.has(album.id) ?? false}
+                onOpen={() => (selecting ? toggle(album.id) : setOpened(album.id))}
+                onAdd={() => pickPhotos(album.id)}
+                onEdit={() => setEditing({ album })}
+              />
+            ))}
+          </div>
+        )}
 
         <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={onPick} />
       </div>
@@ -215,6 +220,8 @@ export function AlbumsSheet({ onClose }: { onClose: () => void }) {
 
 interface AlbumCardProps {
   album: Album
+  /** 탭을 어긋나게 놓는 데 쓴다 */
+  index: number
   selecting: boolean
   checked: boolean
   onOpen: () => void
@@ -223,72 +230,74 @@ interface AlbumCardProps {
 }
 
 /** 사진첩 한 칸: 겹쳐 놓인 사진 + 가로지르는 반투명 바 + 제목·날짜·수정 */
-function AlbumCard({ album, selecting, checked, onOpen, onAdd, onEdit }: AlbumCardProps) {
-  const photos = useLiveQuery(() => db.photos.where('albumId').equals(album.id).limit(3).toArray(), [album.id])
+/*
+ * 사진첩 한 칸은 보관 상자에 꽂힌 색인 카드다.
+ *
+ * 카드 위로 이름표(탭)가 솟아 있고, 카드 사이로 그 안의 사진이 비친다.
+ * 탭의 좌우 자리는 칸마다 어긋나게 둬(--tab) 실제 서랍처럼 보이게 한다.
+ */
+const TAB_SPOTS = ['14px', '34%', '58%']
+
+function AlbumCard({ album, index, selecting, checked, onOpen, onAdd, onEdit }: AlbumCardProps) {
+  const photos = useLiveQuery(() => db.photos.where('albumId').equals(album.id).limit(4).toArray(), [album.id])
   const count = useLiveQuery(() => db.photos.where('albumId').equals(album.id).count(), [album.id])
 
   return (
-    <section className={`album${checked ? ' is-checked' : ''}`}>
+    <section
+      className={`file${checked ? ' is-checked' : ''}`}
+      style={{ '--tab': TAB_SPOTS[index % TAB_SPOTS.length] } as CSSProperties}
+    >
       <button
-        className="album__stack"
+        className="file__card"
         onClick={onOpen}
         aria-label={selecting ? `${album.title} 고르기` : `${album.title} 사진첩 열기`}
         aria-pressed={selecting ? checked : undefined}
       >
-        <span className="album__shots">
+        <span className="file__tab">{album.title}</span>
+
+        <span className="file__peek">
           {photos?.length ? (
             photos.map((photo) => <Shot key={photo.id} blob={photo.thumb} />)
           ) : (
-            <span className="album__none">아직 사진이 없어요</span>
+            <span className="file__none">아직 사진이 없어요</span>
           )}
         </span>
-        {selecting ? (
-          <span className={`album__check${checked ? ' is-on' : ''}`} aria-hidden="true">
+
+        <span className="file__meta">
+          {formatDateRange(album.date, album.endDate)}
+          {count != null && ` · ${count}장`}
+        </span>
+
+        {selecting && (
+          <span className={`file__check${checked ? ' is-on' : ''}`} aria-hidden="true">
             {checked && (
               <svg viewBox="0 0 24 24">
                 <path d="m5 12.5 5 5 9-11" />
               </svg>
             )}
           </span>
-        ) : (
-          <span className="album__bar">
-            <span
-              className="album__add"
-              role="button"
-              tabIndex={0}
-              aria-label="사진 넣기"
-              onClick={(e) => {
-                e.stopPropagation()
-                onAdd()
-              }}
-            >
-              +
-            </span>
-          </span>
         )}
       </button>
 
-      <div className="album__meta">
-        <div>
-          <h3>{album.title}</h3>
-          <p>
-            {formatDateRange(album.date, album.endDate)}
-            {count != null && ` · 사진 ${count}장`}
-          </p>
-        </div>
-        {!selecting && (
-          <button type="button" className="album__edit" onClick={onEdit} aria-label={`${album.title} 사진첩 수정`}>
+      {!selecting && (
+        <div className="file__tools">
+          <button type="button" onClick={onEdit} aria-label={`${album.title} 사진첩 수정`}>
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4Z" />
             </svg>
           </button>
-        )}
-      </div>
+          <button type="button" onClick={onAdd} aria-label={`${album.title}에 사진 넣기`}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 6v12M6 12h12" />
+            </svg>
+          </button>
+        </div>
+      )}
     </section>
   )
 }
 
 function Shot({ blob }: { blob: Blob }) {
   const url = useObjectUrl(blob)
-  return <span className="album__shot">{url && <img src={url} alt="" loading="lazy" />}</span>
+  return <span className="file__shot">{url && <img src={url} alt="" loading="lazy" />}</span>
 }
