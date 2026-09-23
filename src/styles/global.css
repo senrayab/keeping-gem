@@ -1895,40 +1895,6 @@ svg.dock__icon {
   background-blend-mode: normal, overlay, soft-light;
 }
 
-/* 위쪽 규격 표시 */
-.tape__head {
-  position: absolute;
-  top: 7px;
-  left: 8px;
-  /* 오른쪽은 수정·사진 넣기 자리로 비워 둔다 */
-  right: 70px;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.tape__mark {
-  font-family: var(--mono);
-  font-size: 7px;
-  letter-spacing: 0.1em;
-  color: rgb(253 251 246 / 0.78);
-  white-space: nowrap;
-}
-
-.tape__side {
-  display: grid;
-  place-items: center;
-  width: 15px;
-  height: 15px;
-  border: 1px solid rgb(253 251 246 / 0.6);
-  border-radius: 2px;
-  font-family: var(--mono);
-  font-size: 9px;
-  font-weight: 700;
-  color: rgb(253 251 246 / 0.9);
-}
-
 /* 앞면 제목 — 굵게, 자간을 좁혀 인쇄된 느낌으로 */
 .tape__title {
   position: absolute;

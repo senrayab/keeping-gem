@@ -252,12 +252,6 @@ function AlbumCard({ album, selecting, checked, onOpen, onAdd, onEdit }: AlbumCa
         {coverUrl && <img className="tape__art" src={coverUrl} alt="" loading="lazy" />}
         <span className="tape__grain" aria-hidden="true" />
 
-        {/* 위쪽 인쇄 — 테이프 규격 표시처럼 */}
-        <span className="tape__head">
-          <span className="tape__side">A</span>
-          <span className="tape__mark">COMPACT CASSETTE</span>
-        </span>
-
         <span className="tape__title">{album.title}</span>
 
         {/* 포장 비닐 — 비스듬히 지나가는 빛과 접힌 자국 */}
