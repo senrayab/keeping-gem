@@ -164,8 +164,9 @@ export function AlbumsSheet({ onClose }: { onClose: () => void }) {
             {picked.size > 0 ? `${picked.size}개 지우기` : '지우기'}
           </button>
         </div>
-      ) : (
-        /* 사진첩이 아무리 늘어도 자리가 변하지 않도록 떠 있게 둔다 */
+      ) : editing ? null : (
+        /* 사진첩이 아무리 늘어도 자리가 변하지 않도록 떠 있게 둔다.
+           만들기·수정 화면이 떠 있을 때는 그 위로 비치지 않게 숨긴다 */
         <button
           className="album-fab"
           onClick={() => setEditing({})}
