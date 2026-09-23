@@ -2436,8 +2436,8 @@ svg.dock__icon {
   width: 100%;
   object-fit: contain;
   border-radius: 10px;
-  /* 좌우로 밀 때 사진이 손가락을 따라온다 */
-  touch-action: pan-y;
+  /* 밀 때 사진이 손가락을 따라온다 (좌우는 앞뒤 사진, 위로는 닫기) */
+  touch-action: none;
   -webkit-user-drag: none;
   user-select: none;
 }
