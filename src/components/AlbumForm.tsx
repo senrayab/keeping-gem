@@ -107,7 +107,6 @@ export function AlbumForm({ album, onClose, onSaved }: AlbumFormProps) {
             onChange={(e) => setTitle(e.target.value)}
             onClear={() => setTitle('')}
             placeholder="도쿄 팬미팅 다녀온 날"
-            autoFocus={!album}
           />
         </label>
 
