@@ -1,3 +1,4 @@
+import { Download, Images, Pencil, Share2, Trash2, X } from 'lucide-react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useState, type CSSProperties } from 'react'
 import { db, deleteTicket, type Ticket } from '@/db/db'
@@ -107,10 +108,7 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
           {/* 아래 버튼 줄은 이 티켓을 '다루는' 자리라, 딸린 사진첩은 티켓에 붙은 뱃지로 알린다 */}
           {album && photoCount ? (
             <button className="detail__album" onClick={() => setAlbumOpen(true)}>
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M4.5 7.5h4l1.5-2h4l1.5 2h4v11h-15z" />
-                <circle cx="12" cy="12.5" r="3" />
-              </svg>
+              <Images aria-hidden="true" />
               그날의 사진
             </button>
           ) : null}
@@ -121,25 +119,25 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
       {/* 스크롤하지 않아도 늘 보이도록 아래에 붙인 버튼 줄 */}
       <nav className="detail__actions" aria-label="티켓 동작" onClick={(e) => e.stopPropagation()}>
         <button className="action action--primary" disabled={!image} onClick={save}>
-          <Icon d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14" />
+          <Download aria-hidden="true" />
           {image ? '이미지 저장' : '만드는 중…'}
         </button>
         {shareable && (
           <button className="action" onClick={() => void share()}>
-            <Icon d="M12 15V4m0 0L8 8m4-4 4 4M6 12v6.5A1.5 1.5 0 0 0 7.5 20h9a1.5 1.5 0 0 0 1.5-1.5V12" />
+            <Share2 aria-hidden="true" />
             공유
           </button>
         )}
         <button className="action" onClick={onEdit}>
-          <Icon d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4Z" />
+          <Pencil aria-hidden="true" />
           수정
         </button>
         <button className="action" onClick={() => setConfirming(true)}>
-          <Icon d="M5 7h14M10 11v6m4-6v6M6 7l1 12.5A1.5 1.5 0 0 0 8.5 21h7a1.5 1.5 0 0 0 1.5-1.5L18 7M9 7V4.5h6V7" />
+          <Trash2 aria-hidden="true" />
           삭제
         </button>
         <button className="action" onClick={onClose}>
-          <Icon d="M6 6l12 12M18 6 6 18" />
+          <X aria-hidden="true" />
           닫기
         </button>
       </nav>
@@ -176,10 +174,3 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
   )
 }
 
-function Icon({ d }: { d: string }) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d={d} />
-    </svg>
-  )
-}

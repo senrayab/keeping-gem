@@ -1,3 +1,4 @@
+import { MapPin } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import type { Ticket } from '@/db/db'
 import { categoryOf } from '@/lib/categories'
@@ -55,10 +56,7 @@ export function TicketView({ ticket, posterUrl, onPosterOpen, onVenueOpen }: Tic
             (onVenueOpen && ticket.lat != null ? (
               <button type="button" className="ticket__venue ticket__venue--map" onClick={onVenueOpen}>
                 {ticket.venue}
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
-                  <circle cx="12" cy="10" r="2.5" />
-                </svg>
+                <MapPin aria-hidden="true" />
               </button>
             ) : (
               <p className="ticket__venue">{ticket.venue}</p>

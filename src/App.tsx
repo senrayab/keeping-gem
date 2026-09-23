@@ -1,4 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
+import { Archive, List, Plus, Search, Sparkles } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { db, type Ticket } from './db/db'
 import { sumByCurrency } from './lib/currencies'
@@ -79,23 +80,10 @@ export function App() {
             onClick={toggleView}
             aria-label={view === 'sky' ? '리스트로 보기' : '밤하늘로 보기'}
           >
-            {view === 'sky' ? (
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M4 7h16M4 12h16M4 17h10" />
-              </svg>
-            ) : (
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 4.5 13.6 9l4.4 1.6-4.4 1.7L12 16.8 10.4 12.3 6 10.6 10.4 9 12 4.5Z" />
-                <circle cx="18" cy="17.5" r="1.4" />
-                <circle cx="6.5" cy="17" r="1" />
-              </svg>
-            )}
+            {view === 'sky' ? <List aria-hidden="true" /> : <Sparkles aria-hidden="true" />}
           </button>
           <button className="app-header__icon" onClick={() => setVault(true)} aria-label="보관함 (백업·복원)">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <rect x="3.5" y="4" width="17" height="5" rx="1.5" />
-              <path d="M5 9v9.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9M10 13h4" />
-            </svg>
+            <Archive aria-hidden="true" />
           </button>
         </div>
         <p className="app-header__eyebrow">Keeping Gem</p>
@@ -156,13 +144,10 @@ export function App() {
           aria-label="찾기"
           aria-pressed={searching}
         >
-          <svg className="dock__icon" viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="10.5" cy="10.5" r="6.5" />
-            <path d="M15.5 15.5 20 20" />
-          </svg>
+          <Search className="dock__icon" aria-hidden="true" />
         </button>
         <button className="dock__add" onClick={() => setEditing({})} aria-label="티켓 추가">
-          +
+          <Plus aria-hidden="true" />
         </button>
       </nav>
 

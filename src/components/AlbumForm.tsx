@@ -1,3 +1,4 @@
+import { Check } from 'lucide-react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useRef, useState, type FormEvent } from 'react'
 import { db, saveAlbum, type Album } from '@/db/db'
@@ -173,11 +174,7 @@ export function AlbumForm({ album, onClose, onSaved }: AlbumFormProps) {
                       <small>{formatDate(ticket.date)}</small>
                     </span>
                     <span className="ticket-pick__check" aria-hidden="true">
-                      {ticketIds.includes(ticket.id) && (
-                        <svg viewBox="0 0 24 24">
-                          <path d="m5 12.5 5 5 9-11" />
-                        </svg>
-                      )}
+                      {ticketIds.includes(ticket.id) && <Check aria-hidden="true" />}
                     </span>
                   </button>
                 </li>
