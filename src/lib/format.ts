@@ -29,3 +29,14 @@ export function formatDateRange(from: string, to?: string): string {
   const sameYear = from.slice(0, 4) === to.slice(0, 4)
   return `${formatDate(from)} ~ ${sameYear ? formatDate(to).slice(5) : formatDate(to)}`
 }
+
+/**
+ * 좁은 자리에 쓰는 기간 — 하루면 요일까지, 여러 날이면 요일을 뺀다.
+ * "2026.09.23 (수)" / "2026.02.20 ~ 02.22"
+ */
+export function formatRangeCompact(from: string, to?: string): string {
+  if (!to || to === from) return formatDate(from)
+  const plain = (date: string) => date.replaceAll('-', '.')
+  const sameYear = from.slice(0, 4) === to.slice(0, 4)
+  return `${plain(from)} ~ ${sameYear ? plain(to).slice(5) : plain(to)}`
+}

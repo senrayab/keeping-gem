@@ -5,7 +5,7 @@ import { addPhoto, albumFingerprints, db, deleteAlbums, type Album } from '@/db/
 import { useBackClose } from '@/hooks/useBackClose'
 import { useObjectUrl } from '@/hooks/useObjectUrl'
 import { useScrollLock } from '@/hooks/useScrollLock'
-import { formatDateRange } from '@/lib/format'
+import { formatRangeCompact } from '@/lib/format'
 import { seeded } from '@/lib/seed'
 import { fingerprint } from '@/lib/hash'
 import { PHOTO_MAX_EDGE, processImage } from '@/lib/image'
@@ -271,7 +271,7 @@ function AlbumCard({ album, selecting, checked, onOpen, onAdd, onEdit }: AlbumCa
       </button>
 
       <p className="tape__caption">
-        {formatDateRange(album.date, album.endDate)}
+        {formatRangeCompact(album.date, album.endDate)}
         {count != null && count > 0 ? ` · ${count}장` : ''}
       </p>
 
