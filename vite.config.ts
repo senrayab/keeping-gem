@@ -31,7 +31,8 @@ export default defineConfig(({ command, isPreview }) => ({
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-          { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          // 마스커블은 기기가 원/스퀘어클로 잘라내므로 여백을 더 둔 그림을 따로 쓴다
+          { src: 'icon-512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       workbox: {
