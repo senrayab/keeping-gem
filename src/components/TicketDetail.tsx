@@ -111,7 +111,7 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
                 <path d="M4.5 7.5h4l1.5-2h4l1.5 2h4v11h-15z" />
                 <circle cx="12" cy="12.5" r="3" />
               </svg>
-              그날의 사진 {photoCount}장
+              그날의 사진
             </button>
           ) : null}
         </div>
