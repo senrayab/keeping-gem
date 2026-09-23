@@ -1538,6 +1538,19 @@ svg.dock__icon {
   line-height: 1.5;
 }
 
+/* 날짜·시간 칸의 달력 아이콘이 테두리에 붙지 않게 */
+.field input[type='date'],
+.field input[type='time'] {
+  padding-right: 10px;
+}
+
+.field input[type='date']::-webkit-calendar-picker-indicator,
+.field input[type='time']::-webkit-calendar-picker-indicator {
+  margin-left: 8px;
+  padding: 4px;
+  opacity: 0.8;
+}
+
 /* 금액 칸: 통화 고르기 + 숫자 입력이 한 칸처럼 보이게 */
 .money {
   display: flex;
