@@ -61,7 +61,7 @@ export function AlbumsSheet({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="sheet" role="dialog" aria-modal="true" aria-label="사진첩">
-      <div className="sheet__body">
+      <div className="sheet__body sheet__body--albums">
         <header className="sheet__head">
           <span />
           <h2>사진첩</h2>
@@ -82,12 +82,28 @@ export function AlbumsSheet({ onClose }: { onClose: () => void }) {
           <AlbumCard key={album.id} album={album} onOpen={() => setOpened(album.id)} onAdd={() => pickPhotos(album.id)} />
         ))}
 
-        <button className="btn btn--glow" onClick={() => setEditing({})} disabled={busy !== null}>
-          {busy ? `사진 넣는 중 ${busy.done}/${busy.total}` : '새 사진첩 만들기'}
-        </button>
-
         <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={onPick} />
       </div>
+
+      {busy && (
+        <p className="album-progress" role="status">
+          사진 넣는 중 {busy.done}/{busy.total}
+        </p>
+      )}
+
+      {/* 사진첩이 아무리 늘어도 자리가 변하지 않도록 떠 있게 둔다 */}
+      <button
+        className="album-fab"
+        onClick={() => setEditing({})}
+        disabled={busy !== null}
+        aria-label="새 사진첩 만들기"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3" y="6.5" width="14" height="11" rx="2.5" />
+          <path d="M7 6.5V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v9" />
+          <path d="M6.5 14.5 9 12l2.5 2 2-1.5 3.5 3" />
+        </svg>
+      </button>
 
       {editing && (
         <AlbumForm

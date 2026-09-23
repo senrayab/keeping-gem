@@ -1753,6 +1753,58 @@ svg.dock__icon {
   line-height: 1;
 }
 
+/* 새 사진첩 만들기 — 카드 안의 +(44px)보다 크게 해 다른 일임을 알린다 */
+.album-fab {
+  position: fixed;
+  right: 18px;
+  bottom: calc(env(safe-area-inset-bottom) + 18px);
+  z-index: 33;
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff3dc, rgb(var(--amber)) 62%);
+  color: var(--night-0);
+  box-shadow: 0 10px 26px rgb(0 0 0 / 0.5), 0 0 24px rgb(var(--amber) / 0.5);
+}
+
+.album-fab:disabled {
+  opacity: 0.5;
+}
+
+.album-fab svg {
+  width: 27px;
+  height: 27px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.album-progress {
+  position: fixed;
+  right: 88px;
+  bottom: calc(env(safe-area-inset-bottom) + 33px);
+  z-index: 33;
+  margin: 0;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: #000;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* 떠 있는 버튼에 마지막 사진첩이 가리지 않게 자리를 비운다 */
+.sheet__body--albums {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 96px);
+}
+
 /* ───────── 펼쳐 놓은 사진 ───────── */
 
 /* 정돈 ↔ 자유 고르기 */
