@@ -251,7 +251,6 @@ function AlbumCard({ album, selecting, checked, onOpen, onAdd, onEdit }: AlbumCa
       >
         {/* 앞면 그림 — 그날의 포스터 */}
         {coverUrl && <img className="tape__art" src={coverUrl} alt="" loading="lazy" />}
-        <span className="tape__grain" aria-hidden="true" />
 
         <span className="tape__title">{album.title}</span>
 
