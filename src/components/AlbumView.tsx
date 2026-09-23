@@ -78,8 +78,16 @@ export function AlbumView({ album, onAdd, readOnly, onClose }: AlbumViewProps) {
   useBackClose(onClose)
   useScrollLock()
   const toast = useToast()
+  /*
+   * 찍힌 때가 늦은 사진이 위로 온다.
+   * 넣은 순서로 두면, 예전 사진을 나중에 보태는 순간 이야기의 흐름이 뒤엉킨다.
+   * (찍힌 때를 모르는 사진은 넣은 때를 대신 쓴다)
+   */
   const photos = useLiveQuery(
-    () => db.photos.where('[albumId+createdAt]').between([album.id, 0], [album.id, Infinity]).toArray(),
+    async () =>
+      (await db.photos.where('albumId').equals(album.id).toArray()).sort(
+        (a, b) => (b.takenAt ?? b.createdAt) - (a.takenAt ?? a.createdAt),
+      ),
     [album.id],
   )
   const [opened, setOpened] = useState<Photo | null>(null)

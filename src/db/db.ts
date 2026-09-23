@@ -65,6 +65,8 @@ export interface Photo {
   width: number
   height: number
   bytes: number
+  /** 사진이 찍힌 때 (파일에 적힌 시각). 모르면 넣은 때를 쓴다 */
+  takenAt?: number
   createdAt: number
 }
 
@@ -237,7 +239,7 @@ export async function saveAlbum(
 }
 
 /** 사진 한 장을 사진첩에 넣는다 */
-export async function addPhoto(albumId: string, image: ProcessedImage): Promise<void> {
+export async function addPhoto(albumId: string, image: ProcessedImage, takenAt?: number): Promise<void> {
   const id = uid()
   await db.transaction('rw', db.photos, db.photoImages, db.albums, async () => {
     await db.photos.add({
@@ -247,6 +249,7 @@ export async function addPhoto(albumId: string, image: ProcessedImage): Promise<
       width: image.full.width,
       height: image.full.height,
       bytes: image.full.blob.size + image.thumb.blob.size,
+      takenAt,
       createdAt: Date.now(),
     })
     await db.photoImages.add({ photoId: id, blob: image.full.blob })

@@ -61,7 +61,8 @@ export function AlbumsSheet({ onClose }: { onClose: () => void }) {
     // 한 장씩 처리한다 — 여러 장을 한꺼번에 펼치면 휴대폰 메모리가 모자랄 수 있다
     for (const [i, file] of files.entries()) {
       try {
-        await addPhoto(albumId, await processImage(file, PHOTO_MAX_EDGE))
+        // file.lastModified는 대개 사진을 찍은 때다 — 넣은 순서가 아니라 이 시각으로 늘어놓는다
+        await addPhoto(albumId, await processImage(file, PHOTO_MAX_EDGE), file.lastModified || undefined)
       } catch (e) {
         console.error(e)
         failed += 1
