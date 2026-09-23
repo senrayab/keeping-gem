@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Archive, Images, List, Plus, Search, Sparkles } from 'lucide-react'
+import { Images, List, Plus, Search, Settings, Sparkles } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useSmoothScroll } from './hooks/useSmoothScroll'
 import { db, type Ticket } from './db/db'
@@ -89,8 +89,8 @@ export function App() {
           <button className="app-header__icon" onClick={() => setAlbums(true)} aria-label="사진첩">
             <Images aria-hidden="true" />
           </button>
-          <button className="app-header__icon" onClick={() => setVault(true)} aria-label="보관함 (백업·복원)">
-            <Archive aria-hidden="true" />
+          <button className="app-header__icon" onClick={() => setVault(true)} aria-label="설정">
+            <Settings aria-hidden="true" />
           </button>
         </div>
         <p className="app-header__eyebrow">Keeping Gem</p>

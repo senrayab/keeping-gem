@@ -55,7 +55,7 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
   const [posterOpen, setPosterOpen] = useState(false)
   const [mapOpen, setMapOpen] = useState(false)
   const [albumOpen, setAlbumOpen] = useState(false)
-  // 이 티켓에 이어 둔 사진첩 (보관함에서 만들 때 티켓을 고르면 생긴다)
+  // 이 티켓에 이어 둔 사진첩 (사진첩을 만들 때 티켓을 고르면 생긴다)
   const album = useLiveQuery(async () => (await db.albums.where('ticketIds').equals(ticket.id).first()) ?? null, [ticket.id])
   const photoCount = useLiveQuery(
     async () => (album ? await db.photos.where('albumId').equals(album.id).count() : 0),
