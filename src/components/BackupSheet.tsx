@@ -11,7 +11,7 @@ import { useToast } from './Toast'
 const formatWhen = (ms: number) =>
   new Date(ms).toLocaleString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })
 
-/** 보관함: 백업 파일 만들기와 백업에서 불러오기 */
+/** 설정: 저장 현황과 백업 파일 만들기·불러오기 */
 export function BackupSheet({ onClose }: { onClose: () => void }) {
   useBackClose(onClose)
   useScrollLock()
@@ -90,12 +90,12 @@ export function BackupSheet({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="sheet" role="dialog" aria-modal="true" aria-label="보관함">
+    <div className="sheet" role="dialog" aria-modal="true" aria-label="설정">
       <div className="sheet__body">
         <header className="sheet__head">
           {/* 닫기는 여는 버튼(머리말 오른쪽 위)과 같은 쪽에 둔다 */}
           <span />
-          <h2>보관함</h2>
+          <h2>설정</h2>
           <button type="button" className="btn btn--ghost btn--small" onClick={onClose}>
             닫기
           </button>

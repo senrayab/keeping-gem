@@ -184,7 +184,7 @@ export function AlbumView({ album, onAdd, readOnly, onClose }: AlbumViewProps) {
       >
         {photos?.length === 0 && (
           <p className="album-view__empty">
-            {readOnly ? '아직 사진이 없어요. 보관함 → 사진첩에서 넣을 수 있어요.' : '아래 버튼으로 그날의 사진을 넣어 보세요.'}
+            {readOnly ? '아직 사진이 없어요. 머리말의 사진첩에서 넣을 수 있어요.' : '아래 버튼으로 그날의 사진을 넣어 보세요.'}
           </p>
         )}
         {photos?.map((photo, i) => (

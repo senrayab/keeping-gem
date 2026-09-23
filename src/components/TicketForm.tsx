@@ -183,7 +183,7 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
     <div className="sheet" role="dialog" aria-modal="true" aria-label={ticket ? '티켓 수정' : '티켓 추가'}>
       <form className="sheet__body" onSubmit={(e) => void submit(e)}>
         <header className="sheet__head">
-          {/* 취소는 보관함 닫기와 같은 오른쪽 위에 둔다 */}
+          {/* 취소는 다른 화면의 닫기와 같은 오른쪽 위에 둔다 */}
           <span className="sheet__spacer" />
           <h2>{ticket ? '티켓 수정' : '새 티켓'}</h2>
           <button type="button" className="btn btn--ghost btn--small" onClick={onClose}>
