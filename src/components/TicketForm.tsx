@@ -57,9 +57,8 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
   const albumRef = useRef<HTMLInputElement>(null)
   const titleRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    if (!ticket) titleRef.current?.focus({ preventScroll: true })
-  }, [ticket])
+  // 열자마자 칸에 커서를 두지 않는다 — 키보드가 올라와 화면 절반을 가린다.
+  // 어디부터 적을지는 사람이 고른다.
 
   const onPick = async (event: ChangeEvent<HTMLInputElement>) => {
     const input = event.currentTarget
