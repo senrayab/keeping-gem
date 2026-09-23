@@ -1014,18 +1014,6 @@ svg.dock__icon {
   object-fit: contain;
 }
 
-/* 티켓 아래 오른쪽에 두는 금액 — 상자도 그림자도 없이 글자만 */
-.detail__price {
-  flex: none;
-  width: min(340px, 100%);
-  margin: 10px auto 0;
-  padding-right: 12px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--ink-soft);
-  text-align: right;
-}
-
 /* 티켓에 붙은 사진첩 뱃지 — 티켓 아래 가운데에 살짝 걸친다 */
 .detail__album {
   /* 티켓 위로 올라와야 한다 — 티켓이 그림자를 갖고 있어 그냥 두면 뒤로 깔린다 */
@@ -1196,6 +1184,21 @@ svg.dock__icon {
   text-align: center;
   word-break: keep-all;
   text-shadow: 0 2px 12px rgb(0 0 0 / 0.2);
+}
+
+/*
+ * 포스터 오른쪽 위의 금액 — 보일 듯 말 듯.
+ * 작게, 자간을 좁혀, 옅은 흰 글씨로 둔다. 밝은 포스터에서도 읽히도록 그림자만 아주 얕게 깐다.
+ */
+.ticket__price {
+  position: absolute;
+  top: 9px;
+  right: 11px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: rgb(255 255 255 / 0.72);
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.4);
 }
 
 .ticket__head {
