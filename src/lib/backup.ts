@@ -173,7 +173,7 @@ export async function readBackup(file: File): Promise<RestorePreview> {
   }
 
   // 사진첩 (format 1 백업에는 없다 — 그 경우 빈 목록)
-  const albums = (manifest.albums ?? []).filter(isAlbum)
+  const albums = (manifest.albums ?? []).filter(isAlbum).map(normalizeAlbum)
   const albumIds = new Set(albums.map((a) => a.id))
   const photos: Photo[] = []
   const photoImages: PhotoImage[] = []
@@ -189,6 +189,12 @@ export async function readBackup(file: File): Promise<RestorePreview> {
 
   const existing = (await db.tickets.bulkGet(tickets.map((t) => t.id))).filter(Boolean).length
   return { tickets, posters, albums, photos, photoImages, createdAt: manifest.createdAt ?? 0, existing }
+}
+
+/** 옛 백업은 티켓을 하나만 담았다(ticketId) — 여럿 담는 새 형식으로 옮긴다 */
+function normalizeAlbum(album: Album & { ticketId?: string }): Album {
+  const { ticketId, ...rest } = album
+  return { ...rest, ticketIds: album.ticketIds ?? (ticketId ? [ticketId] : []) }
 }
 
 function isAlbum(value: unknown): value is Album {

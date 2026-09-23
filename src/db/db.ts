@@ -47,10 +47,12 @@ export interface Poster {
 export interface Album {
   id: string
   title: string
-  /** 그날(여행 시작일) "YYYY-MM-DD" */
+  /** 시작일 "YYYY-MM-DD" */
   date: string
-  /** 연결된 티켓 */
-  ticketId?: string
+  /** 마지막 날 — 이틀 이상 이어진 일정일 때만 있다 (2박 3일 콘서트 등) */
+  endDate?: string
+  /** 이어 둔 티켓들 — 같은 공연을 여러 날 본 경우 여러 장이 걸린다 */
+  ticketIds?: string[]
   createdAt: number
   updatedAt: number
 }
@@ -115,6 +117,27 @@ class KeepingGemDB extends Dexie {
       photos: 'id, albumId, [albumId+createdAt]',
       photoImages: 'photoId',
     })
+    /*
+     * v4: 사진첩 하나에 티켓을 여러 장 걸 수 있게 한다(*ticketIds).
+     * 이틀 이상 이어진 공연은 하루씩 나누지 않고 한 사진첩에 모아 두는 편이 낫다.
+     */
+    this.version(4)
+      .stores({
+        tickets: 'id, date, createdAt',
+        posters: 'ticketId',
+        albums: 'id, date, *ticketIds, createdAt',
+        photos: 'id, albumId, [albumId+createdAt]',
+        photoImages: 'photoId',
+      })
+      .upgrade(async (tx) => {
+        await tx
+          .table('albums')
+          .toCollection()
+          .modify((album: Album & { ticketId?: string }) => {
+            album.ticketIds = album.ticketId ? [album.ticketId] : []
+            delete album.ticketId
+          })
+      })
   }
 }
 
@@ -198,7 +221,7 @@ export async function saveTicket(
 }
 
 export async function saveAlbum(
-  input: Pick<Album, 'title' | 'date' | 'ticketId'>,
+  input: Pick<Album, 'title' | 'date' | 'endDate' | 'ticketIds'>,
   id?: string,
 ): Promise<string> {
   const now = Date.now()
