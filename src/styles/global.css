@@ -1823,104 +1823,157 @@ svg.dock__icon {
 /*
  * 사진 보관 상자.
  *
- * 사진첩 하나가 상자에 꽂힌 색인 카드다. 카드마다 이름표(탭)가 솟아 있고,
- * 카드 사이로 안의 사진이 비친다. 탭의 좌우 자리는 칸마다 어긋나게 둔다.
+ * 사진첩 하나가 상자에 꽂힌 색인 카드다. 카드 뒤로 사진이 비스듬히 꽂혀 윗머리만 보이고,
+ * 카드 위로는 빛깔 있는 이름표가 솟아 있다. 상자에는 이름표 판을 달아 서랍 같은 무게를 준다.
  */
 .album-box {
+  position: relative;
   display: grid;
-  padding: 26px 12px 16px;
-  border: 1px solid rgb(255 255 255 / 0.08);
-  border-radius: 20px;
-  background: linear-gradient(180deg, #161226, #0c0a14);
-  box-shadow: inset 0 3px 14px rgb(0 0 0 / 0.6), inset 0 -1px 0 rgb(255 255 255 / 0.05);
+  padding: 42px 12px 18px;
+  border: 1px solid rgb(255 255 255 / 0.07);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #1b1626, #100d18 60%);
+  box-shadow: inset 0 10px 22px rgb(0 0 0 / 0.6), inset 0 -1px 0 rgb(255 255 255 / 0.05),
+    0 14px 30px rgb(0 0 0 / 0.45);
+}
+
+/* 상자에 붙은 이름표 판 */
+.album-box::before {
+  content: 'PHOTOS';
+  position: absolute;
+  top: 13px;
+  left: 50%;
+  padding: 4px 16px 5px;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 4px;
+  background: rgb(255 255 255 / 0.04);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.34em;
+  color: rgb(255 255 255 / 0.42);
+  transform: translateX(-50%);
 }
 
 .file {
   position: relative;
-  margin-bottom: 20px;
+  /* 카드 뒤에 꽂힌 사진이 삐져나올 자리 */
+  padding-top: 54px;
+  /* 아래 칸의 사진이 이 카드에 붙어 보이지 않도록 넉넉히 띄운다 */
+  margin-bottom: 26px;
 }
 
 .file:last-child {
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
-/* 색인 카드 — 종이 색으로 두어 상자 안의 서류처럼 보이게 */
+/* 뒤에 꽂힌 사진들 */
+.file__peeks {
+  position: absolute;
+  top: 4px;
+  right: 10px;
+  left: 10px;
+  height: 84px;
+}
+
+.file__peek {
+  position: absolute;
+  bottom: 0;
+  display: block;
+  width: 70px;
+  height: 82px;
+  padding: 3px 3px 8px;
+  border-radius: 3px;
+  background: #fbf9f4;
+  box-shadow: 0 6px 12px rgb(0 0 0 / 0.45);
+}
+
+.file__peek img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 2px;
+}
+
+.file__peek--0 { left: 3%; transform: rotate(-4deg); }
+.file__peek--1 { left: 28%; transform: rotate(2deg); }
+.file__peek--2 { left: 53%; transform: rotate(-1.5deg); }
+
+/* 색인 카드 */
 .file__card {
+  position: relative;
+  z-index: 2;
   display: block;
   width: 100%;
-  padding: 0 0 8px;
+  padding: 13px 14px 13px;
   border: 0;
-  border-radius: 4px 4px 12px 12px;
-  background: #efe9dc;
+  border-radius: 5px 5px 12px 12px;
+  background: linear-gradient(180deg, #f4efe3, #e7e0d1);
   color: #34303f;
   text-align: left;
-  box-shadow: 0 8px 16px rgb(0 0 0 / 0.5);
+  box-shadow: 0 -3px 10px rgb(0 0 0 / 0.35), 0 10px 18px rgb(0 0 0 / 0.5);
 }
 
 .file__card:active {
   transform: translateY(1px);
 }
 
+/* 카드 윗면을 따라 흐르는 빛깔 띠 — 이름표와 같은 색 */
+.file__card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 5px 5px 0 0;
+  background: var(--tint);
+}
+
 /* 카드 위로 솟은 이름표 */
 .file__tab {
   position: absolute;
-  top: -19px;
+  top: -23px;
   left: var(--tab);
-  max-width: 62%;
-  padding: 4px 14px 5px;
+  max-width: 68%;
+  padding: 5px 14px 6px;
   overflow: hidden;
-  border-radius: 8px 8px 0 0;
-  background: #efe9dc;
-  color: #34303f;
+  border-radius: 7px 7px 0 0;
+  background: var(--tint);
+  color: #2b2733;
   font-size: 12.5px;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: -0.01em;
   white-space: nowrap;
   text-overflow: ellipsis;
   box-shadow: 0 -3px 8px rgb(0 0 0 / 0.35);
 }
 
-/* 카드 사이로 비치는 사진 */
-.file__peek {
+.file__front {
   display: flex;
-  gap: 3px;
-  padding: 8px 8px 0;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding-right: 64px;
 }
 
-.file__shot {
-  flex: 1;
-  height: 58px;
-  overflow: hidden;
-  border-radius: 3px;
-  background: rgb(0 0 0 / 0.1);
+.file__date {
+  font-size: 13px;
+  font-weight: 700;
+  color: #46414f;
 }
 
-.file__shot img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.file__count {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: #837c8e;
 }
 
-.file__none {
-  padding: 18px 4px;
-  width: 100%;
-  font-size: 12.5px;
-  color: #8d8799;
-  text-align: center;
-}
-
-.file__meta {
-  display: block;
-  padding: 7px 12px 0;
-  font-size: 12px;
-  font-weight: 600;
-  color: #7d7689;
-}
-
-/* 수정·사진 넣기 — 카드 오른쪽 아래에 작게 */
+/* 수정·사진 넣기 — 카드 오른쪽에 작게 */
 .file__tools {
   position: absolute;
-  right: 8px;
-  bottom: 4px;
+  right: 10px;
+  bottom: 11px;
+  z-index: 3;
   display: flex;
   gap: 4px;
 }
@@ -1928,12 +1981,12 @@ svg.dock__icon {
 .file__tools button {
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: rgb(52 48 63 / 0.1);
+  background: rgb(52 48 63 / 0.09);
   color: #55506a;
 }
 
@@ -1942,8 +1995,8 @@ svg.dock__icon {
 }
 
 .file__tools svg {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   fill: none;
   stroke: currentColor;
   stroke-width: 2;
@@ -1953,20 +2006,21 @@ svg.dock__icon {
 
 /* 고르는 중인 사진첩 */
 .file.is-checked .file__card {
-  box-shadow: 0 0 0 2px rgb(var(--amber)), 0 8px 16px rgb(0 0 0 / 0.5);
+  box-shadow: 0 0 0 2px rgb(var(--amber)), 0 10px 18px rgb(0 0 0 / 0.5);
 }
 
 .file__check {
   position: absolute;
-  right: 10px;
-  bottom: 8px;
+  right: 12px;
+  top: 50%;
   display: grid;
   place-items: center;
   width: 26px;
   height: 26px;
-  border: 2px solid rgb(52 48 63 / 0.35);
+  border: 2px solid rgb(52 48 63 / 0.3);
   border-radius: 50%;
-  background: rgb(255 255 255 / 0.6);
+  background: rgb(255 255 255 / 0.55);
+  transform: translateY(-50%);
 }
 
 .file__check.is-on {
