@@ -15,15 +15,15 @@ export function useSmoothScroll() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     const lenis = new Lenis({
-      // 손을 뗀 뒤 미끄러지는 거리
-      duration: 1.1,
+      // 손을 뗀 뒤 미끄러지는 거리 — 짧게 둬야 가볍다
+      duration: 0.85,
       // 처음엔 천천히, 뒤로 갈수록 빠르게 따라잡는 곡선
       easing: (t) => 1 - Math.pow(1 - t, 3),
-      // 손가락을 따라오는 정도 — 1보다 작게 둬야 '끌려오는' 느낌이 난다
+      // 손가락을 따라오는 정도 — 높을수록 바짝 따라와 가볍게 느껴진다
       syncTouch: true,
-      syncTouchLerp: 0.085,
-      touchInertiaExponent: 1.7,
-      wheelMultiplier: 0.9,
+      syncTouchLerp: 0.16,
+      touchInertiaExponent: 1.4,
+      wheelMultiplier: 1,
     })
 
     let frame = 0
