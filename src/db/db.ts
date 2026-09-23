@@ -40,6 +40,37 @@ export interface Poster {
   blob: Blob
 }
 
+/**
+ * 사진첩 — 그날의 사진을 모아 두는 곳. 티켓 한 장에 하나씩 달 수도 있고,
+ * 티켓 없이 따로 만들 수도 있다.
+ */
+export interface Album {
+  id: string
+  title: string
+  /** 그날(여행 시작일) "YYYY-MM-DD" */
+  date: string
+  /** 연결된 티켓 */
+  ticketId?: string
+  createdAt: number
+  updatedAt: number
+}
+
+/** 사진 한 장의 정보와 썸네일. 원본은 photoImages에 따로 둔다(목록이 무거워지지 않게). */
+export interface Photo {
+  id: string
+  albumId: string
+  thumb: Blob
+  width: number
+  height: number
+  bytes: number
+  createdAt: number
+}
+
+export interface PhotoImage {
+  photoId: string
+  blob: Blob
+}
+
 export type TicketInput = Pick<
   Ticket,
   | 'title'
@@ -59,6 +90,9 @@ export type TicketInput = Pick<
 class KeepingGemDB extends Dexie {
   tickets!: Table<Ticket, string>
   posters!: Table<Poster, string>
+  albums!: Table<Album, string>
+  photos!: Table<Photo, string>
+  photoImages!: Table<PhotoImage, string>
 
   constructor() {
     super('keeping-gem')
@@ -72,6 +106,14 @@ class KeepingGemDB extends Dexie {
       images: null,
       tickets: 'id, date, createdAt',
       posters: 'ticketId',
+    })
+    // v3: 사진첩을 더한다. 사진 본체는 따로 둬서 목록을 읽을 때 딸려 오지 않게 한다.
+    this.version(3).stores({
+      tickets: 'id, date, createdAt',
+      posters: 'ticketId',
+      albums: 'id, date, ticketId, createdAt',
+      photos: 'id, albumId, [albumId+createdAt]',
+      photoImages: 'photoId',
     })
   }
 }
@@ -153,6 +195,57 @@ export async function saveTicket(
   })
 
   return ticketId
+}
+
+export async function saveAlbum(
+  input: Pick<Album, 'title' | 'date' | 'ticketId'>,
+  id?: string,
+): Promise<string> {
+  const now = Date.now()
+  const albumId = id ?? uid()
+  const prev = id ? await db.albums.get(id) : undefined
+  await db.albums.put({
+    ...input,
+    id: albumId,
+    createdAt: prev?.createdAt ?? now,
+    updatedAt: now,
+  })
+  return albumId
+}
+
+/** 사진 한 장을 사진첩에 넣는다 */
+export async function addPhoto(albumId: string, image: ProcessedImage): Promise<void> {
+  const id = uid()
+  await db.transaction('rw', db.photos, db.photoImages, db.albums, async () => {
+    await db.photos.add({
+      id,
+      albumId,
+      thumb: image.thumb.blob,
+      width: image.full.width,
+      height: image.full.height,
+      bytes: image.full.blob.size + image.thumb.blob.size,
+      createdAt: Date.now(),
+    })
+    await db.photoImages.add({ photoId: id, blob: image.full.blob })
+    await db.albums.update(albumId, { updatedAt: Date.now() })
+  })
+}
+
+export async function deletePhoto(id: string): Promise<void> {
+  await db.transaction('rw', db.photos, db.photoImages, async () => {
+    await db.photos.delete(id)
+    await db.photoImages.delete(id)
+  })
+}
+
+/** 사진첩과 그 안의 사진을 모두 지운다 */
+export async function deleteAlbum(albumId: string): Promise<void> {
+  await db.transaction('rw', db.albums, db.photos, db.photoImages, async () => {
+    const ids = await db.photos.where('albumId').equals(albumId).primaryKeys()
+    await db.photos.bulkDelete(ids)
+    await db.photoImages.bulkDelete(ids)
+    await db.albums.delete(albumId)
+  })
 }
 
 export async function deleteTicket(id: string): Promise<void> {
