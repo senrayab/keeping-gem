@@ -41,11 +41,15 @@ export function BackupSheet({ onClose }: { onClose: () => void }) {
   const backup = async () => {
     setBusy('backup')
     try {
-      const { blob, name, count } = await createBackup()
+      const { blob, name, count, photoCount } = await createBackup()
       download(blob, name)
       markBackedUp()
       setLastBackup(lastBackupAt())
-      toast(`티켓 ${count}장을 백업했어요. 다운로드 폴더를 확인해 주세요.`)
+      toast(
+        photoCount > 0
+          ? `티켓 ${count}장과 사진 ${photoCount}장을 백업했어요.`
+          : `티켓 ${count}장을 백업했어요. 다운로드 폴더를 확인해 주세요.`,
+      )
     } catch (e) {
       console.error(e)
       toast('백업 파일을 만들지 못했어요.')
@@ -74,7 +78,11 @@ export function BackupSheet({ onClose }: { onClose: () => void }) {
     setBusy('restore')
     try {
       await applyBackup(preview)
-      toast(`티켓 ${preview.tickets.length}장을 불러왔어요.`)
+      toast(
+        preview.photos.length > 0
+          ? `티켓 ${preview.tickets.length}장과 사진 ${preview.photos.length}장을 불러왔어요.`
+          : `티켓 ${preview.tickets.length}장을 불러왔어요.`,
+      )
       setPreview(null)
       onClose()
     } catch (e) {
@@ -140,7 +148,7 @@ export function BackupSheet({ onClose }: { onClose: () => void }) {
           {!preview ? (
             <>
               <p className="vault__meta">
-                백업 파일(.zip)을 고르면 티켓을 합쳐서 불러와요. 지금 있는 티켓은 지워지지 않아요.
+                백업 파일(.zip)을 고르면 티켓과 사진첩을 합쳐서 불러와요. 지금 있는 것은 지워지지 않아요.
               </p>
               <button className="btn btn--ghost" disabled={busy !== null} onClick={() => inputRef.current?.click()}>
                 {busy === 'read' ? '읽는 중…' : '백업 파일 고르기'}
@@ -151,6 +159,7 @@ export function BackupSheet({ onClose }: { onClose: () => void }) {
               <p>
                 {preview.createdAt > 0 && `${formatWhen(preview.createdAt)}에 만든 백업 · `}
                 티켓 <strong>{preview.tickets.length}</strong>장
+                {preview.photos.length > 0 && ` · 사진 ${preview.photos.length}장`}
                 {preview.existing > 0 && (
                   <>
                     <br />이 중 {preview.existing}장은 이미 있어서 백업 내용으로 바뀌어요.
