@@ -1,3 +1,4 @@
+import { Check, ImagePlus, Pencil, Plus, Trash2, X } from 'lucide-react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useRef, useState, type ChangeEvent, type CSSProperties } from 'react'
 import { addPhoto, albumFingerprints, db, deleteAlbums, type Album } from '@/db/db'
@@ -109,15 +110,7 @@ export function AlbumsSheet({ onClose }: { onClose: () => void }) {
                 onClick={() => setPicked(selecting ? null : new Set())}
                 aria-label={selecting ? '고르기 그만두기' : '사진첩 골라 지우기'}
               >
-                {selecting ? (
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M6 6l12 12M18 6 6 18" />
-                  </svg>
-                ) : (
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M5 7h14M10 11v6m4-6v6M6 7l1 12.5A1.5 1.5 0 0 0 8.5 21h7a1.5 1.5 0 0 0 1.5-1.5L18 7M9 7V4.5h6V7" />
-                  </svg>
-                )}
+                {selecting ? <X aria-hidden="true" /> : <Trash2 aria-hidden="true" />}
               </button>
             ) : null}
             {!selecting && (
@@ -179,11 +172,7 @@ export function AlbumsSheet({ onClose }: { onClose: () => void }) {
           disabled={busy !== null}
           aria-label="새 사진첩 만들기"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <rect x="3" y="6.5" width="14" height="11" rx="2.5" />
-            <path d="M7 6.5V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v9" />
-            <path d="M6.5 14.5 9 12l2.5 2 2-1.5 3.5 3" />
-          </svg>
+          <ImagePlus aria-hidden="true" />
         </button>
       )}
 
@@ -270,11 +259,7 @@ function AlbumCard({ album, index, selecting, checked, onOpen, onAdd, onEdit }: 
 
         {selecting && (
           <span className={`file__check${checked ? ' is-on' : ''}`} aria-hidden="true">
-            {checked && (
-              <svg viewBox="0 0 24 24">
-                <path d="m5 12.5 5 5 9-11" />
-              </svg>
-            )}
+            {checked && <Check aria-hidden="true" />}
           </span>
         )}
       </button>
@@ -282,14 +267,10 @@ function AlbumCard({ album, index, selecting, checked, onOpen, onAdd, onEdit }: 
       {!selecting && (
         <div className="file__tools">
           <button type="button" onClick={onEdit} aria-label={`${album.title} 사진첩 수정`}>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4Z" />
-            </svg>
+            <Pencil aria-hidden="true" />
           </button>
           <button type="button" onClick={onAdd} aria-label={`${album.title}에 사진 넣기`}>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 6v12M6 12h12" />
-            </svg>
+            <Plus aria-hidden="true" />
           </button>
         </div>
       )}

@@ -1,3 +1,4 @@
+import { Check, ImagePlus } from 'lucide-react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useState, type CSSProperties } from 'react'
 import { db, deletePhoto, deletePhotos, type Album, type Photo } from '@/db/db'
@@ -217,11 +218,7 @@ export function AlbumView({ album, onAdd, readOnly, onClose }: AlbumViewProps) {
         ) : (
           /* 아래 바로 깔면 사진을 가린다 — 떠 있는 단추로 두고, 사진은 그만큼 자리를 비운다 */
           <button className="album-fab" onClick={onAdd} aria-label="사진 넣기">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <rect x="3" y="6" width="14" height="12" rx="2.5" />
-              <path d="M6 15l3-3 2.5 2 2-1.5L17 16" />
-              <path d="M18 4.5v6M15 7.5h6" />
-            </svg>
+            <ImagePlus aria-hidden="true" />
           </button>
         ))}
 
@@ -288,9 +285,7 @@ function Print({
       {url && <img src={url} alt="" loading="lazy" draggable={false} />}
       {picked && (
         <span className="print__check" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <path d="m5 12.5 5 5 9-11" />
-          </svg>
+          <Check aria-hidden="true" />
         </span>
       )}
     </button>
