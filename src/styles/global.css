@@ -585,9 +585,14 @@ button {
   white-space: nowrap;
 }
 
-/* 돋보기만 있는 단추 — 글자가 없으니 좌우 여백을 줄여 동그랗게 */
+/* 돋보기만 있는 단추 — 늘 동그란 테두리를 둘러 눌리는 자리임을 알린다 */
 .dock__btn--icon {
-  padding: 0 14px;
+  justify-content: center;
+  width: 48px;
+  padding: 0;
+  border: 1px solid var(--glass-line);
+  border-radius: 50%;
+  background: var(--glass);
 }
 
 .dock__btn:disabled {
