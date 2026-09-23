@@ -2,6 +2,7 @@ import Dexie, { type Table } from 'dexie'
 import type { ProcessedImage } from '@/lib/image'
 import type { CategoryId } from '@/lib/categories'
 import type { CurrencyId } from '@/lib/currencies'
+import { fingerprint } from '@/lib/hash'
 
 /**
  * 티켓 한 장. 밤하늘을 그릴 때는 이것만 읽는다 —
@@ -67,6 +68,8 @@ export interface Photo {
   bytes: number
   /** 사진이 찍힌 때 (파일에 적힌 시각). 모르면 넣은 때를 쓴다 */
   takenAt?: number
+  /** 그림의 지문 — 같은 사진을 두 번 넣지 않으려고 쓴다 (lib/hash.ts) */
+  hash?: string
   createdAt: number
 }
 
@@ -239,7 +242,12 @@ export async function saveAlbum(
 }
 
 /** 사진 한 장을 사진첩에 넣는다 */
-export async function addPhoto(albumId: string, image: ProcessedImage, takenAt?: number): Promise<void> {
+export async function addPhoto(
+  albumId: string,
+  image: ProcessedImage,
+  takenAt?: number,
+  hash?: string,
+): Promise<void> {
   const id = uid()
   await db.transaction('rw', db.photos, db.photoImages, db.albums, async () => {
     await db.photos.add({
@@ -250,6 +258,7 @@ export async function addPhoto(albumId: string, image: ProcessedImage, takenAt?:
       height: image.full.height,
       bytes: image.full.blob.size + image.thumb.blob.size,
       takenAt,
+      hash,
       createdAt: Date.now(),
     })
     await db.photoImages.add({ photoId: id, blob: image.full.blob })
@@ -259,6 +268,30 @@ export async function addPhoto(albumId: string, image: ProcessedImage, takenAt?:
 
 export async function deletePhoto(id: string): Promise<void> {
   await deletePhotos([id])
+}
+
+/**
+ * 이 사진첩에 이미 있는 사진들의 지문을 모은다.
+ *
+ * 지문이 없던 사진(이 기능 이전에 넣은 것)은 이때 한 번 구해 저장해 둔다 —
+ * 그래야 예전에 넣은 사진과도 겹치는지 가릴 수 있다.
+ */
+export async function albumFingerprints(albumId: string): Promise<Set<string>> {
+  const photos = await db.photos.where('albumId').equals(albumId).toArray()
+  const known = new Set<string>()
+  for (const photo of photos) {
+    if (photo.hash) {
+      known.add(photo.hash)
+      continue
+    }
+    const image = await db.photoImages.get(photo.id)
+    if (!image) continue
+    const hash = await fingerprint(image.blob)
+    if (!hash) continue
+    await db.photos.update(photo.id, { hash })
+    known.add(hash)
+  }
+  return known
 }
 
 /** 고른 사진을 한꺼번에 지운다 */
