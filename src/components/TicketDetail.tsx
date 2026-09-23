@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useState, type CSSProperties } from 'react'
 import { db, deleteTicket, type Ticket } from '@/db/db'
+import { AlbumView } from './AlbumView'
 import { useBackClose } from '@/hooks/useBackClose'
 import { useScrollLock } from '@/hooks/useScrollLock'
 import { useObjectUrl } from '@/hooks/useObjectUrl'
@@ -52,6 +53,13 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
   const shareable = image !== null && canShareFiles(image)
   const [posterOpen, setPosterOpen] = useState(false)
   const [mapOpen, setMapOpen] = useState(false)
+  const [albumOpen, setAlbumOpen] = useState(false)
+  // 이 티켓에 이어 둔 사진첩 (보관함에서 만들 때 티켓을 고르면 생긴다)
+  const album = useLiveQuery(async () => (await db.albums.where('ticketId').equals(ticket.id).first()) ?? null, [ticket.id])
+  const photoCount = useLiveQuery(
+    async () => (album ? await db.photos.where('albumId').equals(album.id).count() : 0),
+    [album?.id],
+  )
 
   const share = async () => {
     if (!image) return
@@ -110,6 +118,12 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
             공유
           </button>
         )}
+        {album && (
+          <button className="action" onClick={() => setAlbumOpen(true)}>
+            <Icon d="M4.5 7.5h4l1.5-2h4l1.5 2h4v11h-15zM12 15.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+            사진 {photoCount ?? 0}
+          </button>
+        )}
         <button className="action" onClick={onEdit}>
           <Icon d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4Z" />
           수정
@@ -132,6 +146,16 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
           confirmLabel="삭제"
           onConfirm={() => void remove()}
           onCancel={() => setConfirming(false)}
+        />
+      )}
+
+      {albumOpen && album && (
+        <AlbumView
+          album={album}
+          onAdd={() => {}}
+          onEdit={() => {}}
+          readOnly
+          onClose={() => setAlbumOpen(false)}
         />
       )}
 
