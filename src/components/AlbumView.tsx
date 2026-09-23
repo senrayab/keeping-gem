@@ -23,7 +23,7 @@ import { useToast } from './Toast'
 export type DeskLayout = 'collage' | 'pile'
 
 const LAYOUT_KEY = 'keeping-gem:desk'
-const PILE_STEP = 62
+const PILE_STEP = 58
 const TOP = 10
 
 interface Spot {
@@ -40,17 +40,24 @@ interface Spot {
  * 겹치되 가려지지는 않아야 한다 — 이웃한 사진을 좌우로 번갈아 놓고 세로 간격을 넉넉히 둬,
  * 어느 장이든 절반 넘게 드러나게 한다. 가장자리는 살짝 넘겨 더미 한가운데를 보는 느낌만 남긴다.
  */
-/** 왼쪽·가운데·오른쪽을 돌아가며 놓아 가로 여백을 고루 채운다 */
-const LANES = [-3, 24, 51]
-
+/*
+ * 잡지 콜라주처럼 붙인다.
+ *
+ * 크기를 섞고(작은 것과 큰 것) 가운데로 모아 겹치되, 좌우로 조금씩 흘려 여백을 채운다.
+ * 기울기는 대체로 얕게 두고 가끔 한 장씩 크게 틀어 손으로 붙인 티를 낸다.
+ */
 function pileSpot(photo: Photo, index: number): Spot {
   const rand = seeded(photo.id)
-  const width = 30 + rand() * 10
-  const lane = LANES[index % LANES.length]
+  // 넷 중 하나는 크게 — 큰 사진이 중심을 잡아 준다
+  const big = index % 4 === 1
+  const width = big ? 48 + rand() * 12 : 28 + rand() * 12
+  const drift = (index % 2 === 0 ? -1 : 1) * (6 + rand() * 16)
+  const left = Math.min(Math.max(50 - width / 2 + drift, -6), 102 - width)
+  const tilt = index % 5 === 2 ? 14 + rand() * 10 : rand() * 9
   return {
-    left: Math.min(lane + rand() * 14, 101 - width),
-    top: TOP + index * PILE_STEP + (rand() - 0.5) * 26,
-    rotate: (rand() - 0.5) * 30,
+    left,
+    top: TOP + index * PILE_STEP + (rand() - 0.5) * 24,
+    rotate: (index % 2 === 0 ? -tilt : tilt),
     width,
     z: Math.floor(rand() * 20),
   }
