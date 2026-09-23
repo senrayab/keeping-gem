@@ -23,7 +23,7 @@ import { useToast } from './Toast'
 export type DeskLayout = 'collage' | 'pile'
 
 const LAYOUT_KEY = 'keeping-gem:desk'
-const PILE_STEP = 66
+const PILE_STEP = 86
 const TOP = 10
 
 interface Spot {
@@ -34,15 +34,21 @@ interface Spot {
   z: number
 }
 
-/** 쏟아 놓기 */
+/**
+ * 쏟아 놓기.
+ *
+ * 겹치되 가려지지는 않아야 한다 — 이웃한 사진을 좌우로 번갈아 놓고 세로 간격을 넉넉히 둬,
+ * 어느 장이든 절반 넘게 드러나게 한다. 가장자리는 살짝 넘겨 더미 한가운데를 보는 느낌만 남긴다.
+ */
 function pileSpot(photo: Photo, index: number): Spot {
   const rand = seeded(photo.id)
-  const width = 42 + rand() * 16
+  const width = 40 + rand() * 10
+  // 이웃끼리 좌우로 어긋나게 둔다 — 귀퉁이만 겹치고 가운데는 서로 가리지 않는다
+  const left = (index % 2 === 0 ? -4 : 42) + rand() * 14
   return {
-    // 가장자리를 살짝 넘겨 잘리게 둔다 — 사진 더미 한가운데를 보는 느낌
-    left: -7 + rand() * (107 - width),
-    top: TOP + index * PILE_STEP + (rand() - 0.5) * 28,
-    rotate: (rand() - 0.5) * 34,
+    left,
+    top: TOP + index * PILE_STEP + (rand() - 0.5) * 20,
+    rotate: (rand() - 0.5) * 26,
     width,
     z: Math.floor(rand() * 20),
   }
@@ -85,7 +91,7 @@ export function AlbumView({ album, onAdd, readOnly, onClose }: AlbumViewProps) {
   }
 
   // 쏟아 놓기는 자리를 직접 잡으므로 높이도 직접 알려줘야 한다
-  const pileHeight = photos?.length ? TOP + (photos.length - 1) * PILE_STEP + 230 : 0
+  const pileHeight = photos?.length ? TOP + (photos.length - 1) * PILE_STEP + 260 : 0
 
   /* 꾹 눌러 고르고 끌어서 여러 장 — 손가락 아래 사진을 자리로 찾는다 */
   const sweep = useSweepSelect({
@@ -105,7 +111,14 @@ export function AlbumView({ album, onAdd, readOnly, onClose }: AlbumViewProps) {
   }
 
   return (
-    <div className="album-view" role="dialog" aria-modal="true" aria-label={`${album.title} 사진첩`}>
+    <div
+      className="album-view"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${album.title} 사진첩`}
+      // 티켓 상세보기 안에서 열릴 수 있다 — 막지 않으면 사진을 누를 때 상세보기까지 닫힌다
+      onClick={(e) => e.stopPropagation()}
+    >
       <header className="album-view__head">
         <div>
           <h2>{album.title}</h2>
