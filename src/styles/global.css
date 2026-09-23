@@ -1755,6 +1755,34 @@ svg.dock__icon {
 
 /* ───────── 펼쳐 놓은 사진 ───────── */
 
+/* 정돈 ↔ 자유 고르기 */
+.desk-switch {
+  display: flex;
+  gap: 2px;
+  align-self: center;
+  margin: 0 0 8px;
+  padding: 3px;
+  border: 1px solid var(--glass-line);
+  border-radius: 999px;
+  background: var(--glass);
+}
+
+.desk-switch button {
+  min-height: 30px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.desk-switch button.is-active {
+  background: rgb(var(--amber) / 0.18);
+  color: rgb(var(--amber));
+}
+
 .album-view {
   position: fixed;
   inset: 0;
@@ -1791,12 +1819,35 @@ svg.dock__icon {
 
 /* 사진을 늘어놓는 '책상' */
 .album-view__desk {
-  position: relative;
   flex: 1;
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  margin: 0 8px;
+}
+
+/* 정돈: 벽에 붙인 콜라주 — 3열로 흐르게 두고 기울기만 준다 */
+.album-view__desk--collage {
+  columns: 3;
+  column-gap: 7px;
+  padding: 6px 12px 24px;
+}
+
+.album-view__desk--collage .print {
+  position: static;
+  width: 100%;
+  margin: 0 0 7px;
+  padding: 3px 3px 9px;
+  break-inside: avoid;
+}
+
+.album-view__desk--collage .print img {
+  aspect-ratio: auto;
+}
+
+/* 자유: 쏟아 놓기 — 자리를 직접 잡고, 가장자리를 넘겨 잘리게 둔다 */
+.album-view__desk--pile {
+  position: relative;
+  overflow-x: hidden;
 }
 
 .album-view__empty {
@@ -1809,7 +1860,7 @@ svg.dock__icon {
 /* 인화지 한 장 */
 .print {
   position: absolute;
-  padding: 6px 6px 16px;
+  padding: 5px 5px 14px;
   border: 0;
   border-radius: 4px;
   background: #f7f5f0;
