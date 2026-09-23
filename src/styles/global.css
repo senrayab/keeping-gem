@@ -1400,6 +1400,30 @@ svg.dock__icon {
   justify-self: end;
 }
 
+/* 머리말 오른쪽에 나란히 놓는 단추들 */
+.sheet__tools {
+  display: flex;
+  justify-self: end;
+  gap: 6px;
+}
+
+.btn--icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  padding: 0;
+}
+
+.btn--icon svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .sheet__head h2 {
   margin: 0;
   font-size: 17px;
@@ -1687,15 +1711,106 @@ svg.dock__icon {
   color: var(--ink-soft);
 }
 
-.album h3 {
+/* 제목·날짜 줄 — 오른쪽 빈 자리에 수정 아이콘을 둔다 */
+.album__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin: 12px 4px 0;
+}
+
+.album__meta > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.album h3 {
+  margin: 0;
   font-size: 17px;
+  word-break: keep-all;
 }
 
 .album p {
-  margin: 4px 4px 0;
+  margin: 4px 0 0;
   font-size: 13px;
   color: var(--ink-soft);
+}
+
+.album__edit {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--glass-line);
+  border-radius: 50%;
+  background: var(--glass);
+}
+
+.album__edit svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+/* 고르는 중인 사진첩 */
+.album.is-checked .album__stack {
+  border-color: rgb(var(--amber) / 0.8);
+  box-shadow: 0 0 0 2px rgb(var(--amber) / 0.35);
+}
+
+.album__check {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 2px solid rgb(255 255 255 / 0.85);
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.45);
+}
+
+.album__check.is-on {
+  border-color: rgb(var(--amber));
+  background: rgb(var(--amber));
+}
+
+.album__check svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: var(--night-0);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* 고른 것을 지우는 줄 (사진첩 목록·사진 모두) */
+.select-bar {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(env(safe-area-inset-bottom) + 12px);
+  z-index: 33;
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 22px;
+  background: rgb(20 16 38 / 0.86);
+  border: 1px solid var(--glass-line);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.select-bar--desk {
+  z-index: 35;
 }
 
 /* 사진첩 표지: 사진이 겹쳐 놓이고 그 위를 반투명한 바가 가로지른다 */
@@ -1939,6 +2054,51 @@ svg.dock__icon {
 
 .print:active {
   transform: rotate(var(--rotate)) scale(0.97);
+}
+
+/* 고르는 중에는 손가락을 끌어도 화면이 따라 움직이지 않아야 한다 */
+.album-view__desk.is-selecting {
+  touch-action: none;
+}
+
+/* 끌어서 고르는 동안 그림이 끌려 나오거나 글자가 잡히지 않게 */
+.album-view__desk {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.print img {
+  -webkit-user-drag: none;
+}
+
+.print.is-picked {
+  box-shadow: 0 0 0 3px rgb(var(--amber)), 0 10px 22px rgb(0 0 0 / 0.5);
+}
+
+.print.is-picked img {
+  opacity: 0.72;
+}
+
+.print__check {
+  position: absolute;
+  right: 7px;
+  top: 7px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgb(var(--amber));
+}
+
+.print__check svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: var(--night-0);
+  stroke-width: 3.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .print img {

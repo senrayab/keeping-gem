@@ -155,13 +155,7 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
       )}
 
       {albumOpen && album && (
-        <AlbumView
-          album={album}
-          onAdd={() => {}}
-          onEdit={() => {}}
-          readOnly
-          onClose={() => setAlbumOpen(false)}
-        />
+        <AlbumView album={album} onAdd={() => {}} readOnly onClose={() => setAlbumOpen(false)} />
       )}
 
       {mapOpen && ticket.lat != null && ticket.lng != null && (
