@@ -203,7 +203,7 @@ export async function renderTicketImage(ticket: Ticket, poster?: Blob): Promise<
    * 되살리려면 여기 stubGap·stubH를 되돌리고 8번의 주석을 푼다.
    */
   const stubY = bottom
-  const H = stubY + 170
+  const H = stubY + 140
 
   canvas.width = W
   canvas.height = H
@@ -347,9 +347,6 @@ export async function renderTicketImage(ticket: Ticket, poster?: Blob): Promise<
   spacing(ctx, 8)
   ctx.fillText('KEEPING GEM', W / 2, stubY + 84)
   spacing(ctx, 0)
-  ctx.fillStyle = rgba('244 240 255', 0.45)
-  font(ctx, 500, 26)
-  ctx.fillText('추억의 밤하늘', W / 2, stubY + 126)
 
   return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('이미지를 만들지 못했습니다.'))), 'image/png')
