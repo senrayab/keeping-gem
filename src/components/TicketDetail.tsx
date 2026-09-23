@@ -97,11 +97,6 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
   return (
     <div className="detail" role="dialog" aria-modal="true" aria-label={`${ticket.title} 티켓`} onClick={onClose}>
       <div className="detail__stage">
-        {/* 금액은 티켓 밖, 하늘 쪽에 글자로만 둔다 — 티켓 안은 그날의 기록만 담는다 */}
-        {ticket.price != null && (
-          <p className="detail__price">{formatMoney(ticket.price, ticket.currency)}</p>
-        )}
-
         <div className="detail__ticket" style={origin as CSSProperties} onClick={(e) => e.stopPropagation()}>
           <TicketView
             ticket={ticket}
@@ -121,6 +116,9 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
             </button>
           ) : null}
         </div>
+
+        {/* 금액은 티켓 밖, 아래 오른쪽에 글자로만 둔다 — 티켓 안은 그날의 기록만 담는다 */}
+        {ticket.price != null && <p className="detail__price">{formatMoney(ticket.price, ticket.currency)}</p>}
       </div>
 
       {/* 스크롤하지 않아도 늘 보이도록 아래에 붙인 버튼 줄 */}
