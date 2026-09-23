@@ -1725,174 +1725,163 @@ svg.dock__icon {
   color: var(--ink-soft);
 }
 
-/* 제목·날짜 줄 — 오른쪽 빈 자리에 수정 아이콘을 둔다 */
-.album__meta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 12px 4px 0;
-}
-
-.album__meta > div {
-  flex: 1;
-  min-width: 0;
-}
-
-.album h3 {
-  margin: 0;
-  font-size: 17px;
-  word-break: keep-all;
-}
-
-.album p {
-  margin: 4px 0 0;
-  font-size: 13px;
-  color: var(--ink-soft);
-}
-
-.album__edit {
+/*
+ * 사진 보관 상자.
+ *
+ * 사진첩 하나가 상자에 꽂힌 색인 카드다. 카드마다 이름표(탭)가 솟아 있고,
+ * 카드 사이로 안의 사진이 비친다. 탭의 좌우 자리는 칸마다 어긋나게 둔다.
+ */
+.album-box {
   display: grid;
-  place-items: center;
-  flex: none;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  border: 1px solid var(--glass-line);
-  border-radius: 50%;
-  background: var(--glass);
+  padding: 26px 12px 16px;
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-radius: 20px;
+  background: linear-gradient(180deg, #161226, #0c0a14);
+  box-shadow: inset 0 3px 14px rgb(0 0 0 / 0.6), inset 0 -1px 0 rgb(255 255 255 / 0.05);
 }
 
-.album__edit svg {
-  width: 17px;
-  height: 17px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linejoin: round;
+.file {
+  position: relative;
+  margin-bottom: 20px;
 }
 
-/* 사진첩에 걸 티켓 고르기 */
-.ticket-pick {
-  display: grid;
-  gap: 4px;
-  max-height: 232px;
-  margin: 0;
-  padding: 4px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  list-style: none;
-  border: 1px solid var(--glass-line);
-  border-radius: 16px;
-  background: var(--glass);
+.file:last-child {
+  margin-bottom: 4px;
 }
 
-.ticket-pick__item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+/* 색인 카드 — 종이 색으로 두어 상자 안의 서류처럼 보이게 */
+.file__card {
+  display: block;
   width: 100%;
-  padding: 7px 8px;
+  padding: 0 0 8px;
   border: 0;
-  border-radius: 12px;
-  background: none;
+  border-radius: 4px 4px 12px 12px;
+  background: #efe9dc;
+  color: #34303f;
   text-align: left;
+  box-shadow: 0 8px 16px rgb(0 0 0 / 0.5);
 }
 
-.ticket-pick__item.is-on {
-  background: rgb(var(--amber) / 0.14);
+.file__card:active {
+  transform: translateY(1px);
 }
 
-.ticket-pick__thumb {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 38px;
-  height: 46px;
+/* 카드 위로 솟은 이름표 */
+.file__tab {
+  position: absolute;
+  top: -19px;
+  left: var(--tab);
+  max-width: 62%;
+  padding: 4px 14px 5px;
   overflow: hidden;
-  border-radius: 8px;
-  background: rgb(255 255 255 / 0.08);
-  font-size: 15px;
-  font-weight: 800;
+  border-radius: 8px 8px 0 0;
+  background: #efe9dc;
+  color: #34303f;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  box-shadow: 0 -3px 8px rgb(0 0 0 / 0.35);
 }
 
-.ticket-pick__thumb img {
+/* 카드 사이로 비치는 사진 */
+.file__peek {
+  display: flex;
+  gap: 3px;
+  padding: 8px 8px 0;
+}
+
+.file__shot {
+  flex: 1;
+  height: 58px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: rgb(0 0 0 / 0.1);
+}
+
+.file__shot img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.ticket-pick__text {
-  display: grid;
-  gap: 2px;
-  flex: 1;
-  min-width: 0;
+.file__none {
+  padding: 18px 4px;
+  width: 100%;
+  font-size: 12.5px;
+  color: #8d8799;
+  text-align: center;
 }
 
-.ticket-pick__text strong {
-  overflow: hidden;
-  font-size: 14px;
-  font-weight: 700;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.ticket-pick__text small {
+.file__meta {
+  display: block;
+  padding: 7px 12px 0;
   font-size: 12px;
-  color: var(--ink-faint);
+  font-weight: 600;
+  color: #7d7689;
 }
 
-.ticket-pick__check {
+/* 수정·사진 넣기 — 카드 오른쪽 아래에 작게 */
+.file__tools {
+  position: absolute;
+  right: 8px;
+  bottom: 4px;
+  display: flex;
+  gap: 4px;
+}
+
+.file__tools button {
   display: grid;
   place-items: center;
-  flex: none;
-  width: 24px;
-  height: 24px;
-  border: 1.5px solid var(--glass-line);
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
   border-radius: 50%;
+  background: rgb(52 48 63 / 0.1);
+  color: #55506a;
 }
 
-.ticket-pick__item.is-on .ticket-pick__check {
-  border-color: rgb(var(--amber));
-  background: rgb(var(--amber));
+.file__tools button:active {
+  background: rgb(52 48 63 / 0.2);
 }
 
-.ticket-pick__check svg {
-  width: 14px;
-  height: 14px;
+.file__tools svg {
+  width: 16px;
+  height: 16px;
   fill: none;
-  stroke: var(--night-0);
-  stroke-width: 3.2;
+  stroke: currentColor;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 /* 고르는 중인 사진첩 */
-.album.is-checked .album__stack {
-  border-color: rgb(var(--amber) / 0.8);
-  box-shadow: 0 0 0 2px rgb(var(--amber) / 0.35);
+.file.is-checked .file__card {
+  box-shadow: 0 0 0 2px rgb(var(--amber)), 0 8px 16px rgb(0 0 0 / 0.5);
 }
 
-.album__check {
+.file__check {
   position: absolute;
-  right: 12px;
-  bottom: 12px;
+  right: 10px;
+  bottom: 8px;
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
-  border: 2px solid rgb(255 255 255 / 0.85);
+  width: 26px;
+  height: 26px;
+  border: 2px solid rgb(52 48 63 / 0.35);
   border-radius: 50%;
-  background: rgb(0 0 0 / 0.45);
+  background: rgb(255 255 255 / 0.6);
 }
 
-.album__check.is-on {
+.file__check.is-on {
   border-color: rgb(var(--amber));
   background: rgb(var(--amber));
 }
 
-.album__check svg {
-  width: 17px;
-  height: 17px;
+.file__check svg {
+  width: 15px;
+  height: 15px;
   fill: none;
   stroke: var(--night-0);
   stroke-width: 3;
