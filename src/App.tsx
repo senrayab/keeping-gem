@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Archive, Images, List, Plus, Search, Sparkles } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { useSmoothScroll } from './hooks/useSmoothScroll'
 import { db, type Ticket } from './db/db'
 import { sumByCurrency } from './lib/currencies'
 import { AlbumsSheet } from './components/AlbumsSheet'
@@ -20,6 +21,7 @@ type Editing = { ticket?: Ticket } | null
 const VIEW_KEY = 'keeping-gem:view'
 
 export function App() {
+  useSmoothScroll()
   const tickets = useLiveQuery(() => db.tickets.orderBy('date').reverse().toArray(), [])
   const [opened, setOpened] = useState<{ id: string; from?: DOMRect } | null>(null)
   const [editing, setEditing] = useState<Editing>(null)

@@ -5,6 +5,8 @@
 declare global {
   interface Window {
     kakao?: { maps: KakaoMaps }
+    /** 부드러운 스크롤 (hooks/useSmoothScroll.ts) — 연도 줄에서 건너뛸 때 함께 쓴다 */
+    __lenis?: { scrollTo: (target: HTMLElement | number, options?: { offset?: number }) => void }
   }
 }
 

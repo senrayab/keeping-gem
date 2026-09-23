@@ -178,7 +178,13 @@ function YearRail({ years }: { years: string[] }) {
         <button
           key={year}
           className={`rail__year${year === active ? ' is-active' : ''}`}
-          onClick={() => document.getElementById(`year-${year}`)?.scrollIntoView({ behavior: 'smooth' })}
+          onClick={() => {
+            const band = document.getElementById(`year-${year}`)
+            if (!band) return
+            // 부드러운 스크롤이 켜져 있으면 그쪽에 맡긴다 — 손맛이 같아야 한다
+            if (window.__lenis) window.__lenis.scrollTo(band)
+            else band.scrollIntoView({ behavior: 'smooth' })
+          }}
         >
           {year.slice(2)}
         </button>
