@@ -876,7 +876,7 @@ svg.dock__icon {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: calc(env(safe-area-inset-top) + 14px) 16px 12px;
+  padding: calc(env(safe-area-inset-top) + 24px) 16px 12px;
 }
 
 /* 제목 칸이 남는 자리를 다 쓰게 해 닫기 버튼을 오른쪽 끝으로 민다 */
@@ -1398,7 +1398,8 @@ svg.dock__icon {
 .sheet__body {
   display: grid;
   gap: 18px;
-  padding: calc(env(safe-area-inset-top) + 8px) 20px calc(env(safe-area-inset-bottom) + 24px);
+  /* 위쪽은 머리말 아이콘과 같은 높이에 닫기가 오도록 맞춘다 */
+  padding: calc(env(safe-area-inset-top) + 24px) 20px calc(env(safe-area-inset-bottom) + 24px);
 }
 
 .sheet__head {
@@ -2206,15 +2207,27 @@ svg.dock__icon {
   z-index: 34;
   display: flex;
   flex-direction: column;
+  /*
+   * 스크롤은 이 화면이 맡는다.
+   * 사진을 3열로 흘리는 '정돈'은 높이가 고정된 상자 안에서는 세로가 아니라 가로로 넘친다 —
+   * 그러면 넘친 사진에 닿을 길이 없어진다. 높이를 내용에 맡기고 화면이 굴러가게 둔다.
+   */
+  overflow-y: auto;
+  overscroll-behavior: contain;
   background: linear-gradient(180deg, var(--night-2), var(--night-0) 60%);
   animation: rise 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
 }
 
 .album-view__head {
+  position: sticky;
+  top: 0;
+  z-index: 3;
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  padding: calc(env(safe-area-inset-top) + 14px) 16px 10px;
+  /* 머리말 아이콘과 같은 높이에 오도록 */
+  padding: calc(env(safe-area-inset-top) + 24px) 16px 10px;
+  background: linear-gradient(180deg, var(--night-2) 70%, transparent);
 }
 
 .album-view__head > div {
@@ -2236,10 +2249,7 @@ svg.dock__icon {
 
 /* 사진을 늘어놓는 '책상' */
 .album-view__desk {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  flex: none;
 }
 
 /* 정돈: 벽에 붙인 콜라주 — 3열로 흐르게 두고 기울기만 준다 */
@@ -2263,14 +2273,12 @@ svg.dock__icon {
   break-inside: avoid;
 }
 
-.album-view__desk--collage .print img {
-  aspect-ratio: auto;
-}
-
 /* 자유: 쏟아 놓기 — 자리를 직접 잡고, 가장자리를 넘겨 잘리게 둔다 */
 .album-view__desk--pile {
   position: relative;
   overflow-x: hidden;
+  /* 떠 있는 '사진 넣기' 단추 자리 */
+  padding-bottom: 96px;
 }
 
 .album-view__empty {
@@ -2351,9 +2359,15 @@ svg.dock__icon {
 .print img {
   display: block;
   width: 100%;
-  aspect-ratio: 1;
+  /* 사진 본래 비율대로 — 벽돌 쌓기처럼 높낮이가 생긴다 */
+  aspect-ratio: auto;
   object-fit: cover;
   border-radius: 2px;
+}
+
+/* 쏟아 놓기(지금은 쓰지 않음)에서는 네모로 잘라 놓는다 */
+.album-view__desk--pile .print img {
+  aspect-ratio: 1;
 }
 
 .photo-detail {

@@ -16,14 +16,20 @@ export function useSmoothScroll() {
 
     const lenis = new Lenis({
       // 손을 뗀 뒤 미끄러지는 거리 — 짧게 둬야 가볍다
-      duration: 0.85,
+      duration: 0.6,
       // 처음엔 천천히, 뒤로 갈수록 빠르게 따라잡는 곡선
       easing: (t) => 1 - Math.pow(1 - t, 3),
       // 손가락을 따라오는 정도 — 높을수록 바짝 따라와 가볍게 느껴진다
       syncTouch: true,
-      syncTouchLerp: 0.16,
-      touchInertiaExponent: 1.4,
+      syncTouchLerp: 0.3,
+      touchInertiaExponent: 1.2,
       wheelMultiplier: 1,
+      /*
+       * 겹친 화면은 저마다 스크롤을 갖고 있다(사진첩·설정·입력·지도).
+       * 그 안에서는 손대지 않아야 그 화면이 제 스크롤로 움직인다.
+       */
+      prevent: (node) =>
+        Boolean(node.closest?.('.sheet, .album-view, .detail, .map-viewer, .photo-detail, .poster-viewer')),
     })
 
     let frame = 0
