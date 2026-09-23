@@ -16,9 +16,16 @@ if (typeof history !== 'undefined') {
 
 export function useScrollLock() {
   useEffect(() => {
-    if (locks++ === 0) document.documentElement.classList.add('is-locked')
+    if (locks++ === 0) {
+      document.documentElement.classList.add('is-locked')
+      // 부드러운 스크롤을 멈춘다 (useSmoothScroll)
+      window.dispatchEvent(new Event('overlay-open'))
+    }
     return () => {
-      if (--locks === 0) document.documentElement.classList.remove('is-locked')
+      if (--locks === 0) {
+        document.documentElement.classList.remove('is-locked')
+        window.dispatchEvent(new Event('overlay-close'))
+      }
     }
   }, [])
 }
