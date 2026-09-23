@@ -1186,6 +1186,17 @@ svg.dock__icon {
   text-shadow: 0 2px 12px rgb(0 0 0 / 0.2);
 }
 
+/* 포스터 오른쪽 위에 얹는 금액 — 상자 없이 글자만, 포스터 위에서도 읽히게 그림자만 준다 */
+.ticket__price {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 1px 6px rgb(0 0 0 / 0.75), 0 0 18px rgb(0 0 0 / 0.5);
+}
+
 .ticket__head {
   padding: 14px 20px 16px;
   text-align: center;
@@ -1285,6 +1296,11 @@ svg.dock__icon {
 
 .ticket__grid div:nth-child(even) {
   text-align: right;
+}
+
+/* 한 줄을 다 쓰는 칸 (좌석) */
+.ticket__wide {
+  grid-column: 1 / -1;
 }
 
 .ticket__grid dt {
