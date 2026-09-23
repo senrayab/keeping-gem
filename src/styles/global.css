@@ -1294,7 +1294,8 @@ svg.dock__icon {
   -webkit-appearance: none;
   text-align: center;
   height: 46px;
-  padding: 0 4px 0 12px;
+  /* 기호 양옆 여백을 같게 */
+  padding: 0 10px;
   border: 0;
   background: none;
   color: rgb(var(--amber));
@@ -1307,7 +1308,7 @@ svg.dock__icon {
 .money__input {
   flex: 1;
   min-width: 0;
-  padding: 0 12px 0 4px;
+  padding: 0 12px 0 0;
   border: 0;
   background: none;
   color: var(--ink);
