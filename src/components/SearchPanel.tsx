@@ -1,3 +1,4 @@
+import { X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import type { Ticket } from '@/db/db'
 import { useBackClose } from '@/hooks/useBackClose'
@@ -58,8 +59,8 @@ export function SearchPanel({ tickets, filter, onChange, onClose }: SearchPanelP
           placeholder="제목, 장소, 좌석, 한마디로 찾기"
           aria-label="티켓 찾기"
         />
-        <button type="button" className="btn btn--ghost btn--small" onClick={onClose}>
-          닫기
+        <button type="button" className="btn btn--ghost btn--small btn--icon" onClick={onClose} aria-label="찾기 닫기">
+          <X aria-hidden="true" />
         </button>
       </div>
       <div className="search__chips" role="group" aria-label="종류로 골라 보기">

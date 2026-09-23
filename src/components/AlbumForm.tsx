@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react'
+import { Check, X } from 'lucide-react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useRef, useState, type FormEvent } from 'react'
 import { db, saveAlbum, type Album } from '@/db/db'
@@ -95,8 +95,8 @@ export function AlbumForm({ album, onClose, onSaved }: AlbumFormProps) {
         <header className="sheet__head">
           <span />
           <h2>{album ? '사진첩 수정' : '새 사진첩'}</h2>
-          <button type="button" className="btn btn--ghost btn--small" onClick={onClose}>
-            취소
+          <button type="button" className="btn btn--ghost btn--small btn--icon" onClick={onClose} aria-label="취소">
+            <X aria-hidden="true" />
           </button>
         </header>
 

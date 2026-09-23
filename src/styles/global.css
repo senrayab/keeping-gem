@@ -2378,9 +2378,13 @@ svg.dock__icon {
 }
 
 .photo-detail__foot {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  justify-content: center;
   gap: 8px;
+}
+
+.photo-detail__foot .btn--icon {
+  flex: none;
 }
 
 /* 고르는 칸 (사진첩의 티켓 연결) */
