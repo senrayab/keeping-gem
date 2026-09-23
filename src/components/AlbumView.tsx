@@ -21,11 +21,8 @@ import { useToast } from './Toast'
  *
  * 어느 쪽이든 기울기와 자리는 사진마다 정해져 있어 열 때마다 바뀌지 않는다.
  */
-export type DeskLayout = 'collage' | 'pile'
-
-const LAYOUT_KEY = 'keeping-gem:desk'
-const PILE_STEP = 58
-const TOP = 10
+// 지금은 '정돈'만 쓴다. 쏟아 놓기(자유)는 아래에 주석으로 남겨 두었다. (TOP·Spot도 그때 쓴다)
+// const TOP = 10
 
 interface Spot {
   left: number
@@ -35,34 +32,34 @@ interface Spot {
   z: number
 }
 
-/**
- * 쏟아 놓기.
- *
- * 겹치되 가려지지는 않아야 한다 — 이웃한 사진을 좌우로 번갈아 놓고 세로 간격을 넉넉히 둬,
- * 어느 장이든 절반 넘게 드러나게 한다. 가장자리는 살짝 넘겨 더미 한가운데를 보는 느낌만 남긴다.
- */
-/*
- * 잡지 콜라주처럼 붙인다.
- *
- * 크기를 섞고(작은 것과 큰 것) 가운데로 모아 겹치되, 좌우로 조금씩 흘려 여백을 채운다.
- * 기울기는 대체로 얕게 두고 가끔 한 장씩 크게 틀어 손으로 붙인 티를 낸다.
- */
-function pileSpot(photo: Photo, index: number): Spot {
-  const rand = seeded(photo.id)
-  // 넷 중 하나는 크게 — 큰 사진이 중심을 잡아 준다
-  const big = index % 4 === 1
-  const width = big ? 48 + rand() * 12 : 28 + rand() * 12
-  const drift = (index % 2 === 0 ? -1 : 1) * (6 + rand() * 16)
-  const left = Math.min(Math.max(50 - width / 2 + drift, -6), 102 - width)
-  const tilt = index % 5 === 2 ? 14 + rand() * 10 : rand() * 9
-  return {
-    left,
-    top: TOP + index * PILE_STEP + (rand() - 0.5) * 24,
-    rotate: (index % 2 === 0 ? -tilt : tilt),
-    width,
-    z: Math.floor(rand() * 20),
-  }
-}
+// /**
+//  * 쏟아 놓기.
+//  *
+//  * 겹치되 가려지지는 않아야 한다 — 이웃한 사진을 좌우로 번갈아 놓고 세로 간격을 넉넉히 둬,
+//  * 어느 장이든 절반 넘게 드러나게 한다. 가장자리는 살짝 넘겨 더미 한가운데를 보는 느낌만 남긴다.
+//  */
+// /*
+//  * 잡지 콜라주처럼 붙인다.
+//  *
+//  * 크기를 섞고(작은 것과 큰 것) 가운데로 모아 겹치되, 좌우로 조금씩 흘려 여백을 채운다.
+//  * 기울기는 대체로 얕게 두고 가끔 한 장씩 크게 틀어 손으로 붙인 티를 낸다.
+//  */
+// function pileSpot(photo: Photo, index: number): Spot {
+//   const rand = seeded(photo.id)
+//   // 넷 중 하나는 크게 — 큰 사진이 중심을 잡아 준다
+//   const big = index % 4 === 1
+//   const width = big ? 48 + rand() * 12 : 28 + rand() * 12
+//   const drift = (index % 2 === 0 ? -1 : 1) * (6 + rand() * 16)
+//   const left = Math.min(Math.max(50 - width / 2 + drift, -6), 102 - width)
+//   const tilt = index % 5 === 2 ? 14 + rand() * 10 : rand() * 9
+//   return {
+//     left,
+//     top: TOP + index * PILE_STEP + (rand() - 0.5) * 24,
+//     rotate: (index % 2 === 0 ? -tilt : tilt),
+//     width,
+//     z: Math.floor(rand() * 20),
+//   }
+// }
 
 /** 콜라주에서 사진마다 다른 기울기 — 벽에 손으로 붙인 듯하게 */
 const collageTilt = (photo: Photo) => (seeded(`${photo.id}:tilt`)() - 0.5) * 7
@@ -92,26 +89,6 @@ export function AlbumView({ album, onAdd, readOnly, onClose }: AlbumViewProps) {
     [album.id],
   )
   const [opened, setOpened] = useState<Photo | null>(null)
-  const [layout, setLayout] = useState<DeskLayout>(() => {
-    try {
-      return localStorage.getItem(LAYOUT_KEY) === 'pile' ? 'pile' : 'collage'
-    } catch {
-      return 'collage'
-    }
-  })
-  const changeLayout = (next: DeskLayout) => {
-    setLayout(next)
-    try {
-      localStorage.setItem(LAYOUT_KEY, next)
-    } catch {
-      // 기억하지 못해도 보는 데는 지장이 없다
-    }
-  }
-
-  // 쏟아 놓기는 자리를 직접 잡으므로 높이도 직접 알려줘야 한다
-  // 마지막 사진이 떠 있는 단추에 가리지 않도록 아래를 넉넉히 비운다
-  const pileHeight = photos?.length ? TOP + (photos.length - 1) * PILE_STEP + 330 : 0
-
   /* 꾹 눌러 고르고 끌어서 여러 장 — 손가락 아래 사진을 자리로 찾는다 */
   const sweep = useSweepSelect({
     idAt: (x, y) => {
@@ -157,28 +134,31 @@ export function AlbumView({ album, onAdd, readOnly, onClose }: AlbumViewProps) {
         </button>
       </header>
 
-      {photos && photos.length > 0 && (
-        <div className="desk-switch" role="group" aria-label="사진 놓는 방식">
-          <button
-            type="button"
-            className={layout === 'collage' ? 'is-active' : undefined}
-            onClick={() => changeLayout('collage')}
-          >
-            정돈
-          </button>
-          <button
-            type="button"
-            className={layout === 'pile' ? 'is-active' : undefined}
-            onClick={() => changeLayout('pile')}
-          >
-            자유
-          </button>
-        </div>
-      )}
+      {/*
+       * 배치 고르기(정돈 / 자유)는 지금 쓰지 않는다 — 정돈만 남겨 사진이 위까지 올라오게 했다.
+       * 되살리려면 이 주석과 위의 pileSpot 주석을 함께 푼다.
+      // {photos && photos.length > 0 && (
+      // <div className="desk-switch" role="group" aria-label="사진 놓는 방식">
+      // <button
+      // type="button"
+      // className={layout === 'collage' ? 'is-active' : undefined}
+      // onClick={() => changeLayout('collage')}
+      // >
+      // 정돈
+      // </button>
+      // <button
+      // type="button"
+      // className={layout === 'pile' ? 'is-active' : undefined}
+      // onClick={() => changeLayout('pile')}
+      // >
+      // 자유
+      // </button>
+      // </div>
+      // )}
+      */}
 
       <div
-        className={`album-view__desk album-view__desk--${layout}${sweep.selecting ? ' is-selecting' : ''}`}
-        style={layout === 'pile' ? { height: pileHeight } : undefined}
+        className={`album-view__desk album-view__desk--collage${sweep.selecting ? ' is-selecting' : ''}`}
         onPointerMove={(e) => sweep.onPointerMove(e)}
         onPointerUp={sweep.onPointerUp}
         onPointerCancel={sweep.onPointerUp}
@@ -188,11 +168,10 @@ export function AlbumView({ album, onAdd, readOnly, onClose }: AlbumViewProps) {
             {readOnly ? '아직 사진이 없어요. 머리말의 사진첩에서 넣을 수 있어요.' : '아래 버튼으로 그날의 사진을 넣어 보세요.'}
           </p>
         )}
-        {photos?.map((photo, i) => (
+        {photos?.map((photo) => (
           <Print
             key={photo.id}
             photo={photo}
-            spot={layout === 'pile' ? pileSpot(photo, i) : undefined}
             tilt={collageTilt(photo)}
             picked={sweep.selected.has(photo.id)}
             selecting={sweep.selecting}
@@ -283,7 +262,16 @@ function Print({
       aria-pressed={picked}
     >
       {/* 브라우저 기본 '그림 끌어다 놓기'를 막는다 — 그게 끼어들면 끌어서 고르기가 끊긴다 */}
-      {url && <img src={url} alt="" loading="lazy" draggable={false} />}
+      {url && (
+        <img
+          src={url}
+          alt=""
+          loading="lazy"
+          draggable={false}
+          /* 비율을 미리 알려 두면 그림이 도착하기 전에도 자리가 잡혀 화면이 덜컥이지 않는다 */
+          style={{ aspectRatio: `${photo.width} / ${photo.height}` }}
+        />
+      )}
       {picked && (
         <span className="print__check" aria-hidden="true">
           <Check aria-hidden="true" />
