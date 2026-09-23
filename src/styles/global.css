@@ -207,7 +207,7 @@ button {
  * 그 선의 위아래 끝을 반원으로 파낸다(mask) — 상세보기의 티켓과 같은 약속이다.
  */
 .tlist__item {
-  --seam: 112px;
+  --seam: 118px;
   position: relative;
   display: flex;
   gap: 14px;
@@ -242,18 +242,17 @@ button {
   border-left: 2px dashed #dedbe6;
 }
 
+/* 포스터는 세로가 긴 본래 비율(3:4)로 — 가로로 자르면 포스터를 알아보기 어렵다 */
 .tlist__poster {
+  position: relative;
   display: grid;
   place-items: center;
   flex: none;
-  width: 86px;
-  height: 86px;
+  width: 92px;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
   border-radius: 12px;
   background: radial-gradient(circle at 35% 30%, rgb(var(--glow) / 0.9), rgb(var(--glow) / 0.4));
-  color: #fff;
-  font-size: 30px;
-  font-weight: 800;
 }
 
 .tlist__poster img {
@@ -263,21 +262,54 @@ button {
   border-radius: 12px;
 }
 
+.tlist__initial {
+  color: #fff;
+  font-size: 30px;
+  font-weight: 800;
+}
+
 .tlist__body {
   display: grid;
-  gap: 4px;
+  align-content: center;
+  gap: 5px;
   min-width: 0;
   padding-left: 12px;
 }
 
+/* 상세보기의 라벨과 같은 모양을 작게 — 파낸 자리에 앉고 모서리는 모두 둥글다 */
 .tlist__chip {
-  justify-self: start;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: rgb(var(--glow) / 0.22);
+  --cut: 7px;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  height: 21px;
+  padding: 0 8px 0 7px;
+  border-top-right-radius: 10px;
+  background: var(--paper);
+  color: #4a3f63;
   font-size: 10px;
   font-weight: 700;
-  color: #4a3f63;
+}
+
+.tlist__chip::before,
+.tlist__chip::after {
+  content: '';
+  position: absolute;
+  width: var(--cut);
+  height: var(--cut);
+  background: radial-gradient(circle var(--cut) at top right, #0000 98%, var(--paper) 100%);
+}
+
+.tlist__chip::before {
+  left: 0;
+  bottom: 100%;
+}
+
+.tlist__chip::after {
+  left: 100%;
+  bottom: 0;
 }
 
 .tlist__title {
