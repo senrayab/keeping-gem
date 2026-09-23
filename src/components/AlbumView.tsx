@@ -1,6 +1,6 @@
 import { ArrowDownWideNarrow, ArrowUpNarrowWide, Check, ImagePlus, X } from 'lucide-react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useMemo, useState, type CSSProperties } from 'react'
+import { useMemo, useRef, useState, type CSSProperties } from 'react'
 import { db, deletePhoto, deletePhotos, type Album, type Photo } from '@/db/db'
 import { useBackClose } from '@/hooks/useBackClose'
 import { useObjectUrl } from '@/hooks/useObjectUrl'
@@ -132,8 +132,10 @@ export function AlbumView({ album, onAdd, readOnly, onClose }: AlbumViewProps) {
       [...(photos ?? [])].sort((a, b) => (order === 'newest' ? takenAt(b) - takenAt(a) : takenAt(a) - takenAt(b))),
     [photos, order],
   )
-  const [opened, setOpened] = useState<Photo | null>(null)
+  const [openedId, setOpenedId] = useState<string | null>(null)
   const columns = useMemo(() => toColumns(sorted), [sorted])
+  // 지운 사진이 열려 있었다면 -1이 되어 저절로 닫힌다
+  const openedIndex = openedId ? sorted.findIndex((p) => p.id === openedId) : -1
   /* 꾹 눌러 고르고 끌어서 여러 장 — 손가락 아래 사진을 자리로 찾는다 */
   const sweep = useSweepSelect({
     idAt: (x, y) => {
@@ -229,7 +231,7 @@ export function AlbumView({ album, onAdd, readOnly, onClose }: AlbumViewProps) {
                 picked={sweep.selected.has(photo.id)}
                 selecting={sweep.selecting}
                 onPointerDown={readOnly ? undefined : (e) => sweep.onPointerDown(photo.id, e)}
-                onOpen={() => setOpened(photo)}
+                onOpen={() => setOpenedId(photo.id)}
               />
             ))}
           </div>
@@ -268,7 +270,15 @@ export function AlbumView({ album, onAdd, readOnly, onClose }: AlbumViewProps) {
         />
       )}
 
-      {opened && <PhotoDetail photo={opened} onClose={() => setOpened(null)} onDeleted={() => toast('사진을 지웠어요.')} />}
+      {openedIndex >= 0 && (
+        <PhotoDetail
+          photos={sorted}
+          index={openedIndex}
+          onMove={(next) => setOpenedId(sorted[next].id)}
+          onClose={() => setOpenedId(null)}
+          onDeleted={() => toast('사진을 지웠어요.')}
+        />
+      )}
     </div>
   )
 }
@@ -336,12 +346,64 @@ function Print({
   )
 }
 
-/** 사진 한 장 크게 보기 + 지우기 */
-function PhotoDetail({ photo, onClose, onDeleted }: { photo: Photo; onClose: () => void; onDeleted: () => void }) {
+/*
+ * 사진 크게 보기.
+ *
+ * 좌우로 밀면 앞뒤 사진으로 넘어간다 — 한 장씩 열고 닫지 않아도 쭉 훑어볼 수 있다.
+ * 미는 동안에는 사진이 손가락을 따라오고, 끝에서는 더 끌리지 않는다.
+ */
+const SWIPE_DISTANCE = 56
+
+function PhotoDetail({
+  photos,
+  index,
+  onMove,
+  onClose,
+  onDeleted,
+}: {
+  photos: Photo[]
+  index: number
+  onMove: (next: number) => void
+  onClose: () => void
+  onDeleted: () => void
+}) {
   useBackClose(onClose)
+  const photo = photos[index]
   const image = useLiveQuery(async () => (await db.photoImages.get(photo.id)) ?? null, [photo.id])
   const url = useObjectUrl(image?.blob ?? photo.thumb)
   const [confirming, setConfirming] = useState(false)
+  const [drag, setDrag] = useState(0)
+  const start = useRef<{ x: number; y: number } | null>(null)
+  // 민 것인지 그냥 누른 것인지 — 민 손끝은 화면을 닫으면 안 된다
+  const moved = useRef(false)
+
+  const move = (step: number) => {
+    const next = index + step
+    if (next < 0 || next >= photos.length) return
+    onMove(next)
+  }
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    start.current = { x: e.clientX, y: e.clientY }
+    moved.current = false
+  }
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!start.current) return
+    const dx = e.clientX - start.current.x
+    if (Math.abs(dx) > 6 || Math.abs(e.clientY - start.current.y) > 6) moved.current = true
+    // 세로로 긋는 중이면 사진을 끌지 않는다
+    if (Math.abs(e.clientY - start.current.y) > Math.abs(dx)) return
+    // 끝에서는 덜 끌리게 해 더 없다는 것을 손으로 알린다
+    const atEdge = (dx > 0 && index === 0) || (dx < 0 && index === photos.length - 1)
+    setDrag(atEdge ? dx * 0.25 : dx)
+  }
+
+  const onPointerUp = () => {
+    if (Math.abs(drag) > SWIPE_DISTANCE) move(drag > 0 ? -1 : 1)
+    start.current = null
+    setDrag(0)
+  }
 
   const remove = async () => {
     setConfirming(false)
@@ -351,8 +413,35 @@ function PhotoDetail({ photo, onClose, onDeleted }: { photo: Photo; onClose: () 
   }
 
   return (
-    <div className="photo-detail" role="dialog" aria-modal="true" aria-label="사진" onClick={onClose}>
-      {url && <img src={url} alt="" />}
+    <div
+      className="photo-detail"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`사진 ${index + 1} / ${photos.length}`}
+      onClick={() => {
+        // 넘기려고 민 손끝이 닫기로 읽히지 않도록
+        if (!moved.current) onClose()
+      }}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+    >
+      {url && (
+        <img
+          src={url}
+          alt=""
+          draggable={false}
+          style={{ transform: `translateX(${drag}px)`, transition: drag === 0 ? 'transform 0.2s ease-out' : 'none' }}
+        />
+      )}
+
+      {photos.length > 1 && (
+        <p className="photo-detail__count" onClick={(e) => e.stopPropagation()}>
+          {index + 1} / {photos.length}
+        </p>
+      )}
+
       <div className="photo-detail__foot" onClick={(e) => e.stopPropagation()}>
         <button className="btn btn--ghost" onClick={() => setConfirming(true)}>
           지우기

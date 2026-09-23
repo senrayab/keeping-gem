@@ -2440,6 +2440,25 @@ svg.dock__icon {
   width: 100%;
   object-fit: contain;
   border-radius: 10px;
+  /* 좌우로 밀 때 사진이 손가락을 따라온다 */
+  touch-action: pan-y;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* 몇 번째 사진인지 */
+.photo-detail__count {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 14px);
+  left: 50%;
+  margin: 0;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.12);
+  font-family: var(--mono);
+  font-size: 12px;
+  color: rgb(255 255 255 / 0.82);
+  transform: translateX(-50%);
 }
 
 .photo-detail__foot {
