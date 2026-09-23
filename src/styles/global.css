@@ -585,6 +585,11 @@ button {
   white-space: nowrap;
 }
 
+/* 돋보기만 있는 단추 — 글자가 없으니 좌우 여백을 줄여 동그랗게 */
+.dock__btn--icon {
+  padding: 0 14px;
+}
+
 .dock__btn:disabled {
   opacity: 0.4;
 }

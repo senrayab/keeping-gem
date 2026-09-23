@@ -150,16 +150,16 @@ export function App() {
           별똥별
         </button>
         <button
-          className={`dock__btn${searching ? ' is-active' : ''}`}
+          className={`dock__btn dock__btn--icon${searching ? ' is-active' : ''}`}
           onClick={() => setSearching(true)}
           disabled={!tickets?.length}
+          aria-label="찾기"
           aria-pressed={searching}
         >
           <svg className="dock__icon" viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="10.5" cy="10.5" r="6.5" />
             <path d="M15.5 15.5 20 20" />
           </svg>
-          찾기
         </button>
         <button className="dock__add" onClick={() => setEditing({})} aria-label="티켓 추가">
           +
