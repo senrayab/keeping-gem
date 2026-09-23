@@ -1014,6 +1014,18 @@ svg.dock__icon {
   object-fit: contain;
 }
 
+/* 티켓 밖 오른쪽 위에 얹는 금액 — 상자도 그림자도 없이 글자만 */
+.detail__price {
+  flex: none;
+  width: min(340px, 100%);
+  margin: 0 auto 6px;
+  padding-right: 2px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  text-align: right;
+}
+
 /* 티켓에 붙은 사진첩 뱃지 — 티켓 아래 가운데에 살짝 걸친다 */
 .detail__album {
   /* 티켓 위로 올라와야 한다 — 티켓이 그림자를 갖고 있어 그냥 두면 뒤로 깔린다 */
@@ -1184,17 +1196,6 @@ svg.dock__icon {
   text-align: center;
   word-break: keep-all;
   text-shadow: 0 2px 12px rgb(0 0 0 / 0.2);
-}
-
-/* 포스터 오른쪽 위에 얹는 금액 — 상자 없이 글자만, 포스터 위에서도 읽히게 그림자만 준다 */
-.ticket__price {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  font-size: 13px;
-  font-weight: 800;
-  color: #fff;
-  text-shadow: 0 1px 6px rgb(0 0 0 / 0.75), 0 0 18px rgb(0 0 0 / 0.5);
 }
 
 .ticket__head {
@@ -1407,10 +1408,11 @@ svg.dock__icon {
   gap: 6px;
 }
 
-.btn--icon {
+.btn.btn--icon {
   display: grid;
   place-items: center;
   width: 40px;
+  min-height: 40px;
   padding: 0;
 }
 
@@ -1757,6 +1759,101 @@ svg.dock__icon {
   stroke-linejoin: round;
 }
 
+/* 사진첩에 걸 티켓 고르기 */
+.ticket-pick {
+  display: grid;
+  gap: 4px;
+  max-height: 232px;
+  margin: 0;
+  padding: 4px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  list-style: none;
+  border: 1px solid var(--glass-line);
+  border-radius: 16px;
+  background: var(--glass);
+}
+
+.ticket-pick__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  text-align: left;
+}
+
+.ticket-pick__item.is-on {
+  background: rgb(var(--amber) / 0.14);
+}
+
+.ticket-pick__thumb {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 38px;
+  height: 46px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 0.08);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.ticket-pick__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ticket-pick__text {
+  display: grid;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.ticket-pick__text strong {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ticket-pick__text small {
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+
+.ticket-pick__check {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid var(--glass-line);
+  border-radius: 50%;
+}
+
+.ticket-pick__item.is-on .ticket-pick__check {
+  border-color: rgb(var(--amber));
+  background: rgb(var(--amber));
+}
+
+.ticket-pick__check svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: var(--night-0);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 /* 고르는 중인 사진첩 */
 .album.is-checked .album__stack {
   border-color: rgb(var(--amber) / 0.8);
@@ -2074,6 +2171,13 @@ svg.dock__icon {
 
 .print img {
   -webkit-user-drag: none;
+  /* 길게 눌러도 '이미지 공유/복사' 메뉴가 뜨지 않게 */
+  -webkit-touch-callout: none;
+  pointer-events: none;
+}
+
+.print {
+  -webkit-touch-callout: none;
 }
 
 .print.is-picked {
