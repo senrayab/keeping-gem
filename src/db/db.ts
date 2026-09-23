@@ -232,10 +232,21 @@ export async function addPhoto(albumId: string, image: ProcessedImage): Promise<
 }
 
 export async function deletePhoto(id: string): Promise<void> {
+  await deletePhotos([id])
+}
+
+/** 고른 사진을 한꺼번에 지운다 */
+export async function deletePhotos(ids: string[]): Promise<void> {
+  if (!ids.length) return
   await db.transaction('rw', db.photos, db.photoImages, async () => {
-    await db.photos.delete(id)
-    await db.photoImages.delete(id)
+    await db.photos.bulkDelete(ids)
+    await db.photoImages.bulkDelete(ids)
   })
+}
+
+/** 고른 사진첩과 그 안의 사진을 한꺼번에 지운다 */
+export async function deleteAlbums(ids: string[]): Promise<void> {
+  for (const id of ids) await deleteAlbum(id)
 }
 
 /** 사진첩과 그 안의 사진을 모두 지운다 */

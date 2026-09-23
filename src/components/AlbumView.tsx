@@ -1,9 +1,10 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useState, type CSSProperties } from 'react'
-import { db, deletePhoto, type Album, type Photo } from '@/db/db'
+import { db, deletePhoto, deletePhotos, type Album, type Photo } from '@/db/db'
 import { useBackClose } from '@/hooks/useBackClose'
 import { useObjectUrl } from '@/hooks/useObjectUrl'
 import { useScrollLock } from '@/hooks/useScrollLock'
+import { useSweepSelect } from '@/hooks/useSweepSelect'
 import { formatDate } from '@/lib/format'
 import { seeded } from '@/lib/seed'
 import { ConfirmDialog } from './ConfirmDialog'
@@ -53,13 +54,12 @@ const collageTilt = (photo: Photo) => (seeded(`${photo.id}:tilt`)() - 0.5) * 7
 interface AlbumViewProps {
   album: Album
   onAdd: () => void
-  onEdit: () => void
-  /** 티켓 상세보기에서 열었을 때 — 사진첩을 고치지 않고 보기만 한다 */
+  /** 티켓 상세보기에서 열었을 때 — 사진을 넣거나 지우지 않고 보기만 한다 */
   readOnly?: boolean
   onClose: () => void
 }
 
-export function AlbumView({ album, onAdd, onEdit, readOnly, onClose }: AlbumViewProps) {
+export function AlbumView({ album, onAdd, readOnly, onClose }: AlbumViewProps) {
   useBackClose(onClose)
   useScrollLock()
   const toast = useToast()
@@ -87,23 +87,40 @@ export function AlbumView({ album, onAdd, onEdit, readOnly, onClose }: AlbumView
   // 쏟아 놓기는 자리를 직접 잡으므로 높이도 직접 알려줘야 한다
   const pileHeight = photos?.length ? TOP + (photos.length - 1) * PILE_STEP + 230 : 0
 
+  /* 꾹 눌러 고르고 끌어서 여러 장 — 손가락 아래 사진을 자리로 찾는다 */
+  const sweep = useSweepSelect({
+    idAt: (x, y) => {
+      const el = document.elementFromPoint(x, y)
+      return el instanceof Element ? (el.closest('.print') as HTMLElement | null)?.dataset.photo : undefined
+    },
+  })
+  const [confirming, setConfirming] = useState(false)
+
+  const removePicked = async () => {
+    const ids = [...sweep.selected]
+    setConfirming(false)
+    await deletePhotos(ids)
+    sweep.stop()
+    toast(`사진 ${ids.length}장을 지웠어요.`)
+  }
+
   return (
     <div className="album-view" role="dialog" aria-modal="true" aria-label={`${album.title} 사진첩`}>
       <header className="album-view__head">
         <div>
           <h2>{album.title}</h2>
           <p>
-            {formatDate(album.date)}
-            {photos && ` · 사진 ${photos.length}장`}
+            {sweep.selecting
+              ? `${sweep.selected.size}장 고름 · 꾹 눌러 끌면 여러 장`
+              : `${formatDate(album.date)}${photos ? ` · 사진 ${photos.length}장` : ''}`}
           </p>
         </div>
-        {!readOnly && (
-          <button type="button" className="btn btn--ghost btn--small" onClick={onEdit}>
-            수정
-          </button>
-        )}
-        <button type="button" className="btn btn--ghost btn--small" onClick={onClose}>
-          닫기
+        <button
+          type="button"
+          className="btn btn--ghost btn--small"
+          onClick={() => (sweep.selecting ? sweep.stop() : onClose())}
+        >
+          {sweep.selecting ? '그만두기' : '닫기'}
         </button>
       </header>
 
@@ -127,8 +144,11 @@ export function AlbumView({ album, onAdd, onEdit, readOnly, onClose }: AlbumView
       )}
 
       <div
-        className={`album-view__desk album-view__desk--${layout}`}
+        className={`album-view__desk album-view__desk--${layout}${sweep.selecting ? ' is-selecting' : ''}`}
         style={layout === 'pile' ? { height: pileHeight } : undefined}
+        onPointerMove={(e) => sweep.onPointerMove(e)}
+        onPointerUp={sweep.onPointerUp}
+        onPointerCancel={sweep.onPointerUp}
       >
         {photos?.length === 0 && (
           <p className="album-view__empty">
@@ -141,17 +161,44 @@ export function AlbumView({ album, onAdd, onEdit, readOnly, onClose }: AlbumView
             photo={photo}
             spot={layout === 'pile' ? pileSpot(photo, i) : undefined}
             tilt={collageTilt(photo)}
-            onOpen={() => setOpened(photo)}
+            picked={sweep.selected.has(photo.id)}
+            onPointerDown={readOnly ? undefined : (e) => sweep.onPointerDown(photo.id, e)}
+            onOpen={() => (sweep.selecting ? sweep.toggle(photo.id) : setOpened(photo))}
           />
         ))}
       </div>
 
-      {!readOnly && (
-        <div className="album-view__foot">
-          <button className="btn btn--glow" onClick={onAdd}>
-            사진 넣기
-          </button>
-        </div>
+      {!readOnly &&
+        (sweep.selecting ? (
+          <div className="select-bar select-bar--desk">
+            <button className="btn btn--ghost" onClick={sweep.stop}>
+              그만두기
+            </button>
+            <button
+              className="btn btn--danger"
+              disabled={sweep.selected.size === 0}
+              onClick={() => setConfirming(true)}
+            >
+              {sweep.selected.size > 0 ? `${sweep.selected.size}장 지우기` : '지우기'}
+            </button>
+          </div>
+        ) : (
+          <div className="album-view__foot">
+            <button className="btn btn--glow" onClick={onAdd}>
+              사진 넣기
+            </button>
+          </div>
+        ))}
+
+      {confirming && (
+        <ConfirmDialog
+          title={`사진 ${sweep.selected.size}장을 지울까요?`}
+          message="되돌릴 수 없어요."
+          danger
+          confirmLabel="지우기"
+          onConfirm={() => void removePicked()}
+          onCancel={() => setConfirming(false)}
+        />
       )}
 
       {opened && <PhotoDetail photo={opened} onClose={() => setOpened(null)} onDeleted={() => toast('사진을 지웠어요.')} />}
@@ -164,12 +211,16 @@ function Print({
   photo,
   spot,
   tilt,
+  picked,
+  onPointerDown,
   onOpen,
 }: {
   photo: Photo
   /** 쏟아 놓기에서만 쓴다. 정돈일 때는 3열 흐름에 맡긴다. */
   spot?: Spot
   tilt: number
+  picked: boolean
+  onPointerDown?: (event: { clientX: number; clientY: number }) => void
   onOpen: () => void
 }) {
   const url = useObjectUrl(photo.thumb)
@@ -184,8 +235,24 @@ function Print({
     : ({ '--rotate': `${tilt}deg` } as CSSProperties)
 
   return (
-    <button className="print" style={style} onClick={onOpen} aria-label="사진 크게 보기">
-      {url && <img src={url} alt="" loading="lazy" />}
+    <button
+      className={`print${picked ? ' is-picked' : ''}`}
+      style={style}
+      data-photo={photo.id}
+      onPointerDown={onPointerDown}
+      onClick={onOpen}
+      aria-label="사진 크게 보기"
+      aria-pressed={picked}
+    >
+      {/* 브라우저 기본 '그림 끌어다 놓기'를 막는다 — 그게 끼어들면 끌어서 고르기가 끊긴다 */}
+      {url && <img src={url} alt="" loading="lazy" draggable={false} />}
+      {picked && (
+        <span className="print__check" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="m5 12.5 5 5 9-11" />
+          </svg>
+        </span>
+      )}
     </button>
   )
 }
