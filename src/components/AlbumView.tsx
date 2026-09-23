@@ -47,10 +47,12 @@ interface AlbumViewProps {
   album: Album
   onAdd: () => void
   onEdit: () => void
+  /** 티켓 상세보기에서 열었을 때 — 사진첩을 고치지 않고 보기만 한다 */
+  readOnly?: boolean
   onClose: () => void
 }
 
-export function AlbumView({ album, onAdd, onEdit, onClose }: AlbumViewProps) {
+export function AlbumView({ album, onAdd, onEdit, readOnly, onClose }: AlbumViewProps) {
   useBackClose(onClose)
   useScrollLock()
   const toast = useToast()
@@ -72,26 +74,34 @@ export function AlbumView({ album, onAdd, onEdit, onClose }: AlbumViewProps) {
             {photos && ` · 사진 ${photos.length}장`}
           </p>
         </div>
-        <button type="button" className="btn btn--ghost btn--small" onClick={onEdit}>
-          수정
-        </button>
+        {!readOnly && (
+          <button type="button" className="btn btn--ghost btn--small" onClick={onEdit}>
+            수정
+          </button>
+        )}
         <button type="button" className="btn btn--ghost btn--small" onClick={onClose}>
           닫기
         </button>
       </header>
 
       <div className="album-view__desk" style={{ height }}>
-        {photos?.length === 0 && <p className="album-view__empty">아래 버튼으로 그날의 사진을 넣어 보세요.</p>}
+        {photos?.length === 0 && (
+          <p className="album-view__empty">
+            {readOnly ? '아직 사진이 없어요. 보관함 → 사진첩에서 넣을 수 있어요.' : '아래 버튼으로 그날의 사진을 넣어 보세요.'}
+          </p>
+        )}
         {photos?.map((photo, i) => (
           <Print key={photo.id} photo={photo} spot={spot(photo, i)} onOpen={() => setOpened(photo)} />
         ))}
       </div>
 
-      <div className="album-view__foot">
-        <button className="btn btn--glow" onClick={onAdd}>
-          사진 넣기
-        </button>
-      </div>
+      {!readOnly && (
+        <div className="album-view__foot">
+          <button className="btn btn--glow" onClick={onAdd}>
+            사진 넣기
+          </button>
+        </div>
+      )}
 
       {opened && <PhotoDetail photo={opened} onClose={() => setOpened(null)} onDeleted={() => toast('사진을 지웠어요.')} />}
     </div>
