@@ -5,7 +5,7 @@ import { useBackClose } from '@/hooks/useBackClose'
 import { useObjectUrl } from '@/hooks/useObjectUrl'
 import { useScrollLock } from '@/hooks/useScrollLock'
 import { useSweepSelect } from '@/hooks/useSweepSelect'
-import { formatDate } from '@/lib/format'
+import { formatDateRange } from '@/lib/format'
 import { seeded } from '@/lib/seed'
 import { ConfirmDialog } from './ConfirmDialog'
 import { useToast } from './Toast'
@@ -125,7 +125,7 @@ export function AlbumView({ album, onAdd, readOnly, onClose }: AlbumViewProps) {
           <p>
             {sweep.selecting
               ? `${sweep.selected.size}장 고름 · 꾹 눌러 끌면 여러 장`
-              : `${formatDate(album.date)}${photos ? ` · 사진 ${photos.length}장` : ''}`}
+              : `${formatDateRange(album.date, album.endDate)}${photos ? ` · 사진 ${photos.length}장` : ''}`}
           </p>
         </div>
         <button

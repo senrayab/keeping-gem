@@ -4,7 +4,7 @@ import { addPhoto, db, deleteAlbums, type Album } from '@/db/db'
 import { useBackClose } from '@/hooks/useBackClose'
 import { useObjectUrl } from '@/hooks/useObjectUrl'
 import { useScrollLock } from '@/hooks/useScrollLock'
-import { formatDate } from '@/lib/format'
+import { formatDateRange } from '@/lib/format'
 import { PHOTO_MAX_EDGE, processImage } from '@/lib/image'
 import { AlbumForm } from './AlbumForm'
 import { AlbumView } from './AlbumView'
@@ -256,7 +256,7 @@ function AlbumCard({ album, selecting, checked, onOpen, onAdd, onEdit }: AlbumCa
         <div>
           <h3>{album.title}</h3>
           <p>
-            {formatDate(album.date)}
+            {formatDateRange(album.date, album.endDate)}
             {count != null && ` · 사진 ${count}장`}
           </p>
         </div>
