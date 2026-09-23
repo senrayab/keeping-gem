@@ -1014,6 +1014,39 @@ svg.dock__icon {
   object-fit: contain;
 }
 
+/* 티켓에 붙은 사진첩 뱃지 — 티켓 아래 가운데에 살짝 걸친다 */
+.detail__album {
+  /* 티켓 위로 올라와야 한다 — 티켓이 그림자를 갖고 있어 그냥 두면 뒤로 깔린다 */
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: none;
+  align-self: center;
+  min-height: 34px;
+  margin-top: -12px;
+  padding: 0 14px;
+  border: 1px solid var(--glass-line);
+  border-radius: 999px;
+  background: rgb(20 16 38 / 0.9);
+  color: rgb(var(--amber));
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 6px 16px rgb(0 0 0 / 0.45);
+  animation: fade-in 0.4s 0.3s ease-out backwards;
+}
+
+.detail__album svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
 /* ───────── 티켓 ───────── */
 
 .ticket {

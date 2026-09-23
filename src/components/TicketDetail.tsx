@@ -103,6 +103,17 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
             onPosterOpen={() => setPosterOpen(true)}
             onVenueOpen={() => setMapOpen(true)}
           />
+
+          {/* 아래 버튼 줄은 이 티켓을 '다루는' 자리라, 딸린 사진첩은 티켓에 붙은 뱃지로 알린다 */}
+          {album && photoCount ? (
+            <button className="detail__album" onClick={() => setAlbumOpen(true)}>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4.5 7.5h4l1.5-2h4l1.5 2h4v11h-15z" />
+                <circle cx="12" cy="12.5" r="3" />
+              </svg>
+              그날의 사진 {photoCount}장
+            </button>
+          ) : null}
         </div>
       </div>
 
@@ -116,12 +127,6 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
           <button className="action" onClick={() => void share()}>
             <Icon d="M12 15V4m0 0L8 8m4-4 4 4M6 12v6.5A1.5 1.5 0 0 0 7.5 20h9a1.5 1.5 0 0 0 1.5-1.5V12" />
             공유
-          </button>
-        )}
-        {album && (
-          <button className="action" onClick={() => setAlbumOpen(true)}>
-            <Icon d="M4.5 7.5h4l1.5-2h4l1.5 2h4v11h-15zM12 15.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-            사진 {photoCount ?? 0}
           </button>
         )}
         <button className="action" onClick={onEdit}>
