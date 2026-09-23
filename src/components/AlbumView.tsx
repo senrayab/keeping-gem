@@ -1,4 +1,4 @@
-import { Check, ImagePlus, X } from 'lucide-react'
+import { ArrowDownWideNarrow, ArrowUpNarrowWide, Check, ImagePlus, X } from 'lucide-react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useMemo, useState, type CSSProperties } from 'react'
 import { db, deletePhoto, deletePhotos, type Album, type Photo } from '@/db/db'
@@ -26,6 +26,12 @@ import { useToast } from './Toast'
 
 /** 벽돌 쌓기 칸 수 */
 const COLUMNS = 3
+
+/** 사진을 늘어놓는 순서 — 최신순(늦게 찍은 것부터) / 날짜순(먼저 찍은 것부터) */
+type PhotoOrder = 'newest' | 'oldest'
+const ORDER_KEY = 'keeping-gem:photo-order'
+
+const takenAt = (photo: Photo) => photo.takenAt ?? photo.createdAt
 
 /**
  * 사진을 세 칸에 나눠 담는다.
@@ -98,20 +104,36 @@ export function AlbumView({ album, onAdd, readOnly, onClose }: AlbumViewProps) {
   useBackClose(onClose)
   useScrollLock()
   const toast = useToast()
+  const [order, setOrder] = useState<PhotoOrder>(() => {
+    try {
+      return localStorage.getItem(ORDER_KEY) === 'oldest' ? 'oldest' : 'newest'
+    } catch {
+      return 'newest'
+    }
+  })
+  const toggleOrder = () => {
+    const next: PhotoOrder = order === 'newest' ? 'oldest' : 'newest'
+    setOrder(next)
+    try {
+      localStorage.setItem(ORDER_KEY, next)
+    } catch {
+      // 기억하지 못해도 보는 데는 지장이 없다
+    }
+  }
+
   /*
-   * 찍힌 때가 늦은 사진이 위로 온다.
+   * 찍힌 때를 기준으로 늘어놓는다.
    * 넣은 순서로 두면, 예전 사진을 나중에 보태는 순간 이야기의 흐름이 뒤엉킨다.
    * (찍힌 때를 모르는 사진은 넣은 때를 대신 쓴다)
    */
-  const photos = useLiveQuery(
-    async () =>
-      (await db.photos.where('albumId').equals(album.id).toArray()).sort(
-        (a, b) => (b.takenAt ?? b.createdAt) - (a.takenAt ?? a.createdAt),
-      ),
-    [album.id],
+  const photos = useLiveQuery(async () => db.photos.where('albumId').equals(album.id).toArray(), [album.id])
+  const sorted = useMemo(
+    () =>
+      [...(photos ?? [])].sort((a, b) => (order === 'newest' ? takenAt(b) - takenAt(a) : takenAt(a) - takenAt(b))),
+    [photos, order],
   )
   const [opened, setOpened] = useState<Photo | null>(null)
-  const columns = useMemo(() => toColumns(photos ?? []), [photos])
+  const columns = useMemo(() => toColumns(sorted), [sorted])
   /* 꾹 눌러 고르고 끌어서 여러 장 — 손가락 아래 사진을 자리로 찾는다 */
   const sweep = useSweepSelect({
     idAt: (x, y) => {
@@ -147,6 +169,12 @@ export function AlbumView({ album, onAdd, readOnly, onClose }: AlbumViewProps) {
               : `${formatDateRange(album.date, album.endDate)}${photos ? ` · 사진 ${photos.length}장` : ''}`}
           </p>
         </div>
+        {!sweep.selecting && photos && photos.length > 1 && (
+          <button type="button" className="btn btn--ghost btn--small order-btn" onClick={toggleOrder}>
+            {order === 'newest' ? <ArrowDownWideNarrow aria-hidden="true" /> : <ArrowUpNarrowWide aria-hidden="true" />}
+            {order === 'newest' ? '최신순' : '날짜순'}
+          </button>
+        )}
         <button
           type="button"
           className="btn btn--ghost btn--small btn--icon"
