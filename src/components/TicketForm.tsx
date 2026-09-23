@@ -1,3 +1,4 @@
+import { X } from 'lucide-react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { db, saveTicket, type Ticket } from '@/db/db'
@@ -186,8 +187,8 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
           {/* 취소는 다른 화면의 닫기와 같은 오른쪽 위에 둔다 */}
           <span className="sheet__spacer" />
           <h2>{ticket ? '티켓 수정' : '새 티켓'}</h2>
-          <button type="button" className="btn btn--ghost btn--small" onClick={onClose}>
-            취소
+          <button type="button" className="btn btn--ghost btn--small btn--icon" onClick={onClose} aria-label="취소">
+            <X aria-hidden="true" />
           </button>
         </header>
 

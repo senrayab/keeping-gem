@@ -1,3 +1,4 @@
+import { X } from 'lucide-react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useRef, useState, type ChangeEvent } from 'react'
 import { db } from '@/db/db'
@@ -96,8 +97,8 @@ export function BackupSheet({ onClose }: { onClose: () => void }) {
           {/* 닫기는 여는 버튼(머리말 오른쪽 위)과 같은 쪽에 둔다 */}
           <span />
           <h2>설정</h2>
-          <button type="button" className="btn btn--ghost btn--small" onClick={onClose}>
-            닫기
+          <button type="button" className="btn btn--ghost btn--small btn--icon" onClick={onClose} aria-label="닫기">
+            <X aria-hidden="true" />
           </button>
         </header>
 

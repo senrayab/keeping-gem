@@ -1,4 +1,4 @@
-import { Check, ImagePlus } from 'lucide-react'
+import { Check, ImagePlus, X } from 'lucide-react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useState, type CSSProperties } from 'react'
 import { db, deletePhoto, deletePhotos, type Album, type Photo } from '@/db/db'
@@ -149,10 +149,11 @@ export function AlbumView({ album, onAdd, readOnly, onClose }: AlbumViewProps) {
         </div>
         <button
           type="button"
-          className="btn btn--ghost btn--small"
+          className="btn btn--ghost btn--small btn--icon"
           onClick={() => (sweep.selecting ? sweep.stop() : onClose())}
+          aria-label={sweep.selecting ? '고르기 그만두기' : '닫기'}
         >
-          {sweep.selecting ? '그만두기' : '닫기'}
+          <X aria-hidden="true" />
         </button>
       </header>
 
@@ -313,8 +314,8 @@ function PhotoDetail({ photo, onClose, onDeleted }: { photo: Photo; onClose: () 
         <button className="btn btn--ghost" onClick={() => setConfirming(true)}>
           지우기
         </button>
-        <button className="btn btn--light" onClick={onClose}>
-          닫기
+        <button className="btn btn--light btn--icon" onClick={onClose} aria-label="닫기">
+          <X aria-hidden="true" />
         </button>
       </div>
 

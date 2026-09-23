@@ -115,8 +115,8 @@ export function AlbumsSheet({ onClose }: { onClose: () => void }) {
               </button>
             ) : null}
             {!selecting && (
-              <button type="button" className="btn btn--ghost btn--small" onClick={onClose}>
-                닫기
+              <button type="button" className="btn btn--ghost btn--small btn--icon" onClick={onClose} aria-label="닫기">
+                <X aria-hidden="true" />
               </button>
             )}
           </div>
