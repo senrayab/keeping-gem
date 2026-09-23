@@ -1,6 +1,6 @@
 import { Check, ImagePlus, X } from 'lucide-react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useState, type CSSProperties } from 'react'
+import { useMemo, useState, type CSSProperties } from 'react'
 import { db, deletePhoto, deletePhotos, type Album, type Photo } from '@/db/db'
 import { useBackClose } from '@/hooks/useBackClose'
 import { useObjectUrl } from '@/hooks/useObjectUrl'
@@ -23,6 +23,28 @@ import { useToast } from './Toast'
  */
 // 지금은 '정돈'만 쓴다. 쏟아 놓기(자유)는 아래에 주석으로 남겨 두었다. (TOP·Spot도 그때 쓴다)
 // const TOP = 10
+
+/** 벽돌 쌓기 칸 수 */
+const COLUMNS = 3
+
+/**
+ * 사진을 세 칸에 나눠 담는다.
+ *
+ * 앞에서부터 차례로, 그때그때 가장 낮은 칸에 놓는다 — 그래야 최신 사진이 위쪽에 모이고
+ * 왼쪽에서 오른쪽으로 읽힌다. (칸 하나를 끝까지 채우고 다음 칸으로 넘어가면
+ * 날짜 순서가 위아래로 흩어져 뒤죽박죽으로 보인다)
+ */
+function toColumns(photos: Photo[]): Photo[][] {
+  const columns: Photo[][] = Array.from({ length: COLUMNS }, () => [])
+  const heights = new Array<number>(COLUMNS).fill(0)
+  for (const photo of photos) {
+    const shortest = heights.indexOf(Math.min(...heights))
+    columns[shortest].push(photo)
+    // 칸 너비가 같으므로 세로 비율만으로 높이를 가늠할 수 있다
+    heights[shortest] += photo.height / photo.width
+  }
+  return columns
+}
 
 interface Spot {
   left: number
@@ -89,6 +111,7 @@ export function AlbumView({ album, onAdd, readOnly, onClose }: AlbumViewProps) {
     [album.id],
   )
   const [opened, setOpened] = useState<Photo | null>(null)
+  const columns = useMemo(() => toColumns(photos ?? []), [photos])
   /* 꾹 눌러 고르고 끌어서 여러 장 — 손가락 아래 사진을 자리로 찾는다 */
   const sweep = useSweepSelect({
     idAt: (x, y) => {
@@ -168,16 +191,20 @@ export function AlbumView({ album, onAdd, readOnly, onClose }: AlbumViewProps) {
             {readOnly ? '아직 사진이 없어요. 머리말의 사진첩에서 넣을 수 있어요.' : '아래 버튼으로 그날의 사진을 넣어 보세요.'}
           </p>
         )}
-        {photos?.map((photo) => (
-          <Print
-            key={photo.id}
-            photo={photo}
-            tilt={collageTilt(photo)}
-            picked={sweep.selected.has(photo.id)}
-            selecting={sweep.selecting}
-            onPointerDown={readOnly ? undefined : (e) => sweep.onPointerDown(photo.id, e)}
-            onOpen={() => setOpened(photo)}
-          />
+        {columns.map((column, i) => (
+          <div className="desk__column" key={i}>
+            {column.map((photo) => (
+              <Print
+                key={photo.id}
+                photo={photo}
+                tilt={collageTilt(photo)}
+                picked={sweep.selected.has(photo.id)}
+                selecting={sweep.selecting}
+                onPointerDown={readOnly ? undefined : (e) => sweep.onPointerDown(photo.id, e)}
+                onOpen={() => setOpened(photo)}
+              />
+            ))}
+          </div>
         ))}
       </div>
 
