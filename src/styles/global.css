@@ -1881,19 +1881,24 @@ svg.dock__icon {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* 바랜 인쇄 — 오래 둔 앨범처럼 */
-  filter: saturate(0.72) contrast(1.12) sepia(0.2) brightness(0.9);
+  /* 살짝 바랜 인쇄 — 어둡게 누르지는 않는다 */
+  filter: saturate(0.88) contrast(1.02) sepia(0.12);
 }
 
-/* 인쇄 결과 스캔선, 그리고 글씨가 놓일 위아래를 어둡게 */
+/*
+ * 비닐이 덮인 느낌.
+ *
+ * 줄무늬는 두지 않는다 — 그림을 어둡게 눌러 버린다.
+ * 아주 옅은 뿌연 막과 빛깔만 얹고, 제목이 놓일 아래쪽만 살짝 어둡게 한다.
+ */
 .tape__grain {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgb(8 7 12 / 0.62) 0 22%, rgb(8 7 12 / 0) 42% 58%, rgb(8 7 12 / 0.72) 84%),
-    repeating-linear-gradient(0deg, rgb(0 0 0 / 0.14) 0 1px, rgb(255 255 255 / 0) 1px 3px),
-    linear-gradient(140deg, var(--tint), transparent 55%);
-  background-blend-mode: normal, overlay, soft-light;
+    linear-gradient(180deg, rgb(255 255 255 / 0.05) 0 40%, rgb(8 7 12 / 0) 55%, rgb(8 7 12 / 0.45) 92%),
+    linear-gradient(140deg, var(--tint), transparent 62%);
+  background-blend-mode: normal, soft-light;
+  opacity: 0.85;
 }
 
 /* 앞면 제목 — 굵게, 자간을 좁혀 인쇄된 느낌으로 */
@@ -1930,6 +1935,7 @@ svg.dock__icon {
 }
 
 /* 포장 비닐 */
+/* 포장 비닐 — 뿌연 막 위로 빛이 비스듬히 스친다 */
 .tape__wrap {
   position: absolute;
   inset: 0;
@@ -1937,14 +1943,14 @@ svg.dock__icon {
   background:
     linear-gradient(
       118deg,
-      rgb(255 255 255 / 0) 0 24%,
-      rgb(255 255 255 / 0.16) 28% 33%,
-      rgb(255 255 255 / 0) 37% 58%,
-      rgb(255 255 255 / 0.1) 62% 66%,
+      rgb(255 255 255 / 0) 0 22%,
+      rgb(255 255 255 / 0.2) 27% 32%,
+      rgb(255 255 255 / 0.05) 36% 54%,
+      rgb(255 255 255 / 0.14) 60% 64%,
       rgb(255 255 255 / 0) 70%
     ),
-    linear-gradient(100deg, rgb(255 255 255 / 0.08) 0 6%, rgb(255 255 255 / 0) 12%);
-  box-shadow: inset 0 0 14px rgb(255 255 255 / 0.1), inset 0 0 0 1px rgb(255 255 255 / 0.14);
+    /* 비닐이 덮여 전체가 아주 살짝 뿌옇다 */ linear-gradient(rgb(255 255 255 / 0.07), rgb(255 255 255 / 0.07));
+  box-shadow: inset 0 0 20px rgb(255 255 255 / 0.14), inset 0 0 0 1px rgb(255 255 255 / 0.2);
   pointer-events: none;
 }
 
