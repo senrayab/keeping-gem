@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react'
 import { db, saveAlbum, type Album } from '@/db/db'
 import { useBackClose } from '@/hooks/useBackClose'
 import { useScrollLock } from '@/hooks/useScrollLock'
+import { useObjectUrl } from '@/hooks/useObjectUrl'
 import { formatDate, today } from '@/lib/format'
 import { ClearInput } from './ClearInput'
 import { useToast } from './Toast'
@@ -13,7 +14,12 @@ interface AlbumFormProps {
   onSaved: (id: string) => void
 }
 
-/** 사진첩 만들기·고치기. 티켓과 이어 두면 그 티켓 상세보기에서 바로 열 수 있다. */
+/**
+ * 사진첩 만들기·고치기.
+ *
+ * 하루짜리도 있고 이틀 이상 이어지는 일정도 있다(2박 3일 콘서트 등).
+ * 그런 경우 하루씩 나누지 않고 한 사진첩에 모아 두고, 그날들의 티켓을 함께 건다.
+ */
 export function AlbumForm({ album, onClose, onSaved }: AlbumFormProps) {
   useBackClose(onClose)
   useScrollLock()
@@ -22,8 +28,13 @@ export function AlbumForm({ album, onClose, onSaved }: AlbumFormProps) {
 
   const [title, setTitle] = useState(album?.title ?? '')
   const [date, setDate] = useState(album?.date ?? today())
-  const [ticketId, setTicketId] = useState(album?.ticketId ?? '')
+  const [endDate, setEndDate] = useState(album?.endDate ?? '')
+  const [several, setSeveral] = useState(Boolean(album?.endDate))
+  const [ticketIds, setTicketIds] = useState<string[]>(album?.ticketIds ?? [])
   const [saving, setSaving] = useState(false)
+
+  const toggleTicket = (id: string) =>
+    setTicketIds((prev) => (prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]))
 
   const submit = async (event: FormEvent) => {
     event.preventDefault()
@@ -31,9 +42,22 @@ export function AlbumForm({ album, onClose, onSaved }: AlbumFormProps) {
       toast('사진첩 이름을 적어 주세요.')
       return
     }
+    // 끝나는 날이 시작일보다 앞이면 사람이 잘못 고른 것이다
+    if (several && endDate && endDate < date) {
+      toast('끝나는 날이 시작한 날보다 앞이에요.')
+      return
+    }
     setSaving(true)
     try {
-      const id = await saveAlbum({ title: title.trim(), date, ticketId: ticketId || undefined }, album?.id)
+      const id = await saveAlbum(
+        {
+          title: title.trim(),
+          date,
+          endDate: several && endDate && endDate !== date ? endDate : undefined,
+          ticketIds,
+        },
+        album?.id,
+      )
       onSaved(id)
     } catch (e) {
       console.error(e)
@@ -64,22 +88,76 @@ export function AlbumForm({ album, onClose, onSaved }: AlbumFormProps) {
           />
         </label>
 
-        <label className="field">
+        <div className="field">
           <span>날짜</span>
-          <input type="date" value={date} required onChange={(e) => setDate(e.target.value)} />
-        </label>
+          <div className="chips">
+            <button
+              type="button"
+              className={`chip${several ? '' : ' is-active'}`}
+              onClick={() => {
+                setSeveral(false)
+                setEndDate('')
+              }}
+            >
+              하루
+            </button>
+            <button
+              type="button"
+              className={`chip${several ? ' is-active' : ''}`}
+              onClick={() => {
+                setSeveral(true)
+                if (!endDate) setEndDate(date)
+              }}
+            >
+              여러 날
+            </button>
+          </div>
+          <div className={several ? 'field-row' : undefined}>
+            <input type="date" value={date} required onChange={(e) => setDate(e.target.value)} aria-label="시작한 날" />
+            {several && (
+              <input
+                type="date"
+                value={endDate}
+                min={date}
+                onChange={(e) => setEndDate(e.target.value)}
+                aria-label="끝나는 날"
+              />
+            )}
+          </div>
+        </div>
 
-        <label className="field">
-          <span>이 사진첩의 티켓 (없어도 됩니다)</span>
-          <select className="select" value={ticketId} onChange={(e) => setTicketId(e.target.value)}>
-            <option value="">연결 안 함</option>
-            {tickets?.map((ticket) => (
-              <option key={ticket.id} value={ticket.id}>
-                {formatDate(ticket.date)} · {ticket.title}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="field">
+          <span>이 사진첩의 티켓 {ticketIds.length > 0 && `· ${ticketIds.length}장`}</span>
+          {tickets?.length ? (
+            <ul className="ticket-pick">
+              {tickets.map((ticket) => (
+                <li key={ticket.id}>
+                  <button
+                    type="button"
+                    className={`ticket-pick__item${ticketIds.includes(ticket.id) ? ' is-on' : ''}`}
+                    onClick={() => toggleTicket(ticket.id)}
+                    aria-pressed={ticketIds.includes(ticket.id)}
+                  >
+                    <Thumb blob={ticket.thumb} title={ticket.title} />
+                    <span className="ticket-pick__text">
+                      <strong>{ticket.title}</strong>
+                      <small>{formatDate(ticket.date)}</small>
+                    </span>
+                    <span className="ticket-pick__check" aria-hidden="true">
+                      {ticketIds.includes(ticket.id) && (
+                        <svg viewBox="0 0 24 24">
+                          <path d="m5 12.5 5 5 9-11" />
+                        </svg>
+                      )}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="field__hint">아직 티켓이 없어요. 티켓 없이도 사진첩을 만들 수 있어요.</p>
+          )}
+        </div>
 
         <div className="sheet__foot">
           <button type="submit" className="btn btn--glow" disabled={saving}>
@@ -88,5 +166,12 @@ export function AlbumForm({ album, onClose, onSaved }: AlbumFormProps) {
         </div>
       </form>
     </div>
+  )
+}
+
+function Thumb({ blob, title }: { blob?: Blob; title: string }) {
+  const url = useObjectUrl(blob)
+  return (
+    <span className="ticket-pick__thumb">{url ? <img src={url} alt="" /> : <span>{title.slice(0, 1)}</span>}</span>
   )
 }

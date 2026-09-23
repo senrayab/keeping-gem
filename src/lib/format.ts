@@ -22,3 +22,10 @@ export function today(): string {
   const pad = (n: number) => String(n).padStart(2, '0')
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
 }
+
+/** "2026-09-12" ~ "2026-09-14" → "2026.09.12 (토) ~ 09.14 (월)" */
+export function formatDateRange(from: string, to?: string): string {
+  if (!to || to === from) return formatDate(from)
+  const sameYear = from.slice(0, 4) === to.slice(0, 4)
+  return `${formatDate(from)} ~ ${sameYear ? formatDate(to).slice(5) : formatDate(to)}`
+}
