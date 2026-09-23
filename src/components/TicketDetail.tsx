@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useState, type CSSProperties } from 'react'
 import { db, deleteTicket, type Ticket } from '@/db/db'
+import { formatMoney } from '@/lib/currencies'
 import { AlbumView } from './AlbumView'
 import { useBackClose } from '@/hooks/useBackClose'
 import { useScrollLock } from '@/hooks/useScrollLock'
@@ -55,7 +56,7 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
   const [mapOpen, setMapOpen] = useState(false)
   const [albumOpen, setAlbumOpen] = useState(false)
   // 이 티켓에 이어 둔 사진첩 (보관함에서 만들 때 티켓을 고르면 생긴다)
-  const album = useLiveQuery(async () => (await db.albums.where('ticketId').equals(ticket.id).first()) ?? null, [ticket.id])
+  const album = useLiveQuery(async () => (await db.albums.where('ticketIds').equals(ticket.id).first()) ?? null, [ticket.id])
   const photoCount = useLiveQuery(
     async () => (album ? await db.photos.where('albumId').equals(album.id).count() : 0),
     [album?.id],
@@ -96,6 +97,11 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
   return (
     <div className="detail" role="dialog" aria-modal="true" aria-label={`${ticket.title} 티켓`} onClick={onClose}>
       <div className="detail__stage">
+        {/* 금액은 티켓 밖, 하늘 쪽에 글자로만 둔다 — 티켓 안은 그날의 기록만 담는다 */}
+        {ticket.price != null && (
+          <p className="detail__price">{formatMoney(ticket.price, ticket.currency)}</p>
+        )}
+
         <div className="detail__ticket" style={origin as CSSProperties} onClick={(e) => e.stopPropagation()}>
           <TicketView
             ticket={ticket}

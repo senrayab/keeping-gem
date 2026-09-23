@@ -1,7 +1,6 @@
 import type { CSSProperties } from 'react'
 import type { Ticket } from '@/db/db'
 import { categoryOf } from '@/lib/categories'
-import { formatMoney } from '@/lib/currencies'
 import { formatDate } from '@/lib/format'
 // 일련번호·바코드는 저장 이미지(lib/ticketImage.ts)와 아래 주석 처리된 조각이 쓴다
 
@@ -38,14 +37,12 @@ export function TicketView({ ticket, posterUrl, onPosterOpen, onVenueOpen }: Tic
             <img className="ticket__poster" src={posterUrl} alt={`${ticket.title} 포스터`} />
             {/* 포스터 왼쪽 아래를 라벨 크기만큼 파낸 자리 — 파인 자리의 모서리는 모두 둥글다 */}
             <span className="ticket__chip">{category.label}</span>
-            {ticket.price != null && <span className="ticket__price">{formatMoney(ticket.price, ticket.currency)}</span>}
             {onPosterOpen && <span className="ticket__poster-hint">크게 보기</span>}
           </button>
         ) : (
           <div className="ticket__poster ticket__poster--empty">
             <span>{ticket.title}</span>
             <span className="ticket__chip">{category.label}</span>
-            {ticket.price != null && <span className="ticket__price">{formatMoney(ticket.price, ticket.currency)}</span>}
           </div>
         )}
         <div className="ticket__head">

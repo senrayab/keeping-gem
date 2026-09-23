@@ -23,7 +23,7 @@ import { useToast } from './Toast'
 export type DeskLayout = 'collage' | 'pile'
 
 const LAYOUT_KEY = 'keeping-gem:desk'
-const PILE_STEP = 86
+const PILE_STEP = 62
 const TOP = 10
 
 interface Spot {
@@ -40,15 +40,17 @@ interface Spot {
  * 겹치되 가려지지는 않아야 한다 — 이웃한 사진을 좌우로 번갈아 놓고 세로 간격을 넉넉히 둬,
  * 어느 장이든 절반 넘게 드러나게 한다. 가장자리는 살짝 넘겨 더미 한가운데를 보는 느낌만 남긴다.
  */
+/** 왼쪽·가운데·오른쪽을 돌아가며 놓아 가로 여백을 고루 채운다 */
+const LANES = [-3, 24, 51]
+
 function pileSpot(photo: Photo, index: number): Spot {
   const rand = seeded(photo.id)
-  const width = 40 + rand() * 10
-  // 이웃끼리 좌우로 어긋나게 둔다 — 귀퉁이만 겹치고 가운데는 서로 가리지 않는다
-  const left = (index % 2 === 0 ? -4 : 42) + rand() * 14
+  const width = 30 + rand() * 10
+  const lane = LANES[index % LANES.length]
   return {
-    left,
-    top: TOP + index * PILE_STEP + (rand() - 0.5) * 20,
-    rotate: (rand() - 0.5) * 26,
+    left: Math.min(lane + rand() * 14, 101 - width),
+    top: TOP + index * PILE_STEP + (rand() - 0.5) * 26,
+    rotate: (rand() - 0.5) * 30,
     width,
     z: Math.floor(rand() * 20),
   }
@@ -91,7 +93,7 @@ export function AlbumView({ album, onAdd, readOnly, onClose }: AlbumViewProps) {
   }
 
   // 쏟아 놓기는 자리를 직접 잡으므로 높이도 직접 알려줘야 한다
-  const pileHeight = photos?.length ? TOP + (photos.length - 1) * PILE_STEP + 260 : 0
+  const pileHeight = photos?.length ? TOP + (photos.length - 1) * PILE_STEP + 240 : 0
 
   /* 꾹 눌러 고르고 끌어서 여러 장 — 손가락 아래 사진을 자리로 찾는다 */
   const sweep = useSweepSelect({
@@ -175,8 +177,9 @@ export function AlbumView({ album, onAdd, readOnly, onClose }: AlbumViewProps) {
             spot={layout === 'pile' ? pileSpot(photo, i) : undefined}
             tilt={collageTilt(photo)}
             picked={sweep.selected.has(photo.id)}
+            selecting={sweep.selecting}
             onPointerDown={readOnly ? undefined : (e) => sweep.onPointerDown(photo.id, e)}
-            onOpen={() => (sweep.selecting ? sweep.toggle(photo.id) : setOpened(photo))}
+            onOpen={() => setOpened(photo)}
           />
         ))}
       </div>
@@ -225,6 +228,7 @@ function Print({
   spot,
   tilt,
   picked,
+  selecting,
   onPointerDown,
   onOpen,
 }: {
@@ -233,6 +237,7 @@ function Print({
   spot?: Spot
   tilt: number
   picked: boolean
+  selecting: boolean
   onPointerDown?: (event: { clientX: number; clientY: number }) => void
   onOpen: () => void
 }) {
@@ -253,7 +258,10 @@ function Print({
       style={style}
       data-photo={photo.id}
       onPointerDown={onPointerDown}
-      onClick={onOpen}
+      // 길게 누르면 안드로이드가 '이미지 공유/복사' 메뉴를 띄운다 — 고르는 중이므로 막는다
+      onContextMenu={(e) => e.preventDefault()}
+      // 고르는 중에는 누름을 pointerdown에서 이미 다뤘다. 여기서 또 다루면 골랐다 풀렸다 한다.
+      onClick={selecting ? undefined : onOpen}
       aria-label="사진 크게 보기"
       aria-pressed={picked}
     >
