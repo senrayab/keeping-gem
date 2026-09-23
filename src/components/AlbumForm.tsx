@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { db, saveAlbum, type Album } from '@/db/db'
 import { useBackClose } from '@/hooks/useBackClose'
 import { useScrollLock } from '@/hooks/useScrollLock'
@@ -31,7 +31,29 @@ export function AlbumForm({ album, onClose, onSaved }: AlbumFormProps) {
   const [endDate, setEndDate] = useState(album?.endDate ?? '')
   const [several, setSeveral] = useState(Boolean(album?.endDate))
   const [ticketIds, setTicketIds] = useState<string[]>(album?.ticketIds ?? [])
+  const endRef = useRef<HTMLInputElement>(null)
   const [saving, setSaving] = useState(false)
+
+  /*
+   * 시작한 날을 고르면 끝나는 날 달력을 이어서 연다.
+   * 창이 닫히고 다시 눌러야 하면 '여러 날'을 고른 흐름이 한 번 끊긴다.
+   */
+  const pickStart = (value: string) => {
+    setDate(value)
+    if (!several) return
+    // 끝나는 날이 앞서 있으면 시작일에 맞춰 둔다
+    if (!endDate || endDate < value) setEndDate(value)
+    window.setTimeout(() => {
+      const input = endRef.current
+      if (!input) return
+      try {
+        input.showPicker()
+      } catch {
+        // 달력을 바로 열 수 없는 기기에서는 칸으로 옮겨만 준다
+        input.focus()
+      }
+    }, 120)
+  }
 
   const toggleTicket = (id: string) =>
     setTicketIds((prev) => (prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]))
@@ -113,9 +135,16 @@ export function AlbumForm({ album, onClose, onSaved }: AlbumFormProps) {
             </button>
           </div>
           <div className={several ? 'field-row' : undefined}>
-            <input type="date" value={date} required onChange={(e) => setDate(e.target.value)} aria-label="시작한 날" />
+            <input
+              type="date"
+              value={date}
+              required
+              onChange={(e) => pickStart(e.target.value)}
+              aria-label="시작한 날"
+            />
             {several && (
               <input
+                ref={endRef}
                 type="date"
                 value={endDate}
                 min={date}
