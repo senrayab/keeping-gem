@@ -1,6 +1,5 @@
 import type { Ticket } from '@/db/db'
 import { categoryOf } from './categories'
-import { formatMoney } from './currencies'
 import { formatDate } from './format'
 // barcodeBars·ticketNumber는 아래 주석 처리된 바코드 조각이 쓴다
 import { seeded } from './seed'
@@ -190,7 +189,7 @@ export async function renderTicketImage(ticket: Ticket, poster?: Blob): Promise<
 
   const gridY = perf1 + 70
   const gridRowH = 130
-  const gridEnd = gridY + gridRowH * 2 - 20
+  const gridEnd = gridY + gridRowH * Math.ceil(3 / 2) - 20
 
   font(ctx, 500, 34)
   const memoLines = ticket.memo ? wrap(ctx, ticket.memo, inner - 72, 6) : []
@@ -279,12 +278,15 @@ export async function renderTicketImage(ticket: Ticket, poster?: Blob): Promise<
 
   perforation(ctx, perf1)
 
-  // ── 6. 날짜·시간·좌석·금액 ──
+  /*
+   * ── 6. 날짜·시간·좌석 ──
+   * 금액은 넣지 않는다 — 나눠 보는 것은 그날의 추억이지 값이 아니다.
+   * 금액은 앱 안 상세보기에서만 본다.
+   */
   const cells: [string, string][] = [
     ['DATE', formatDate(ticket.date)],
     ['TIME', ticket.time ?? '—'],
     ['SEAT', ticket.seat || '—'],
-    ['PRICE', ticket.price != null ? formatMoney(ticket.price, ticket.currency) : '—'],
   ]
   const colW = inner / 2 - 12
   cells.forEach(([label, value], i) => {
