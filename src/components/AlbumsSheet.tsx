@@ -260,12 +260,6 @@ function AlbumCard({ album, selecting, checked, onOpen, onAdd, onEdit }: AlbumCa
 
         <span className="tape__title">{album.title}</span>
 
-        {/* 아래 라벨 띠 */}
-        <span className="tape__band">
-          <span className="tape__date">{formatDateRange(album.date, album.endDate)}</span>
-          <span className="tape__count">{count != null && count > 0 ? `${count}장` : '비어 있음'}</span>
-        </span>
-
         {/* 포장 비닐 — 비스듬히 지나가는 빛과 접힌 자국 */}
         <span className="tape__wrap" aria-hidden="true" />
 
@@ -275,6 +269,11 @@ function AlbumCard({ album, selecting, checked, onOpen, onAdd, onEdit }: AlbumCa
           </span>
         )}
       </button>
+
+      <p className="tape__caption">
+        {formatDateRange(album.date, album.endDate)}
+        {count != null && count > 0 ? ` · ${count}장` : ''}
+      </p>
 
       {!selecting && (
         <div className="tape__tools">
