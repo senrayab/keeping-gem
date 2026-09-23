@@ -1,7 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useState, type CSSProperties } from 'react'
 import { db, deleteTicket, type Ticket } from '@/db/db'
-import { formatMoney } from '@/lib/currencies'
 import { AlbumView } from './AlbumView'
 import { useBackClose } from '@/hooks/useBackClose'
 import { useScrollLock } from '@/hooks/useScrollLock'
@@ -117,8 +116,6 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
           ) : null}
         </div>
 
-        {/* 금액은 티켓 밖, 아래 오른쪽에 글자로만 둔다 — 티켓 안은 그날의 기록만 담는다 */}
-        {ticket.price != null && <p className="detail__price">{formatMoney(ticket.price, ticket.currency)}</p>}
       </div>
 
       {/* 스크롤하지 않아도 늘 보이도록 아래에 붙인 버튼 줄 */}
