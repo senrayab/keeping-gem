@@ -1,8 +1,9 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Archive, List, Plus, Search, Sparkles } from 'lucide-react'
+import { Archive, Images, List, Plus, Search, Sparkles } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { db, type Ticket } from './db/db'
 import { sumByCurrency } from './lib/currencies'
+import { AlbumsSheet } from './components/AlbumsSheet'
 import { BackupSheet } from './components/BackupSheet'
 import { DbNotice } from './components/DbNotice'
 import { EMPTY_FILTER, matches, SearchPanel, type Filter } from './components/SearchPanel'
@@ -24,6 +25,7 @@ export function App() {
   const [editing, setEditing] = useState<Editing>(null)
   const [searching, setSearching] = useState(false)
   const [vault, setVault] = useState(false)
+  const [albums, setAlbums] = useState(false)
   // 보던 방식(밤하늘/리스트)은 기기에 기억해 둔다
   const [view, setView] = useState<'sky' | 'list'>(() => {
     try {
@@ -81,6 +83,9 @@ export function App() {
             aria-label={view === 'sky' ? '리스트로 보기' : '밤하늘로 보기'}
           >
             {view === 'sky' ? <List aria-hidden="true" /> : <Sparkles aria-hidden="true" />}
+          </button>
+          <button className="app-header__icon" onClick={() => setAlbums(true)} aria-label="사진첩">
+            <Images aria-hidden="true" />
           </button>
           <button className="app-header__icon" onClick={() => setVault(true)} aria-label="보관함 (백업·복원)">
             <Archive aria-hidden="true" />
@@ -176,7 +181,17 @@ export function App() {
         />
       )}
 
-      {vault && <BackupSheet onClose={() => setVault(false)} />}
+      {vault && (
+        <BackupSheet
+          onClose={() => setVault(false)}
+          onOpenAlbums={() => {
+            setVault(false)
+            setAlbums(true)
+          }}
+        />
+      )}
+
+      {albums && <AlbumsSheet onClose={() => setAlbums(false)} />}
 
       <UpdateToast />
       <DbNotice />
