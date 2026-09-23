@@ -248,27 +248,26 @@ function AlbumCard({ album, selecting, checked, onOpen, onAdd, onEdit }: AlbumCa
         aria-label={selecting ? `${album.title} 고르기` : `${album.title} 사진첩 열기`}
         aria-pressed={selecting ? checked : undefined}
       >
-        {/* 라벨 — 그날의 그림 위에 제목과 날짜 */}
-        <span className="tape__label">
-          {coverUrl && <img className="tape__art" src={coverUrl} alt="" loading="lazy" />}
-          <span className="tape__grain" aria-hidden="true" />
+        {/* 앞면 그림 — 그날의 포스터 */}
+        {coverUrl && <img className="tape__art" src={coverUrl} alt="" loading="lazy" />}
+        <span className="tape__grain" aria-hidden="true" />
+
+        {/* 위쪽 인쇄 — 테이프 규격 표시처럼 */}
+        <span className="tape__head">
           <span className="tape__side">A</span>
-          <span className="tape__title">{album.title}</span>
-          <span className="tape__meta">
-            {formatDateRange(album.date, album.endDate)}
-            {count != null && count > 0 ? ` · ${count}장` : ''}
-          </span>
+          <span className="tape__mark">COMPACT CASSETTE</span>
         </span>
 
-        {/* 테이프 창과 릴 */}
-        <span className="tape__deck" aria-hidden="true">
-          <span className="tape__reel" />
-          <span className="tape__window" />
-          <span className="tape__reel" />
+        <span className="tape__title">{album.title}</span>
+
+        {/* 아래 라벨 띠 */}
+        <span className="tape__band">
+          <span className="tape__date">{formatDateRange(album.date, album.endDate)}</span>
+          <span className="tape__count">{count != null && count > 0 ? `${count}장` : '비어 있음'}</span>
         </span>
 
-        {/* 비닐 포장에 비치는 빛 */}
-        <span className="tape__sheen" aria-hidden="true" />
+        {/* 포장 비닐 — 비스듬히 지나가는 빛과 접힌 자국 */}
+        <span className="tape__wrap" aria-hidden="true" />
 
         {selecting && (
           <span className={`tape__check${checked ? ' is-on' : ''}`} aria-hidden="true">
