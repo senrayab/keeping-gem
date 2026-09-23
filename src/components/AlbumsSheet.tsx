@@ -6,6 +6,7 @@ import { useBackClose } from '@/hooks/useBackClose'
 import { useObjectUrl } from '@/hooks/useObjectUrl'
 import { useScrollLock } from '@/hooks/useScrollLock'
 import { formatDateRange } from '@/lib/format'
+import { seeded } from '@/lib/seed'
 import { fingerprint } from '@/lib/hash'
 import { PHOTO_MAX_EDGE, processImage } from '@/lib/image'
 import { AlbumForm } from './AlbumForm'
@@ -222,20 +223,30 @@ interface AlbumCardProps {
 /*
  * 사진첩 한 칸은 보관 상자에 꽂힌 색인 카드다.
  *
- * 카드 위로 이름표(탭)가 솟아 있고, 카드 사이로 그 안의 사진이 비친다.
- * 탭의 좌우 자리는 칸마다 어긋나게 둬(--tab) 실제 서랍처럼 보이게 한다.
+ * 카드 뒤로 그 안의 사진이 비스듬히 꽂혀 윗머리만 보이고, 카드 위로는 이름표(탭)가 솟아 있다.
+ * 탭의 좌우 자리와 빛깔은 사진첩마다 달라(--tab, --tint) 서랍을 열어 본 듯하게 한다.
  */
-const TAB_SPOTS = ['14px', '34%', '58%']
+const TAB_SPOTS = ['16px', '32%', '54%']
+/* 색인 카드 라벨 빛깔 — 문구점에서 파는 인덱스 카드처럼 */
+const TAB_TINTS = ['#f6d06a', '#8fc3ec', '#98ddb0', '#f0a5bf', '#bfaaf0', '#f2b184']
 
 function AlbumCard({ album, index, selecting, checked, onOpen, onAdd, onEdit }: AlbumCardProps) {
-  const photos = useLiveQuery(() => db.photos.where('albumId').equals(album.id).limit(4).toArray(), [album.id])
+  const photos = useLiveQuery(() => db.photos.where('albumId').equals(album.id).limit(3).toArray(), [album.id])
   const count = useLiveQuery(() => db.photos.where('albumId').equals(album.id).count(), [album.id])
+  const tint = TAB_TINTS[Math.floor(seeded(album.id)() * TAB_TINTS.length)]
 
   return (
     <section
       className={`file${checked ? ' is-checked' : ''}`}
-      style={{ '--tab': TAB_SPOTS[index % TAB_SPOTS.length] } as CSSProperties}
+      style={{ '--tab': TAB_SPOTS[index % TAB_SPOTS.length], '--tint': tint } as CSSProperties}
     >
+      {/* 카드 뒤에 꽂힌 사진들 — 윗머리만 삐져나온다 */}
+      <span className="file__peeks" aria-hidden="true">
+        {photos?.map((photo, i) => (
+          <Peek key={photo.id} blob={photo.thumb} slot={i} />
+        ))}
+      </span>
+
       <button
         className="file__card"
         onClick={onOpen}
@@ -244,17 +255,9 @@ function AlbumCard({ album, index, selecting, checked, onOpen, onAdd, onEdit }: 
       >
         <span className="file__tab">{album.title}</span>
 
-        <span className="file__peek">
-          {photos?.length ? (
-            photos.map((photo) => <Shot key={photo.id} blob={photo.thumb} />)
-          ) : (
-            <span className="file__none">아직 사진이 없어요</span>
-          )}
-        </span>
-
-        <span className="file__meta">
-          {formatDateRange(album.date, album.endDate)}
-          {count != null && ` · ${count}장`}
+        <span className="file__front">
+          <span className="file__date">{formatDateRange(album.date, album.endDate)}</span>
+          <span className="file__count">{count != null ? (count > 0 ? `${count}장` : '비어 있음') : ''}</span>
         </span>
 
         {selecting && (
@@ -278,7 +281,8 @@ function AlbumCard({ album, index, selecting, checked, onOpen, onAdd, onEdit }: 
   )
 }
 
-function Shot({ blob }: { blob: Blob }) {
+/** 카드 뒤에 꽂힌 사진 한 장 */
+function Peek({ blob, slot }: { blob: Blob; slot: number }) {
   const url = useObjectUrl(blob)
-  return <span className="file__shot">{url && <img src={url} alt="" loading="lazy" />}</span>
+  return <span className={`file__peek file__peek--${slot}`}>{url && <img src={url} alt="" loading="lazy" />}</span>
 }
