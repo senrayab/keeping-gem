@@ -12,7 +12,7 @@ const formatWhen = (ms: number) =>
   new Date(ms).toLocaleString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })
 
 /** 보관함: 백업 파일 만들기와 백업에서 불러오기 */
-export function BackupSheet({ onClose, onOpenAlbums }: { onClose: () => void; onOpenAlbums: () => void }) {
+export function BackupSheet({ onClose }: { onClose: () => void }) {
   useBackClose(onClose)
   useScrollLock()
   const toast = useToast()
@@ -22,18 +22,17 @@ export function BackupSheet({ onClose, onOpenAlbums }: { onClose: () => void; on
   const [lastBackup, setLastBackup] = useState(lastBackupAt)
 
   const stats = useLiveQuery(async () => {
-    const [tickets, posters, photos, albumCount] = await Promise.all([
+    const [tickets, posters, photos] = await Promise.all([
       db.tickets.toArray(),
       db.posters.toArray(),
       db.photos.toArray(),
-      db.albums.count(),
     ])
     const bytes =
       tickets.reduce((sum, t) => sum + (t.thumb?.size ?? 0), 0) +
       posters.reduce((sum, p) => sum + p.blob.size, 0) +
       photos.reduce((sum, p) => sum + p.bytes, 0)
     const sinceBackup = lastBackup ? tickets.filter((t) => t.updatedAt > lastBackup).length : tickets.length
-    return { count: tickets.length, bytes, sinceBackup, photoCount: photos.length, albumCount }
+    return { count: tickets.length, bytes, sinceBackup }
   }, [lastBackup])
 
   const backup = async () => {
@@ -111,18 +110,6 @@ export function BackupSheet({ onClose, onOpenAlbums }: { onClose: () => void; on
             티켓과 포스터는 <strong>이 휴대폰 안에만</strong> 저장돼요. 휴대폰을 바꾸거나 브라우저 데이터를 지우면
             사라지니, 가끔 백업 파일을 만들어 드라이브나 PC에 옮겨 두세요.
           </p>
-        </section>
-
-        <section className="vault">
-          <h3>사진첩</h3>
-          <p className="vault__meta">
-            {stats?.albumCount
-              ? `사진첩 ${stats.albumCount}개 · 사진 ${stats.photoCount}장`
-              : '그날의 사진을 모아 두면, 티켓과 함께 그때를 다시 볼 수 있어요.'}
-          </p>
-          <button className="btn btn--ghost" onClick={onOpenAlbums}>
-            사진첩 열기
-          </button>
         </section>
 
         <section className="vault">
