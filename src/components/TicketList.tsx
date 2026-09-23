@@ -57,10 +57,11 @@ function Row({ ticket, onOpen }: { ticket: Ticket; onOpen: (ticket: Ticket, from
       aria-label={`${ticket.title} 티켓 보기`}
     >
       <span className="tlist__poster">
-        {url ? <img src={url} alt="" loading="lazy" /> : <span>{ticket.title.slice(0, 1)}</span>}
+        {url ? <img src={url} alt="" loading="lazy" /> : <span className="tlist__initial">{ticket.title.slice(0, 1)}</span>}
+        {/* 상세보기와 같은 약속 — 포스터 왼쪽 아래를 라벨 크기만큼 파낸다 */}
+        <span className="tlist__chip">{category.label}</span>
       </span>
       <span className="tlist__body">
-        <span className="tlist__chip">{category.label}</span>
         <strong className="tlist__title">{ticket.title}</strong>
         <span className="tlist__fields">
           <span>
