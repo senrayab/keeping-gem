@@ -9,10 +9,13 @@ import { Sky } from './components/Sky'
 import { Starfield } from './components/Starfield'
 import { TicketDetail } from './components/TicketDetail'
 import { TicketForm } from './components/TicketForm'
+import { TicketList } from './components/TicketList'
 import { ToastProvider } from './components/Toast'
 import { UpdateToast } from './components/UpdateToast'
 
 type Editing = { ticket?: Ticket } | null
+
+const VIEW_KEY = 'keeping-gem:view'
 
 export function App() {
   const tickets = useLiveQuery(() => db.tickets.orderBy('date').reverse().toArray(), [])
@@ -20,6 +23,23 @@ export function App() {
   const [editing, setEditing] = useState<Editing>(null)
   const [searching, setSearching] = useState(false)
   const [vault, setVault] = useState(false)
+  // 보던 방식(밤하늘/리스트)은 기기에 기억해 둔다
+  const [view, setView] = useState<'sky' | 'list'>(() => {
+    try {
+      return localStorage.getItem(VIEW_KEY) === 'list' ? 'list' : 'sky'
+    } catch {
+      return 'sky'
+    }
+  })
+  const toggleView = () => {
+    const next = view === 'sky' ? 'list' : 'sky'
+    setView(next)
+    try {
+      localStorage.setItem(VIEW_KEY, next)
+    } catch {
+      // 기억하지 못해도 보는 데는 지장이 없다
+    }
+  }
   // 상세보기를 닫고 돌아왔을 때 잠깐 밝혀 둘 별
   const [returning, setReturning] = useState<string | null>(null)
   useEffect(() => {
@@ -53,12 +73,31 @@ export function App() {
       <Starfield />
 
       <header className={`app-header${searching ? ' is-searching' : ''}`}>
-        <button className="app-header__vault" onClick={() => setVault(true)} aria-label="보관함 (백업·복원)">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <rect x="3.5" y="4" width="17" height="5" rx="1.5" />
-            <path d="M5 9v9.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9M10 13h4" />
-          </svg>
-        </button>
+        <div className="app-header__actions">
+          <button
+            className="app-header__icon"
+            onClick={toggleView}
+            aria-label={view === 'sky' ? '리스트로 보기' : '밤하늘로 보기'}
+          >
+            {view === 'sky' ? (
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 7h16M4 12h16M4 17h10" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 4.5 13.6 9l4.4 1.6-4.4 1.7L12 16.8 10.4 12.3 6 10.6 10.4 9 12 4.5Z" />
+                <circle cx="18" cy="17.5" r="1.4" />
+                <circle cx="6.5" cy="17" r="1" />
+              </svg>
+            )}
+          </button>
+          <button className="app-header__icon" onClick={() => setVault(true)} aria-label="보관함 (백업·복원)">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3.5" y="4" width="17" height="5" rx="1.5" />
+              <path d="M5 9v9.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9M10 13h4" />
+            </svg>
+          </button>
+        </div>
         <p className="app-header__eyebrow">Keeping Gem</p>
         <h1 className="app-header__title">추억의 밤하늘</h1>
         {tickets && tickets.length > 0 && (
@@ -96,9 +135,13 @@ export function App() {
             {visible.length > 0 ? `${visible.length}개의 별을 찾았어요` : '맞는 별이 없어요. 다른 말로 찾아볼까요?'}
           </p>
         )}
-        {visible && visible.length > 0 && (
-          <Sky tickets={visible} returning={returning} onOpen={(ticket, from) => setOpened({ id: ticket.id, from })} />
-        )}
+        {visible &&
+          visible.length > 0 &&
+          (view === 'sky' ? (
+            <Sky tickets={visible} returning={returning} onOpen={(ticket, from) => setOpened({ id: ticket.id, from })} />
+          ) : (
+            <TicketList tickets={visible} onOpen={(ticket, from) => setOpened({ id: ticket.id, from })} />
+          ))}
       </main>
 
       <nav className="dock">
