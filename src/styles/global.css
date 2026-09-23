@@ -1592,6 +1592,224 @@ svg.dock__icon {
   min-height: 48px;
 }
 
+/* ───────── 사진첩 ───────── */
+
+/* 사진첩·사진첩 수정처럼 시트 위에 또 뜨는 시트 */
+.sheet--over {
+  z-index: 32;
+}
+
+.albums__empty {
+  margin: 8px 4px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
+
+.album h3 {
+  margin: 12px 4px 0;
+  font-size: 17px;
+}
+
+.album p {
+  margin: 4px 4px 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+/* 사진첩 표지: 사진이 겹쳐 놓이고 그 위를 반투명한 바가 가로지른다 */
+.album__stack {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 168px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--glass-line);
+  border-radius: 22px;
+  background: var(--glass);
+}
+
+.album__shots {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  gap: 6px;
+  padding: 10px;
+}
+
+.album__shot {
+  flex: 1;
+  overflow: hidden;
+  border-radius: 14px;
+  background: rgb(255 255 255 / 0.06);
+}
+
+.album__shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.album__none {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+
+.album__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 22px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 64px;
+  padding-right: 14px;
+  background: rgb(20 16 38 / 0.42);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgb(255 255 255 / 0.12);
+  border-bottom: 1px solid rgb(255 255 255 / 0.12);
+}
+
+.album__add {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--night-0);
+  font-size: 24px;
+  line-height: 1;
+}
+
+/* ───────── 펼쳐 놓은 사진 ───────── */
+
+.album-view {
+  position: fixed;
+  inset: 0;
+  z-index: 34;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, var(--night-2), var(--night-0) 60%);
+  animation: rise 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.album-view__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: calc(env(safe-area-inset-top) + 14px) 16px 10px;
+}
+
+.album-view__head > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.album-view__head h2 {
+  margin: 0;
+  font-size: 18px;
+  word-break: keep-all;
+}
+
+.album-view__head p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+/* 사진을 늘어놓는 '책상' */
+.album-view__desk {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 0 8px;
+}
+
+.album-view__empty {
+  padding: 40px 24px;
+  font-size: 13px;
+  color: var(--ink-faint);
+  text-align: center;
+}
+
+/* 인화지 한 장 */
+.print {
+  position: absolute;
+  padding: 6px 6px 16px;
+  border: 0;
+  border-radius: 4px;
+  background: #f7f5f0;
+  box-shadow: 0 10px 22px rgb(0 0 0 / 0.5);
+  transform: rotate(var(--rotate));
+  transition: transform 0.15s ease;
+}
+
+.print:active {
+  transform: rotate(var(--rotate)) scale(0.97);
+}
+
+.print img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 2px;
+}
+
+.album-view__foot {
+  display: grid;
+  padding: 12px 16px calc(env(safe-area-inset-bottom) + 12px);
+}
+
+.photo-detail {
+  position: fixed;
+  inset: 0;
+  z-index: 36;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  padding: calc(env(safe-area-inset-top) + 16px) 12px calc(env(safe-area-inset-bottom) + 16px);
+  background: rgb(0 0 0 / 0.94);
+  animation: fade-in 0.2s ease-out;
+}
+
+.photo-detail img {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.photo-detail__foot {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+/* 고르는 칸 (사진첩의 티켓 연결) */
+.select {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--glass-line);
+  border-radius: 14px;
+  background: var(--glass);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+}
+
 /* ───────── 버튼 ───────── */
 
 .btn {

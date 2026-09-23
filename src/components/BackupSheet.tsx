@@ -6,6 +6,7 @@ import { useScrollLock } from '@/hooks/useScrollLock'
 import { applyBackup, createBackup, lastBackupAt, markBackedUp, readBackup, type RestorePreview } from '@/lib/backup'
 import { download } from '@/lib/download'
 import { formatBytes } from '@/lib/image'
+import { AlbumsSheet } from './AlbumsSheet'
 import { useToast } from './Toast'
 
 const formatWhen = (ms: number) =>
@@ -20,13 +21,21 @@ export function BackupSheet({ onClose }: { onClose: () => void }) {
   const [busy, setBusy] = useState<'backup' | 'read' | 'restore' | null>(null)
   const [preview, setPreview] = useState<RestorePreview | null>(null)
   const [lastBackup, setLastBackup] = useState(lastBackupAt)
+  const [albums, setAlbums] = useState(false)
 
   const stats = useLiveQuery(async () => {
-    const [tickets, posters] = await Promise.all([db.tickets.toArray(), db.posters.toArray()])
+    const [tickets, posters, photos, albumCount] = await Promise.all([
+      db.tickets.toArray(),
+      db.posters.toArray(),
+      db.photos.toArray(),
+      db.albums.count(),
+    ])
     const bytes =
-      tickets.reduce((sum, t) => sum + (t.thumb?.size ?? 0), 0) + posters.reduce((sum, p) => sum + p.blob.size, 0)
+      tickets.reduce((sum, t) => sum + (t.thumb?.size ?? 0), 0) +
+      posters.reduce((sum, p) => sum + p.blob.size, 0) +
+      photos.reduce((sum, p) => sum + p.bytes, 0)
     const sinceBackup = lastBackup ? tickets.filter((t) => t.updatedAt > lastBackup).length : tickets.length
-    return { count: tickets.length, bytes, sinceBackup }
+    return { count: tickets.length, bytes, sinceBackup, photoCount: photos.length, albumCount }
   }, [lastBackup])
 
   const backup = async () => {
@@ -99,6 +108,18 @@ export function BackupSheet({ onClose }: { onClose: () => void }) {
         </section>
 
         <section className="vault">
+          <h3>사진첩</h3>
+          <p className="vault__meta">
+            {stats?.albumCount
+              ? `사진첩 ${stats.albumCount}개 · 사진 ${stats.photoCount}장`
+              : '그날의 사진을 모아 두면, 티켓과 함께 그때를 다시 볼 수 있어요.'}
+          </p>
+          <button className="btn btn--ghost" onClick={() => setAlbums(true)}>
+            사진첩 열기
+          </button>
+        </section>
+
+        <section className="vault">
           <h3>백업 파일 만들기</h3>
           <p className="vault__meta">
             {lastBackup ? `마지막 백업 ${formatWhen(lastBackup)}` : '아직 백업한 적이 없어요.'}
@@ -149,6 +170,8 @@ export function BackupSheet({ onClose }: { onClose: () => void }) {
           <input ref={inputRef} type="file" accept=".zip,application/zip" hidden onChange={pick} />
         </section>
       </div>
+
+      {albums && <AlbumsSheet onClose={() => setAlbums(false)} />}
     </div>
   )
 }

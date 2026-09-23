@@ -9,6 +9,8 @@
  * 확대해서 볼 여지를 남겨 2000px로 둔다 — 이보다 크면 눈으로는 차이가 없고 용량만 는다.
  */
 export const FULL_MAX_EDGE = 2000
+/* 사진첩 사진은 여러 장 쌓이므로 조금 작게 — 휴대폰 화면에서는 차이를 느끼기 어렵다 */
+export const PHOTO_MAX_EDGE = 1600
 export const FULL_QUALITY = 0.85
 // 목록은 한 줄에 3장이라 칸이 130px 안팎 — 3배 밀도까지 감안해 400px
 export const THUMB_MAX_EDGE = 400
@@ -87,13 +89,13 @@ function encode(canvas: HTMLCanvasElement, quality: number): Promise<EncodedImag
   })
 }
 
-export async function processImage(file: File): Promise<ProcessedImage> {
+export async function processImage(file: File, maxEdge = FULL_MAX_EDGE): Promise<ProcessedImage> {
   if (!file.type.startsWith('image/')) {
     throw new Error(`이미지 파일이 아닙니다: ${file.name}`)
   }
   const bitmap = await loadBitmap(file)
   try {
-    const shrunk = shrink(bitmap, FULL_MAX_EDGE)
+    const shrunk = shrink(bitmap, maxEdge)
     const full = await encode(shrunk, FULL_QUALITY)
     // 썸네일은 이미 줄인 캔버스에서 뽑는다 — 원본을 두 번 훑지 않아도 화질 차이가 없다
     const thumbCanvas = shrink(shrunk, THUMB_MAX_EDGE)
