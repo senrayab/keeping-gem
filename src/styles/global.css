@@ -1906,7 +1906,7 @@ svg.dock__icon {
 .tape__mark {
   font-family: var(--mono);
   font-size: 7px;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.1em;
   color: rgb(253 251 246 / 0.78);
   white-space: nowrap;
 }
@@ -1930,7 +1930,7 @@ svg.dock__icon {
   z-index: 2;
   left: 9px;
   right: 9px;
-  bottom: 38px;
+  bottom: 10px;
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;
@@ -1944,35 +1944,17 @@ svg.dock__icon {
   word-break: keep-all;
 }
 
-/* 아래 라벨 띠 */
-.tape__band {
-  position: absolute;
-  z-index: 2;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  padding: 5px 9px 6px;
-  background: rgb(250 247 240 / 0.92);
-}
-
-.tape__date,
-.tape__count {
+/* 날짜는 앨범 아래에 글자로만 */
+.tape__caption {
+  margin: 7px 2px 0;
   font-family: var(--mono);
-  font-size: 8.5px;
-  letter-spacing: 0.02em;
-  color: #2a2733;
+  font-size: 10px;
+  /* 자간을 좁혀 앨범 제목과 결을 맞춘다 */
+  letter-spacing: -0.03em;
+  color: var(--ink-faint);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.tape__count {
-  flex: none;
-  font-weight: 700;
 }
 
 /* 포장 비닐 */
