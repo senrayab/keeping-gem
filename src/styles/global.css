@@ -1188,7 +1188,7 @@ svg.dock__icon {
 
 /*
  * 포스터 오른쪽 위의 금액 — 보일 듯 말 듯.
- * 작게, 자간을 좁혀, 옅은 흰 글씨로 둔다. 밝은 포스터에서도 읽히도록 그림자만 아주 얕게 깐다.
+ * 작게, 자간을 좁혀, 옅은 흰 글씨로만 둔다. 그림자는 두지 않는다 — 있는 듯 없는 듯한 편이 낫다.
  */
 .ticket__price {
   position: absolute;
@@ -1198,7 +1198,6 @@ svg.dock__icon {
   font-weight: 600;
   letter-spacing: -0.02em;
   color: rgb(255 255 255 / 0.72);
-  text-shadow: 0 1px 3px rgb(0 0 0 / 0.4);
 }
 
 .ticket__head {
