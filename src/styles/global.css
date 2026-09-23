@@ -1834,180 +1834,232 @@ svg.dock__icon {
 }
 
 /*
- * 사진 보관 상자.
+ * 카세트 선반.
  *
- * 사진첩 하나가 상자에 꽂힌 색인 카드다. 카드 뒤로 사진이 비스듬히 꽂혀 윗머리만 보이고,
- * 카드 위로는 빛깔 있는 이름표가 솟아 있다. 상자에는 이름표 판을 달아 서랍 같은 무게를 준다.
+ * 사진첩 하나가 테이프 한 개다. 라벨에는 그날의 그림이 깔리고, 그 위를 비닐 포장의
+ * 빛이 비스듬히 지나간다. 색감은 조금 바래게 해 '오래 두고 본 것'처럼 보이게 한다.
  */
 .album-box {
-  position: relative;
   display: grid;
-  padding: 42px 12px 18px;
-  border: 1px solid rgb(255 255 255 / 0.07);
-  border-radius: 18px;
-  background: linear-gradient(180deg, #1b1626, #100d18 60%);
-  box-shadow: inset 0 10px 22px rgb(0 0 0 / 0.6), inset 0 -1px 0 rgb(255 255 255 / 0.05),
-    0 14px 30px rgb(0 0 0 / 0.45);
+  gap: 16px;
+  padding: 4px 0 2px;
 }
 
-/* 상자에 붙은 이름표 판 */
-.album-box::before {
-  content: 'PHOTOS';
-  position: absolute;
-  top: 13px;
-  left: 50%;
-  padding: 4px 16px 5px;
-  border: 1px solid rgb(255 255 255 / 0.16);
-  border-radius: 4px;
-  background: rgb(255 255 255 / 0.04);
-  font-family: var(--mono);
-  font-size: 9.5px;
-  letter-spacing: 0.34em;
-  color: rgb(255 255 255 / 0.42);
-  transform: translateX(-50%);
-}
-
-.file {
+.tape {
   position: relative;
-  /* 카드 뒤에 꽂힌 사진이 삐져나올 자리 */
-  padding-top: 54px;
-  /* 아래 칸의 사진이 이 카드에 붙어 보이지 않도록 넉넉히 띄운다 */
-  margin-bottom: 26px;
 }
 
-.file:last-child {
-  margin-bottom: 2px;
-}
-
-/* 뒤에 꽂힌 사진들 */
-.file__peeks {
-  position: absolute;
-  top: 4px;
-  right: 10px;
-  left: 10px;
-  height: 84px;
-}
-
-.file__peek {
-  position: absolute;
-  bottom: 0;
-  display: block;
-  width: 70px;
-  height: 82px;
-  padding: 3px 3px 8px;
-  border-radius: 3px;
-  background: #fbf9f4;
-  box-shadow: 0 6px 12px rgb(0 0 0 / 0.45);
-}
-
-.file__peek img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 2px;
-}
-
-.file__peek--0 { left: 3%; transform: rotate(-4deg); }
-.file__peek--1 { left: 28%; transform: rotate(2deg); }
-.file__peek--2 { left: 53%; transform: rotate(-1.5deg); }
-
-/* 색인 카드 */
-.file__card {
+.tape__body {
   position: relative;
-  z-index: 2;
   display: block;
   width: 100%;
-  padding: 13px 14px 13px;
+  padding: 10px 10px 12px;
+  overflow: hidden;
   border: 0;
-  border-radius: 5px 5px 12px 12px;
-  background: linear-gradient(180deg, #f4efe3, #e7e0d1);
-  color: #34303f;
+  border-radius: 10px;
   text-align: left;
-  box-shadow: 0 -3px 10px rgb(0 0 0 / 0.35), 0 10px 18px rgb(0 0 0 / 0.5);
+  /* 플라스틱 몸체 */
+  background: linear-gradient(180deg, #24222c, #16151c 55%, #1c1b23);
+  box-shadow: 0 10px 22px rgb(0 0 0 / 0.5), inset 0 1px 0 rgb(255 255 255 / 0.12),
+    inset 0 -1px 0 rgb(0 0 0 / 0.5);
 }
 
-.file__card:active {
+.tape__body:active {
   transform: translateY(1px);
 }
 
-/* 카드 윗면을 따라 흐르는 빛깔 띠 — 이름표와 같은 색 */
-.file__card::before {
+/* 몸체 네 귀퉁이의 나사 */
+.tape__body::before,
+.tape__body::after {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  border-radius: 5px 5px 0 0;
-  background: var(--tint);
+  bottom: 7px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #4a4757, #1b1a22);
 }
 
-/* 카드 위로 솟은 이름표 */
-.file__tab {
-  position: absolute;
-  top: -23px;
-  left: var(--tab);
-  max-width: 68%;
-  padding: 5px 14px 6px;
+.tape__body::before { left: 8px; }
+.tape__body::after { right: 8px; }
+
+/* 라벨 — 그날의 그림 */
+.tape__label {
+  position: relative;
+  display: block;
+  height: 104px;
   overflow: hidden;
-  border-radius: 7px 7px 0 0;
-  background: var(--tint);
-  color: #2b2733;
-  font-size: 12.5px;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  box-shadow: 0 -3px 8px rgb(0 0 0 / 0.35);
+  border-radius: 4px;
+  background: linear-gradient(140deg, var(--tint), #d9d3c6);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.25);
 }
 
-.file__front {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-  padding-right: 64px;
-}
-
-.file__date {
-  font-size: 13px;
-  font-weight: 700;
-  color: #46414f;
-}
-
-.file__count {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: #837c8e;
-}
-
-/* 수정·사진 넣기 — 카드 오른쪽에 작게 */
-.file__tools {
+.tape__art {
   position: absolute;
-  right: 10px;
-  bottom: 11px;
-  z-index: 3;
-  display: flex;
-  gap: 4px;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* 바랜 색감 — 오래 둔 테이프의 인쇄처럼 */
+  filter: saturate(0.78) contrast(1.08) sepia(0.22) brightness(0.98);
 }
 
-.file__tools button {
+/* 라벨 빛깔을 그림 위에 얇게 덮고, 글씨가 놓일 아래쪽은 어둡게 깐다 */
+.tape__label::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(var(--glow, 0 0 0) / 0) 30%, rgb(10 9 14 / 0.62)),
+    linear-gradient(140deg, var(--tint), transparent 60%);
+  background-blend-mode: normal, soft-light;
+}
+
+/* 인쇄 결과 종이 티 */
+.tape__grain {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.22), rgb(0 0 0 / 0.2)),
+    repeating-linear-gradient(0deg, rgb(0 0 0 / 0.05) 0 1px, rgb(255 255 255 / 0.03) 1px 2px);
+  mix-blend-mode: soft-light;
+}
+
+.tape__side {
+  position: absolute;
+  z-index: 2;
+  top: 8px;
+  left: 10px;
   display: grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: 0;
+  width: 20px;
+  height: 20px;
+  border: 1px solid rgb(20 18 26 / 0.6);
+  border-radius: 3px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: #17161d;
+  background: rgb(255 255 255 / 0.55);
+}
+
+.tape__title {
+  position: absolute;
+  z-index: 2;
+  left: 10px;
+  right: 10px;
+  bottom: 26px;
+  font-size: 19px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: #fdfbf6;
+  text-shadow: 0 1px 6px rgb(0 0 0 / 0.6);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.tape__meta {
+  position: absolute;
+  z-index: 2;
+  left: 10px;
+  right: 10px;
+  bottom: 8px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  color: rgb(253 251 246 / 0.78);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 릴과 테이프 창 */
+.tape__deck {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 46px;
+  margin-top: 8px;
+}
+
+.tape__reel {
+  position: relative;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: rgb(52 48 63 / 0.09);
-  color: #55506a;
+  background: radial-gradient(circle at 50% 50%, #0d0c11 0 26%, #2c2a36 27% 46%, #17161d 47%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
 }
 
-.file__tools button:active {
-  background: rgb(52 48 63 / 0.2);
+/* 릴의 톱니 */
+.tape__reel::after {
+  content: '';
+  position: absolute;
+  inset: 26%;
+  border-radius: 50%;
+  background:
+    conic-gradient(from 0deg, #55526a 0 8%, transparent 8% 25%, #55526a 25% 33%, transparent 33% 50%,
+      #55526a 50% 58%, transparent 58% 75%, #55526a 75% 83%, transparent 83%);
 }
 
-.file__tools svg {
+.tape__window {
+  flex: 1;
+  max-width: 132px;
+  height: 22px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #0b0a0e, #241f19 55%, #0d0c10);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07);
+}
+
+/* 비닐 포장에 비치는 빛 */
+.tape__sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: linear-gradient(
+    114deg,
+    rgb(255 255 255 / 0) 0 26%,
+    rgb(255 255 255 / 0.14) 30% 34%,
+    rgb(255 255 255 / 0) 38% 62%,
+    rgb(255 255 255 / 0.08) 66% 70%,
+    rgb(255 255 255 / 0) 74%
+  );
+  pointer-events: none;
+}
+
+/* 수정·사진 넣기 */
+.tape__tools {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  z-index: 3;
+  display: flex;
+  gap: 5px;
+}
+
+.tape__tools button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 50%;
+  background: rgb(10 9 14 / 0.55);
+  color: rgb(255 255 255 / 0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.tape__tools button:active {
+  background: rgb(10 9 14 / 0.8);
+}
+
+.tape__tools svg {
   width: 15px;
   height: 15px;
   fill: none;
@@ -2017,33 +2069,32 @@ svg.dock__icon {
   stroke-linejoin: round;
 }
 
-/* 고르는 중인 사진첩 */
-.file.is-checked .file__card {
-  box-shadow: 0 0 0 2px rgb(var(--amber)), 0 10px 18px rgb(0 0 0 / 0.5);
+/* 고르는 중인 테이프 */
+.tape.is-checked .tape__body {
+  box-shadow: 0 0 0 2px rgb(var(--amber)), 0 10px 22px rgb(0 0 0 / 0.5);
 }
 
-.file__check {
+.tape__check {
   position: absolute;
-  right: 12px;
-  top: 50%;
+  right: 14px;
+  top: 14px;
   display: grid;
   place-items: center;
-  width: 26px;
-  height: 26px;
-  border: 2px solid rgb(52 48 63 / 0.3);
+  width: 28px;
+  height: 28px;
+  border: 2px solid rgb(255 255 255 / 0.6);
   border-radius: 50%;
-  background: rgb(255 255 255 / 0.55);
-  transform: translateY(-50%);
+  background: rgb(10 9 14 / 0.5);
 }
 
-.file__check.is-on {
+.tape__check.is-on {
   border-color: rgb(var(--amber));
   background: rgb(var(--amber));
 }
 
-.file__check svg {
-  width: 15px;
-  height: 15px;
+.tape__check svg {
+  width: 16px;
+  height: 16px;
   fill: none;
   stroke: var(--night-0);
   stroke-width: 3;

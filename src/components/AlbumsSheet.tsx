@@ -132,11 +132,10 @@ export function AlbumsSheet({ onClose }: { onClose: () => void }) {
 
         {albums && albums.length > 0 && (
           <div className="album-box">
-            {albums.map((album, index) => (
+            {albums.map((album) => (
               <AlbumCard
                 key={album.id}
                 album={album}
-                index={index}
                 selecting={selecting}
                 checked={picked?.has(album.id) ?? false}
                 onOpen={() => (selecting ? toggle(album.id) : setOpened(album.id))}
@@ -210,8 +209,6 @@ export function AlbumsSheet({ onClose }: { onClose: () => void }) {
 
 interface AlbumCardProps {
   album: Album
-  /** 탭을 어긋나게 놓는 데 쓴다 */
-  index: number
   selecting: boolean
   checked: boolean
   onOpen: () => void
@@ -221,54 +218,67 @@ interface AlbumCardProps {
 
 /** 사진첩 한 칸: 겹쳐 놓인 사진 + 가로지르는 반투명 바 + 제목·날짜·수정 */
 /*
- * 사진첩 한 칸은 보관 상자에 꽂힌 색인 카드다.
+ * 사진첩 한 칸은 카세트 테이프 한 개다.
  *
- * 카드 뒤로 그 안의 사진이 비스듬히 꽂혀 윗머리만 보이고, 카드 위로는 이름표(탭)가 솟아 있다.
- * 탭의 좌우 자리와 빛깔은 사진첩마다 달라(--tab, --tint) 서랍을 열어 본 듯하게 한다.
+ * 그날의 포스터(없으면 첫 사진)가 라벨 그림이 되고, 빈티지한 색감과 비닐 반사를 얹는다.
+ * 아래쪽에는 릴 두 개와 테이프 창이 있어 한눈에 '녹음해 둔 것'으로 읽힌다.
+ * 라벨 빛깔은 사진첩마다 달라(--tint) 선반에 늘어놓은 테이프처럼 보인다.
  */
-const TAB_SPOTS = ['16px', '32%', '54%']
-/* 색인 카드 라벨 빛깔 — 문구점에서 파는 인덱스 카드처럼 */
-const TAB_TINTS = ['#f6d06a', '#8fc3ec', '#98ddb0', '#f0a5bf', '#bfaaf0', '#f2b184']
+const TAPE_TINTS = ['#e8b9c8', '#9fd2d8', '#e9cf9a', '#b9b5e8', '#9fd2ae', '#e8b49a']
 
-function AlbumCard({ album, index, selecting, checked, onOpen, onAdd, onEdit }: AlbumCardProps) {
-  const photos = useLiveQuery(() => db.photos.where('albumId').equals(album.id).limit(3).toArray(), [album.id])
+function AlbumCard({ album, selecting, checked, onOpen, onAdd, onEdit }: AlbumCardProps) {
   const count = useLiveQuery(() => db.photos.where('albumId').equals(album.id).count(), [album.id])
-  const tint = TAB_TINTS[Math.floor(seeded(album.id)() * TAB_TINTS.length)]
+  /* 라벨 그림: 이어 둔 티켓의 포스터를 먼저 쓰고, 없으면 사진첩의 첫 사진 */
+  const cover = useLiveQuery(async () => {
+    for (const ticketId of album.ticketIds ?? []) {
+      const ticket = await db.tickets.get(ticketId)
+      if (ticket?.thumb) return ticket.thumb
+    }
+    const photo = await db.photos.where('albumId').equals(album.id).first()
+    return photo?.thumb
+  }, [album.id, album.ticketIds?.join(',')])
+  const coverUrl = useObjectUrl(cover ?? undefined)
+  const tint = TAPE_TINTS[Math.floor(seeded(album.id)() * TAPE_TINTS.length)]
 
   return (
-    <section
-      className={`file${checked ? ' is-checked' : ''}`}
-      style={{ '--tab': TAB_SPOTS[index % TAB_SPOTS.length], '--tint': tint } as CSSProperties}
-    >
-      {/* 카드 뒤에 꽂힌 사진들 — 윗머리만 삐져나온다 */}
-      <span className="file__peeks" aria-hidden="true">
-        {photos?.map((photo, i) => (
-          <Peek key={photo.id} blob={photo.thumb} slot={i} />
-        ))}
-      </span>
-
+    <section className={`tape${checked ? ' is-checked' : ''}`} style={{ '--tint': tint } as CSSProperties}>
       <button
-        className="file__card"
+        className="tape__body"
         onClick={onOpen}
         aria-label={selecting ? `${album.title} 고르기` : `${album.title} 사진첩 열기`}
         aria-pressed={selecting ? checked : undefined}
       >
-        <span className="file__tab">{album.title}</span>
-
-        <span className="file__front">
-          <span className="file__date">{formatDateRange(album.date, album.endDate)}</span>
-          <span className="file__count">{count != null ? (count > 0 ? `${count}장` : '비어 있음') : ''}</span>
+        {/* 라벨 — 그날의 그림 위에 제목과 날짜 */}
+        <span className="tape__label">
+          {coverUrl && <img className="tape__art" src={coverUrl} alt="" loading="lazy" />}
+          <span className="tape__grain" aria-hidden="true" />
+          <span className="tape__side">A</span>
+          <span className="tape__title">{album.title}</span>
+          <span className="tape__meta">
+            {formatDateRange(album.date, album.endDate)}
+            {count != null && count > 0 ? ` · ${count}장` : ''}
+          </span>
         </span>
 
+        {/* 테이프 창과 릴 */}
+        <span className="tape__deck" aria-hidden="true">
+          <span className="tape__reel" />
+          <span className="tape__window" />
+          <span className="tape__reel" />
+        </span>
+
+        {/* 비닐 포장에 비치는 빛 */}
+        <span className="tape__sheen" aria-hidden="true" />
+
         {selecting && (
-          <span className={`file__check${checked ? ' is-on' : ''}`} aria-hidden="true">
+          <span className={`tape__check${checked ? ' is-on' : ''}`} aria-hidden="true">
             {checked && <Check aria-hidden="true" />}
           </span>
         )}
       </button>
 
       {!selecting && (
-        <div className="file__tools">
+        <div className="tape__tools">
           <button type="button" onClick={onEdit} aria-label={`${album.title} 사진첩 수정`}>
             <Pencil aria-hidden="true" />
           </button>
@@ -279,10 +289,4 @@ function AlbumCard({ album, index, selecting, checked, onOpen, onAdd, onEdit }: 
       )}
     </section>
   )
-}
-
-/** 카드 뒤에 꽂힌 사진 한 장 */
-function Peek({ blob, slot }: { blob: Blob; slot: number }) {
-  const url = useObjectUrl(blob)
-  return <span className={`file__peek file__peek--${slot}`}>{url && <img src={url} alt="" loading="lazy" />}</span>
 }
