@@ -189,7 +189,10 @@ export async function renderTicketImage(ticket: Ticket, poster?: Blob): Promise<
 
   const gridY = perf1 + 70
   const gridRowH = 130
-  const gridEnd = gridY + gridRowH * Math.ceil(3 / 2) - 20
+  // 좌석은 '1층 A구역 12열 7번'처럼 길다 — 화면과 똑같이 한 줄을 통으로 쓰고, 넘치면 두 줄까지 간다
+  font(ctx, 700, 42)
+  const seatLines = wrap(ctx, ticket.seat || '—', inner, 2)
+  const gridEnd = gridY + gridRowH * 2 - 20 + (seatLines.length - 1) * 52
 
   font(ctx, 500, 34)
   const memoLines = ticket.memo ? wrap(ctx, ticket.memo, inner - 72, 6) : []
@@ -283,26 +286,31 @@ export async function renderTicketImage(ticket: Ticket, poster?: Blob): Promise<
    * 금액은 넣지 않는다 — 나눠 보는 것은 그날의 추억이지 값이 아니다.
    * 금액은 앱 안 상세보기에서만 본다.
    */
-  const cells: [string, string][] = [
-    ['DATE', formatDate(ticket.date)],
-    ['TIME', ticket.time ?? '—'],
-    ['SEAT', ticket.seat || '—'],
-  ]
+  const left = TICKET_X + PAD
+  const right = TICKET_X + TICKET_W - PAD
   const colW = inner / 2 - 12
-  cells.forEach(([label, value], i) => {
-    const right = i % 2 === 1
-    const x = right ? TICKET_X + TICKET_W - PAD : TICKET_X + PAD
-    const y = gridY + Math.floor(i / 2) * gridRowH
-    ctx.textAlign = right ? 'right' : 'left'
+
+  const cellLabel = (label: string, x: number, y: number, align: CanvasTextAlign) => {
+    ctx.textAlign = align
     ctx.fillStyle = SOFT
     font(ctx, 500, 26, MONO)
     spacing(ctx, 4)
     ctx.fillText(label, x, y)
     spacing(ctx, 0)
     ctx.fillStyle = INK
-    const text = fitLine(ctx, value, colW, 700, 42, 28)
-    ctx.fillText(text, x, y + 56)
-  })
+  }
+
+  // 날짜·시간은 좌우로 나눠 쓴다
+  cellLabel('DATE', left, gridY, 'left')
+  ctx.fillText(fitLine(ctx, formatDate(ticket.date), colW, 700, 42, 28), left, gridY + 56)
+  cellLabel('TIME', right, gridY, 'right')
+  ctx.fillText(fitLine(ctx, ticket.time ?? '—', colW, 700, 42, 28), right, gridY + 56)
+
+  // 좌석은 한 줄을 통으로 쓴다 (금액은 위에 적은 대로 넣지 않는다)
+  const seatY = gridY + gridRowH
+  cellLabel('SEAT', left, seatY, 'left')
+  font(ctx, 700, 42)
+  seatLines.forEach((line, i) => ctx.fillText(line, left, seatY + 56 + i * 52))
 
   // ── 7. 그날의 한마디 ──
   if (memoLines.length) {
