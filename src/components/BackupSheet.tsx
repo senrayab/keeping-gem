@@ -7,6 +7,7 @@ import { useScrollLock } from '@/hooks/useScrollLock'
 import { applyBackup, createBackup, lastBackupAt, markBackedUp, readBackup, type RestorePreview } from '@/lib/backup'
 import { download } from '@/lib/download'
 import { formatBytes } from '@/lib/image'
+import { THEMES, useTheme } from './Theme'
 import { useToast } from './Toast'
 
 const formatWhen = (ms: number) =>
@@ -17,6 +18,7 @@ export function BackupSheet({ onClose }: { onClose: () => void }) {
   useBackClose(onClose)
   useScrollLock()
   const toast = useToast()
+  const { theme, setTheme } = useTheme()
   const inputRef = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState<'backup' | 'read' | 'restore' | null>(null)
   const [preview, setPreview] = useState<RestorePreview | null>(null)
@@ -104,13 +106,35 @@ export function BackupSheet({ onClose }: { onClose: () => void }) {
 
         <section className="vault">
           <p className="vault__big">
-            별 <strong>{stats?.count ?? 0}</strong>개
+            {theme === 'receipt' ? '티켓' : '별'} <strong>{stats?.count ?? 0}</strong>
+            {theme === 'receipt' ? '장' : '개'}
             <small>{stats && stats.bytes > 0 ? ` · 포스터 ${formatBytes(stats.bytes)}` : ''}</small>
           </p>
           <p className="vault__note">
             티켓과 포스터는 <strong>이 휴대폰 안에만</strong> 저장돼요. 휴대폰을 바꾸거나 브라우저 데이터를 지우면
             사라지니, 가끔 백업 파일을 만들어 드라이브나 PC에 옮겨 두세요.
           </p>
+        </section>
+
+        <section className="vault">
+          <h3>스킨</h3>
+          <div className="skins">
+            {THEMES.map((skin) => (
+              <button
+                key={skin.id}
+                type="button"
+                className={`skin${theme === skin.id ? ' is-on' : ''}`}
+                onClick={() => setTheme(skin.id)}
+                aria-pressed={theme === skin.id}
+              >
+                <span className={`skin__swatch skin__swatch--${skin.id}`} aria-hidden="true" />
+                <span className="skin__text">
+                  <strong>{skin.label}</strong>
+                  <span>{skin.note}</span>
+                </span>
+              </button>
+            ))}
+          </div>
         </section>
 
         <section className="vault">

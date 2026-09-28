@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Images, List, Plus, Search, Settings, Sparkles } from 'lucide-react'
+import { Images, LayoutGrid, List, Plus, Receipt, Search, Settings, Sparkles } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useSmoothScroll } from './hooks/useSmoothScroll'
 import { db, type Ticket } from './db/db'
@@ -13,6 +13,8 @@ import { Starfield } from './components/Starfield'
 import { TicketDetail } from './components/TicketDetail'
 import { TicketForm } from './components/TicketForm'
 import { TicketList } from './components/TicketList'
+import { useTheme } from './components/Theme'
+import { Wall } from './components/Wall'
 import { ToastProvider } from './components/Toast'
 import { UpdateToast } from './components/UpdateToast'
 
@@ -22,6 +24,9 @@ const VIEW_KEY = 'keeping-gem:view'
 
 export function App() {
   useSmoothScroll()
+  // 고른 스킨에 따라 홈 화면과 부르는 말이 달라진다 (밤하늘: 별 / 영수증: 종이 한 장)
+  const { theme } = useTheme()
+  const paper = theme === 'receipt'
   const tickets = useLiveQuery(() => db.tickets.orderBy('date').reverse().toArray(), [])
   const [opened, setOpened] = useState<{ id: string; from?: DOMRect } | null>(null)
   const [editing, setEditing] = useState<Editing>(null)
@@ -75,16 +80,34 @@ export function App() {
 
   return (
     <ToastProvider>
-      <Starfield />
+      {!paper && <Starfield />}
 
       <header className={`app-header${searching ? ' is-searching' : ''}`}>
         <div className="app-header__actions">
           <button
             className="app-header__icon"
             onClick={toggleView}
-            aria-label={view === 'sky' ? '리스트로 보기' : '밤하늘로 보기'}
+            aria-label={
+              paper
+                ? view === 'sky'
+                  ? '영수증으로 보기'
+                  : '카드로 보기'
+                : view === 'sky'
+                  ? '리스트로 보기'
+                  : '밤하늘로 보기'
+            }
           >
-            {view === 'sky' ? <List aria-hidden="true" /> : <Sparkles aria-hidden="true" />}
+            {view === 'sky' ? (
+              paper ? (
+                <Receipt aria-hidden="true" />
+              ) : (
+                <List aria-hidden="true" />
+              )
+            ) : paper ? (
+              <LayoutGrid aria-hidden="true" />
+            ) : (
+              <Sparkles aria-hidden="true" />
+            )}
           </button>
           <button className="app-header__icon" onClick={() => setAlbums(true)} aria-label="사진첩">
             <Images aria-hidden="true" />
@@ -94,10 +117,10 @@ export function App() {
           </button>
         </div>
         <p className="app-header__eyebrow">Keeping Gem</p>
-        <h1 className="app-header__title">추억의 밤하늘</h1>
+        <h1 className="app-header__title">{paper ? '모아 둔 순간들' : '추억의 밤하늘'}</h1>
         {tickets && tickets.length > 0 && (
           <p className="app-header__stats">
-            {oldest}년부터 별 {tickets.length}개
+            {oldest}년부터 {paper ? `티켓 ${tickets.length}장` : `별 ${tickets.length}개`}
             {total && <span className="app-header__spend"> · {total}</span>}
           </p>
         )}
@@ -119,21 +142,38 @@ export function App() {
         {tickets && tickets.length === 0 && (
           <div className="empty">
             <span className="empty__star" aria-hidden="true" />
-            <p>
-              아직 하늘이 비어 있어요.
-              <br />첫 티켓을 별로 띄워 볼까요?
-            </p>
+            {paper ? (
+              <p>
+                아직 꽂아 둔 것이 없어요.
+                <br />첫 티켓을 한 장 꽂아 볼까요?
+              </p>
+            ) : (
+              <p>
+                아직 하늘이 비어 있어요.
+                <br />첫 티켓을 별로 띄워 볼까요?
+              </p>
+            )}
           </div>
         )}
         {filtering && visible && (
           <p className="search__result">
-            {visible.length > 0 ? `${visible.length}개의 별을 찾았어요` : '맞는 별이 없어요. 다른 말로 찾아볼까요?'}
+            {visible.length > 0
+              ? `${visible.length}${paper ? '장을' : '개의 별을'} 찾았어요`
+              : `맞는 ${paper ? '티켓' : '별'}이 없어요. 다른 말로 찾아볼까요?`}
           </p>
         )}
         {visible &&
           visible.length > 0 &&
           (view === 'sky' ? (
-            <Sky tickets={visible} returning={returning} onOpen={(ticket, from) => setOpened({ id: ticket.id, from })} />
+            paper ? (
+              <Wall tickets={visible} onOpen={(ticket, from) => setOpened({ id: ticket.id, from })} />
+            ) : (
+              <Sky
+                tickets={visible}
+                returning={returning}
+                onOpen={(ticket, from) => setOpened({ id: ticket.id, from })}
+              />
+            )
           ) : (
             <TicketList tickets={visible} onOpen={(ticket, from) => setOpened({ id: ticket.id, from })} />
           ))}
