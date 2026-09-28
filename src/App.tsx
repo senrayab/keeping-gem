@@ -206,9 +206,11 @@ export function App() {
 
       {openedTicket && (
         <TicketDetail
-          key={openedTicket.id}
           ticket={openedTicket}
+          /* 옆으로 밀어 앞뒤 티켓으로 넘어갈 수 있도록, 지금 보고 있는 목록을 함께 넘긴다 */
+          tickets={visible ?? []}
           from={opened.from}
+          onMove={(id) => setOpened({ id })}
           onEdit={() => setEditing({ ticket: openedTicket })}
           onClose={() => {
             setReturning(openedTicket.id)

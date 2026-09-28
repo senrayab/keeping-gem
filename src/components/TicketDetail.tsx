@@ -1,6 +1,6 @@
 import { Download, Images, Pencil, Share2, Trash2, X } from 'lucide-react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useEffect, useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { db, deleteTicket, type Ticket } from '@/db/db'
 import { AlbumView } from './AlbumView'
 import { useBackClose } from '@/hooks/useBackClose'
@@ -17,15 +17,22 @@ import { useTheme } from './Theme'
 import { TicketView } from './TicketView'
 import { useToast } from './Toast'
 
+/** 옆으로 이만큼 밀면 앞뒤 티켓으로 넘어가고, 위로 이만큼 올리면 닫힌다 */
+const SWIPE = 60
+const CLOSE = 96
+
 interface TicketDetailProps {
   ticket: Ticket
+  /** 지금 보고 있는 목록 (찾는 중이면 찾은 것들). 옆으로 밀 때 앞뒤를 여기서 찾는다. */
+  tickets: Ticket[]
   /** 누른 별의 자리. 티켓이 그 별에서 펼쳐져 나온다. */
   from?: DOMRect
+  onMove: (id: string) => void
   onEdit: () => void
   onClose: () => void
 }
 
-export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProps) {
+export function TicketDetail({ ticket, tickets, from, onMove, onEdit, onClose }: TicketDetailProps) {
   useBackClose(onClose)
   useScrollLock()
   // undefined: 읽는 중, null: 포스터 없음
@@ -92,6 +99,71 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
       }
     : {}
 
+  /*
+   * 손짓으로 넘기기.
+   *
+   * 옆으로 밀면 앞뒤 티켓, 위로 올리면 닫기 — 사진 크게 보기와 같은 약속이다.
+   * 처음 움직인 방향으로만 끌리게 해, 넘기다가 닫히는 일이 없도록 한다.
+   */
+  const index = tickets.findIndex((t) => t.id === ticket.id)
+  const [drag, setDrag] = useState({ x: 0, y: 0 })
+  const [enter, setEnter] = useState<'prev' | 'next' | null>(null)
+  const start = useRef<{ x: number; y: number } | null>(null)
+  const moved = useRef(false)
+  const axis = useRef<'x' | 'y' | null>(null)
+
+  const move = (step: number) => {
+    const next = tickets[index + step]
+    if (!next) return
+    setEnter(step > 0 ? 'next' : 'prev')
+    setDrag({ x: 0, y: 0 })
+    onMove(next.id)
+  }
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    start.current = { x: e.clientX, y: e.clientY }
+    moved.current = false
+    axis.current = null
+  }
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!start.current) return
+    const dx = e.clientX - start.current.x
+    const dy = e.clientY - start.current.y
+    if (!moved.current && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+      moved.current = true
+      axis.current = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y'
+      /*
+       * 민 것이 확실해진 다음에야 손끝을 붙잡는다.
+       * 처음부터 붙잡으면 톡 누른 것도 이 자리에서 받아 버려, 포스터·장소 단추가 눌리지 않는다.
+       */
+      e.currentTarget.setPointerCapture?.(e.pointerId)
+    }
+    if (axis.current === 'x') {
+      // 앞뒤로 더 없으면 덜 끌린다
+      const atEdge = (dx > 0 && index <= 0) || (dx < 0 && index >= tickets.length - 1)
+      setDrag({ x: atEdge ? dx * 0.25 : dx, y: 0 })
+    } else if (axis.current === 'y') {
+      setDrag({ x: 0, y: dy < 0 ? dy : dy * 0.25 })
+    }
+  }
+
+  const onPointerUp = () => {
+    if (axis.current === 'x' && Math.abs(drag.x) > SWIPE) {
+      move(drag.x > 0 ? -1 : 1)
+      start.current = null
+      axis.current = null
+      return
+    }
+    if (axis.current === 'y' && -drag.y > CLOSE) {
+      onClose()
+      return
+    }
+    start.current = null
+    axis.current = null
+    setDrag({ x: 0, y: 0 })
+  }
+
   const [confirming, setConfirming] = useState(false)
 
   const remove = async () => {
@@ -102,9 +174,35 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
   }
 
   return (
-    <div className="detail" role="dialog" aria-modal="true" aria-label={`${ticket.title} 티켓`} onClick={onClose}>
-      <div className="detail__stage">
-        <div className="detail__ticket" style={origin as CSSProperties} onClick={(e) => e.stopPropagation()}>
+    <div
+      className="detail"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${ticket.title} 티켓 (${index + 1} / ${tickets.length})`}
+      onClick={() => {
+        if (!moved.current) onClose()
+      }}
+    >
+      <div
+        className="detail__stage"
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+      >
+        <div
+          key={ticket.id}
+          className={`detail__ticket${enter ? ` is-${enter}` : ''}`}
+          style={
+            {
+              ...origin,
+              transform: drag.x || drag.y ? `translate(${drag.x}px, ${drag.y}px)` : undefined,
+              opacity: drag.y < 0 ? Math.max(0.4, 1 + drag.y / 320) : undefined,
+              transition: drag.x || drag.y ? 'none' : 'transform 0.2s ease-out, opacity 0.2s ease-out',
+            } as CSSProperties
+          }
+          onClick={(e) => e.stopPropagation()}
+        >
           {theme === 'receipt' ? (
             <ReceiptView
               ticket={ticket}

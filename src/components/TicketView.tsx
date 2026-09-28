@@ -36,7 +36,7 @@ export function TicketView({ ticket, posterUrl, onPosterOpen, onVenueOpen }: Tic
             disabled={!onPosterOpen}
             aria-label={`${ticket.title} 포스터 크게 보기`}
           >
-            <img className="ticket__poster" src={posterUrl} alt={`${ticket.title} 포스터`} />
+            <img className="ticket__poster" src={posterUrl} alt={`${ticket.title} 포스터`} draggable={false} />
             {/* 포스터 왼쪽 아래를 라벨 크기만큼 파낸 자리 — 파인 자리의 모서리는 모두 둥글다 */}
             <span className="ticket__chip">{category.label}</span>
             {/* 금액은 포스터 오른쪽 위에 보일 듯 말 듯 — 궁금할 때만 눈에 들어오면 된다 */}

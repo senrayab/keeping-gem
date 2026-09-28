@@ -42,7 +42,7 @@ export function ReceiptView({ ticket, posterUrl, onPosterOpen, onVenueOpen, asid
               disabled={!onPosterOpen}
               aria-label={`${ticket.title} 포스터 크게 보기`}
             >
-              <img src={posterUrl} alt={`${ticket.title} 포스터`} />
+              <img src={posterUrl} alt={`${ticket.title} 포스터`} draggable={false} />
             </button>
           ) : (
             <span className="rc__poster rc__poster--empty">{category.label}</span>
