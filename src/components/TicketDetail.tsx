@@ -108,19 +108,34 @@ export function TicketDetail({ ticket, tickets, from, onMove, onEdit, onClose }:
   const index = tickets.findIndex((t) => t.id === ticket.id)
   const [drag, setDrag] = useState({ x: 0, y: 0 })
   const [enter, setEnter] = useState<'prev' | 'next' | null>(null)
+  // 민 방향으로 빠져나가는 중 (그동안 손짓은 받지 않는다)
+  const [exit, setExit] = useState<'left' | 'right' | null>(null)
   const start = useRef<{ x: number; y: number } | null>(null)
   const moved = useRef(false)
   const axis = useRef<'x' | 'y' | null>(null)
+  const swapping = useRef<number>()
 
+  useEffect(() => () => window.clearTimeout(swapping.current), [])
+
+  /*
+   * 밀던 손을 떼면 그 방향으로 티켓이 마저 빠져나가고, 다음 티켓이 반대쪽에서 따라 들어온다.
+   * 빠져나가는 걸 건너뛰면 민 자리에서 티켓이 사라졌다가 반대쪽에서 튀어나와, 되튄 것처럼 보인다.
+   */
   const move = (step: number) => {
     const next = tickets[index + step]
-    if (!next) return
-    setEnter(step > 0 ? 'next' : 'prev')
-    setDrag({ x: 0, y: 0 })
-    onMove(next.id)
+    if (!next || swapping.current) return
+    setExit(step > 0 ? 'left' : 'right')
+    swapping.current = window.setTimeout(() => {
+      swapping.current = undefined
+      setEnter(step > 0 ? 'next' : 'prev')
+      setExit(null)
+      setDrag({ x: 0, y: 0 })
+      onMove(next.id)
+    }, 170)
   }
 
   const onPointerDown = (e: React.PointerEvent) => {
+    if (swapping.current) return
     start.current = { x: e.clientX, y: e.clientY }
     moved.current = false
     axis.current = null
@@ -196,9 +211,17 @@ export function TicketDetail({ ticket, tickets, from, onMove, onEdit, onClose }:
           style={
             {
               ...origin,
-              transform: drag.x || drag.y ? `translate(${drag.x}px, ${drag.y}px)` : undefined,
-              opacity: drag.y < 0 ? Math.max(0.4, 1 + drag.y / 320) : undefined,
-              transition: drag.x || drag.y ? 'none' : 'transform 0.2s ease-out, opacity 0.2s ease-out',
+              ...(exit
+                ? {
+                    transform: `translateX(${exit === 'left' ? -110 : 110}%)`,
+                    opacity: 0,
+                    transition: 'transform 0.2s ease-in, opacity 0.2s ease-in',
+                  }
+                : {
+                    transform: drag.x || drag.y ? `translate(${drag.x}px, ${drag.y}px)` : undefined,
+                    opacity: drag.y < 0 ? Math.max(0.4, 1 + drag.y / 320) : undefined,
+                    transition: drag.x || drag.y ? 'none' : 'transform 0.2s ease-out, opacity 0.2s ease-out',
+                  }),
             } as CSSProperties
           }
           onClick={(e) => e.stopPropagation()}

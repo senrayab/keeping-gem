@@ -756,26 +756,26 @@ svg.dock__icon {
   animation: unfold 0.5s cubic-bezier(0.2, 0.9, 0.25, 1.1);
 }
 
-/* 옆으로 밀어 넘어온 티켓은 민 반대쪽에서 미끄러져 들어온다 */
+/* 앞 티켓이 민 방향으로 빠져나가면, 다음 티켓이 화면 밖 반대쪽에서 따라 들어온다 */
 .detail__ticket.is-next {
-  animation: ticket-in-right 0.26s ease-out;
+  animation: ticket-in-right 0.26s cubic-bezier(0.2, 0.8, 0.3, 1);
 }
 
 .detail__ticket.is-prev {
-  animation: ticket-in-left 0.26s ease-out;
+  animation: ticket-in-left 0.26s cubic-bezier(0.2, 0.8, 0.3, 1);
 }
 
 @keyframes ticket-in-right {
   from {
-    opacity: 0;
-    transform: translateX(26%);
+    opacity: 0.4;
+    transform: translateX(100%);
   }
 }
 
 @keyframes ticket-in-left {
   from {
-    opacity: 0;
-    transform: translateX(-26%);
+    opacity: 0.4;
+    transform: translateX(-100%);
   }
 }
 
