@@ -843,3 +843,17 @@
   background: rgb(255 255 255 / 0.14);
   color: #fff;
 }
+
+/*
+ * 짧은 안내(토스트).
+ *
+ * 밤하늘에서는 까만 단색이 하늘에 묻혀 알맞지만, 밝은 종이 위에서는 새까만 덩어리가 너무 튄다.
+ * 검정은 그대로 두되 조금 비쳐 보이게 하고, 뒤를 흐려 글씨만 또렷하게 남긴다.
+ */
+[data-theme='receipt'] .toast {
+  background: rgb(26 23 20 / 0.86);
+  border-color: rgb(255 255 255 / 0.12);
+  box-shadow: 0 8px 20px rgb(35 32 28 / 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
