@@ -825,3 +825,21 @@
   font-size: 9.5px;
   color: var(--paper-soft);
 }
+
+/*
+ * 늘 검은 바탕인 화면들.
+ *
+ * 사진·포스터를 크게 볼 때는 스킨과 상관없이 배경이 까맣다.
+ * 여기까지 종이 색을 따라가면 진한 잉크 글씨가 검은 바탕에 묻히므로, 이 안에서만 밝은 쪽으로 돌려 놓는다.
+ */
+[data-theme='receipt'] .photo-detail,
+[data-theme='receipt'] .poster-viewer {
+  color: #fff;
+}
+
+[data-theme='receipt'] .photo-detail .btn--ghost,
+[data-theme='receipt'] .poster-viewer .btn--ghost {
+  border-color: rgb(255 255 255 / 0.3);
+  background: rgb(255 255 255 / 0.14);
+  color: #fff;
+}
