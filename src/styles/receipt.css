@@ -58,10 +58,16 @@
 }
 
 [data-theme='receipt'] .dock__add,
-[data-theme='receipt'] .btn--glow {
+[data-theme='receipt'] .btn--glow,
+[data-theme='receipt'] .album-fab {
   background: var(--ink);
   color: var(--paper);
   box-shadow: 0 6px 16px rgb(35 32 28 / 0.28);
+}
+
+/* 빛나는 구슬이 아니라 잉크로 찍은 동그라미 — 사진첩·사진 넣기 단추 */
+[data-theme='receipt'] .album-fab {
+  box-shadow: 0 8px 20px rgb(35 32 28 / 0.3);
 }
 
 [data-theme='receipt'] .dock__icon--comet {
