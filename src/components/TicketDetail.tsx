@@ -95,7 +95,7 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
     setConfirming(false)
     await deleteTicket(ticket.id)
     onClose()
-    toast('별 하나를 떠나보냈어요.')
+    toast(theme === 'receipt' ? '한 장을 덜어냈어요.' : '별 하나를 떠나보냈어요.')
   }
 
   return (

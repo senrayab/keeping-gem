@@ -13,6 +13,7 @@ import { searchPlaces } from '@/lib/kakao'
 import { processImage, type ProcessedImage } from '@/lib/image'
 import type { KakaoPlace } from '@/types/kakao'
 import { ClearInput } from './ClearInput'
+import { useTheme } from './Theme'
 import { useToast } from './Toast'
 
 interface TicketFormProps {
@@ -26,6 +27,8 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
   useBackClose(onClose)
   useScrollLock()
   const toast = useToast()
+  // 스킨에 따라 부르는 말이 달라진다 (밤하늘: 별을 띄운다 / 영수증: 한 장 꽂아 둔다)
+  const paper = useTheme().theme === 'receipt'
 
   // 새 티켓이면 쓰던 내용을 기기에 맡겨 두고, 다시 열면 이어서 쓴다
   const [fields, setFields, clearDraft] = useDraft(!ticket, {
@@ -153,7 +156,7 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
         ticket?.id,
       )
       if (!ticket) clearDraft()
-      toast(ticket ? '티켓을 고쳤어요.' : '새 별이 떠올랐어요.')
+      toast(ticket ? '티켓을 고쳤어요.' : paper ? '한 장 꽂아 뒀어요.' : '새 별이 떠올랐어요.')
       onSaved(id)
     } catch (e) {
       console.error(e)
@@ -349,7 +352,7 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
 
         <div className="sheet__foot">
           <button type="submit" className="btn btn--glow" disabled={saving || converting}>
-            {saving ? '저장 중…' : ticket ? '수정 완료' : '하늘에 띄우기'}
+            {saving ? '저장 중…' : ticket ? '수정 완료' : paper ? '꽂아 두기' : '하늘에 띄우기'}
           </button>
         </div>
       </form>
