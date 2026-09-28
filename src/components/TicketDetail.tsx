@@ -11,6 +11,8 @@ import { renderTicketImage, ticketFileName } from '@/lib/ticketImage'
 import { ConfirmDialog } from './ConfirmDialog'
 import { MapViewer } from './MapViewer'
 import { PosterViewer } from './PosterViewer'
+import { ReceiptView } from './ReceiptView'
+import { useTheme } from './Theme'
 import { TicketView } from './TicketView'
 import { useToast } from './Toast'
 
@@ -30,6 +32,8 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
   // 본체를 읽는 동안에는 작은 포스터를 먼저 보여준다
   const posterUrl = useObjectUrl(poster?.blob ?? ticket.thumb)
   const toast = useToast()
+  // 스킨에 따라 같은 티켓이 별에서 펼쳐진 표가 되기도, 영수증 한 장이 되기도 한다
+  const { theme } = useTheme()
 
   /*
    * 공유할 이미지는 상세보기가 열리자마자 미리 그려 둔다.
@@ -98,12 +102,21 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
     <div className="detail" role="dialog" aria-modal="true" aria-label={`${ticket.title} 티켓`} onClick={onClose}>
       <div className="detail__stage">
         <div className="detail__ticket" style={origin as CSSProperties} onClick={(e) => e.stopPropagation()}>
-          <TicketView
-            ticket={ticket}
-            posterUrl={posterUrl}
-            onPosterOpen={() => setPosterOpen(true)}
-            onVenueOpen={() => setMapOpen(true)}
-          />
+          {theme === 'receipt' ? (
+            <ReceiptView
+              ticket={ticket}
+              posterUrl={posterUrl}
+              onPosterOpen={() => setPosterOpen(true)}
+              onVenueOpen={() => setMapOpen(true)}
+            />
+          ) : (
+            <TicketView
+              ticket={ticket}
+              posterUrl={posterUrl}
+              onPosterOpen={() => setPosterOpen(true)}
+              onVenueOpen={() => setMapOpen(true)}
+            />
+          )}
 
           {/* 아래 버튼 줄은 이 티켓을 '다루는' 자리라, 딸린 사진첩은 티켓에 붙은 뱃지로 알린다 */}
           {album && photoCount ? (
