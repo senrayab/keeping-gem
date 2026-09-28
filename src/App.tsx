@@ -12,6 +12,7 @@ import { Sky } from './components/Sky'
 import { Starfield } from './components/Starfield'
 import { TicketDetail } from './components/TicketDetail'
 import { TicketForm } from './components/TicketForm'
+import { Roll } from './components/Roll'
 import { TicketList } from './components/TicketList'
 import { useTheme } from './components/Theme'
 import { Wall } from './components/Wall'
@@ -174,6 +175,8 @@ export function App() {
                 onOpen={(ticket, from) => setOpened({ id: ticket.id, from })}
               />
             )
+          ) : paper ? (
+            <Roll tickets={visible} onOpen={(ticket, from) => setOpened({ id: ticket.id, from })} />
           ) : (
             <TicketList tickets={visible} onOpen={(ticket, from) => setOpened({ id: ticket.id, from })} />
           ))}

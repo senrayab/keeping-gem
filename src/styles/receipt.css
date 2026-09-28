@@ -319,3 +319,220 @@
   line-height: 1.5;
   color: var(--ink-soft);
 }
+
+/* ───────── 리스트 보기: 한 장의 긴 영수증 ───────── */
+
+.roll {
+  position: relative;
+  width: min(342px, calc(100% - 32px));
+  margin: 4px auto 0;
+  /* 종이는 가운데 칸이 칠한다 — 위아래 톱니가 배경에 묻히지 않도록 */
+  box-shadow: 0 14px 30px rgb(35 32 28 / 0.16), 0 2px 4px rgb(35 32 28 / 0.08);
+}
+
+/* 톱니처럼 뜯긴 종이 끝 — 종이색 삼각형을 이어 붙인다 */
+.roll__tear {
+  height: 8px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpolygon points='0,0 12,0 6,8' fill='%23f8f5ef'/%3E%3C/svg%3E") repeat-x;
+}
+
+.roll__tear--top {
+  transform: scaleY(-1);
+}
+
+.roll__body {
+  padding: 18px 20px 16px;
+  background: var(--paper);
+  color: var(--paper-ink);
+}
+
+.roll__mark {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--paper-soft);
+}
+
+.roll__rule {
+  margin: 14px 0;
+  border-top: 1px dashed rgb(35 32 28 / 0.3);
+}
+
+.roll__rule--solid {
+  border-top: 1px solid rgb(35 32 28 / 0.5);
+}
+
+.roll__rule--double {
+  height: 3px;
+  margin: 14px 0;
+  border-top: 1px solid var(--paper-ink);
+  border-bottom: 1px solid var(--paper-ink);
+}
+
+.roll__year h2 {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 2px 0 8px;
+  font-weight: 400;
+}
+
+.roll__year h2 b {
+  font-family: var(--serif);
+  font-size: 25px;
+  font-weight: 400;
+}
+
+.roll__year h2 span {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--paper-soft);
+}
+
+/* 티켓 한 줄 — 포스터는 우표만 하게, 값과 날짜는 오른쪽에 */
+.roll__line {
+  display: grid;
+  grid-template-columns: 38px 1fr auto;
+  gap: 11px;
+  width: 100%;
+  padding: 9px 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  text-align: left;
+  color: inherit;
+}
+
+.roll__line + .roll__line {
+  border-top: 1px dotted rgb(35 32 28 / 0.22);
+}
+
+.roll__line:active {
+  background: rgb(35 32 28 / 0.04);
+}
+
+.roll__poster,
+.roll__poster img,
+.roll__blank {
+  display: block;
+  width: 38px;
+  height: 52px;
+}
+
+.roll__poster {
+  padding: 2px;
+  background: #fff;
+  box-shadow: 0 2px 5px rgb(35 32 28 / 0.22);
+  transform: rotate(-1.5deg);
+}
+
+.roll__poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.roll__blank {
+  width: 100%;
+  height: 100%;
+  background: var(--bg-1);
+}
+
+.roll__what {
+  display: block;
+  min-width: 0;
+}
+
+.roll__what strong {
+  display: block;
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.15;
+  word-break: keep-all;
+}
+
+.roll__at {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  line-height: 1.5;
+  color: var(--paper-soft);
+}
+
+.roll__kind {
+  display: inline-block;
+  margin-top: 5px;
+  padding: 1px 6px;
+  border: 1px solid rgb(35 32 28 / 0.28);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--paper-soft);
+}
+
+.roll__pay {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.roll__pay small {
+  display: block;
+  margin-top: 4px;
+  font-size: 9.5px;
+  font-weight: 400;
+  color: var(--paper-soft);
+}
+
+.roll__sum {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 10px 0 2px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--paper-soft);
+}
+
+.roll__total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0;
+  padding: 8px 0;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.roll__total b {
+  font-size: 17px;
+}
+
+.roll__foot {
+  margin-top: 14px;
+  text-align: center;
+}
+
+.roll__code {
+  width: 150px;
+  height: 26px;
+  fill: var(--paper-ink);
+}
+
+.roll__foot p {
+  margin: 8px 0 0;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  color: var(--paper-soft);
+}
