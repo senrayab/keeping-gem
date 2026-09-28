@@ -830,14 +830,39 @@ svg.dock__icon {
   color: var(--ink-faint);
 }
 
+/*
+ * 장소 후보 목록.
+ *
+ * 최대 여덟 곳까지 오는데, 휴대폰에서는 키보드가 아래를 가려 목록 끝이 보이지 않는다.
+ * 그래서 높이를 네 줄 남짓으로 묶고 안에서 굴린다 — 마지막 줄이 반쯤 잘려 보여 '더 있다'는 걸 알린다.
+ */
 .suggest {
   display: grid;
+  max-height: 244px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* 화면 안으로 끌어올릴 때 아래 저장 버튼과 위 입력칸 자리를 비워 둔다 */
+  scroll-margin: 16px 0 104px;
   margin: 0;
   padding: 4px;
   list-style: none;
   border: 1px solid var(--glass-line);
   border-radius: 14px;
   background: rgb(20 16 38 / 0.96);
+}
+
+/* 몇 곳을 찾았는지 — 목록 맨 위에 붙어 따라 내려온다 */
+.suggest__count {
+  position: sticky;
+  top: -4px;
+  z-index: 1;
+  margin: -4px -4px 2px;
+  padding: 8px 12px 6px;
+  background: inherit;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: -0.02em;
+  color: var(--ink-faint);
 }
 
 .suggest button {

@@ -88,6 +88,20 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
   const [places, setPlaces] = useState<KakaoPlace[]>([])
   const [placeError, setPlaceError] = useState<string>()
   const typingVenue = useRef(false)
+  const suggestRef = useRef<HTMLUListElement>(null)
+
+  /*
+   * 목록이 뜨면 그 목록이 화면 안에 들어오도록 끌어올린다.
+   * 휴대폰에서는 글자를 치는 동안 키보드가 아래 절반을 가려, 목록이 그 밑에 숨어 버린다.
+   */
+  useEffect(() => {
+    if (places.length === 0) return
+    const timer = window.setTimeout(
+      () => suggestRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }),
+      60,
+    )
+    return () => window.clearTimeout(timer)
+  }, [places.length])
 
   useEffect(() => {
     const query = venue.trim()
@@ -294,11 +308,13 @@ export function TicketForm({ ticket, onClose, onSaved }: TicketFormProps) {
           {lat != null && <p className="field__hint">{address ?? '지도에서 고른 장소예요'} · 상세보기에서 지도로 볼 수 있어요</p>}
           {placeError && <p className="field__hint">{placeError}</p>}
           {places.length > 0 && (
-            <ul className="suggest">
+            <ul className="suggest" ref={suggestRef}>
+              {/* 몇 곳을 찾았는지 먼저 알린다 — 아래가 키보드에 가려도 끝인지 아닌지 알 수 있게 */}
+              <li className="suggest__count">{places.length}곳을 찾았어요</li>
               {places.map((place) => (
                 <li key={place.id}>
-                  {/* 손가락을 떼기 전(pointerdown)에 고른다 — 그 뒤에 목록이 닫혀도 놓치지 않게 */}
-                  <button type="button" onPointerDown={() => pickPlace(place)}>
+                  {/* 밀어서 목록을 굴릴 때 골라지지 않도록, 손가락이 움직이지 않았을 때만 고른다 */}
+                  <button type="button" onClick={() => pickPlace(place)}>
                     <strong>{place.place_name}</strong>
                     <span>{place.road_address_name || place.address_name}</span>
                   </button>
