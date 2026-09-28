@@ -536,3 +536,207 @@
   letter-spacing: 0.2em;
   color: var(--paper-soft);
 }
+
+/* ───────── 상세보기: 영수증 한 장 ───────── */
+
+.rc {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  filter: drop-shadow(0 16px 30px rgb(0 0 0 / 0.35));
+}
+
+.rc__tear {
+  flex: none;
+  height: 8px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpolygon points='0,0 12,0 6,8' fill='%23f8f5ef'/%3E%3C/svg%3E") repeat-x;
+}
+
+.rc__tear--top {
+  transform: scaleY(-1);
+}
+
+.rc__body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 16px 20px 18px;
+  background: var(--paper);
+  color: var(--paper-ink);
+}
+
+.rc__mark {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  color: var(--paper-soft);
+}
+
+/*
+ * 포스터 — 화면이 짧으면 이 자리가 먼저 줄어든다(상세보기는 스크롤하지 않는다).
+ * 인화지처럼 흰 여백을 두르고 클립에 물려 종이 위에 얹힌다. 전체는 눌러서 크게 본다.
+ */
+.rc__photo {
+  position: relative;
+  display: flex;
+  flex: 0 1 min(38vh, 300px);
+  justify-content: center;
+  min-height: 90px;
+  margin: 14px 0 16px;
+}
+
+.rc__poster {
+  display: block;
+  width: 74%;
+  height: 100%;
+  padding: 6px 6px 16px;
+  border: 0;
+  background: #fff;
+  box-shadow: 0 8px 18px rgb(35 32 28 / 0.28);
+  transform: rotate(1.6deg);
+}
+
+.rc__poster img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+.rc__poster--empty {
+  display: grid;
+  place-items: center;
+  background: var(--bg-1);
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+}
+
+.rc__wire {
+  position: absolute;
+  top: -13px;
+  left: 60%;
+  z-index: 2;
+  width: 28px;
+  transform: rotate(-7deg);
+}
+
+.rc__title {
+  flex: none;
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 1.08;
+  word-break: keep-all;
+}
+
+/* 그날의 한마디 — 손으로 적어 둔 것처럼 */
+.rc__memo {
+  flex: none;
+  margin: 8px 0 0;
+  font-family: var(--hand);
+  font-size: 23px;
+  line-height: 1.25;
+  color: rgb(var(--amber));
+}
+
+.rc__venue {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 9px 0 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--paper-soft);
+}
+
+.rc__venue--map {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.rc__venue svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.rc__rule {
+  flex: none;
+  margin: 14px 0;
+  border-top: 1px dashed rgb(35 32 28 / 0.3);
+}
+
+.rc__rule--solid {
+  border-top: 1px solid rgb(35 32 28 / 0.42);
+}
+
+.rc__grid {
+  flex: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 12px;
+  margin: 0;
+}
+
+.rc__grid dt {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: var(--paper-soft);
+}
+
+.rc__grid dd {
+  margin: 3px 0 0;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.rc__wide {
+  grid-column: 1 / -1;
+}
+
+.rc__pay dd {
+  font-size: 15px;
+}
+
+.rc__foot {
+  flex: none;
+  text-align: center;
+}
+
+.rc__code {
+  width: 160px;
+  height: 26px;
+  fill: var(--paper-ink);
+}
+
+.rc__foot p {
+  margin: 7px 0 0;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  color: var(--paper-soft);
+}
+
+/* 그날의 사진 뱃지도 종이 위에 얹힌 것처럼 */
+[data-theme='receipt'] .detail__album {
+  background: var(--paper);
+  border-color: rgb(35 32 28 / 0.18);
+  color: var(--paper-ink);
+  box-shadow: 0 6px 16px rgb(35 32 28 / 0.3);
+}
