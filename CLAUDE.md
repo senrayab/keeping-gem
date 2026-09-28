@@ -23,10 +23,29 @@
   백업 형식(`backup.json`의 `format`)을 바꾸면 버전을 올리고, 옛 형식도 읽을 수 있게 둔다.
 - 디자인 톤: 어두운 밤하늘 + 따뜻한 빛번짐(보케), 유리구슬 질감, 종이 티켓 + 홀로그램.
 
+## 스킨(테마)
+
+같은 티켓을 두 가지 모습으로 볼 수 있다. **설정 → 스킨**에서 고르고, 고른 값은 기기에 남는다.
+
+- `night` (밤하늘): 위에 적은 그대로. 홈은 `Sky.tsx`, 리스트는 `TicketList.tsx`, 상세는 `TicketView.tsx`.
+- `receipt` (영수증): 종이 한 장의 결. 홈은 `Wall.tsx`(클립에 물린 포스터가 얹힌 영수증 카드가 두 줄),
+  리스트는 `Roll.tsx`(연도별 소계와 총합이 찍힌 한 장의 긴 영수증), 상세는 `ReceiptView.tsx`.
+
+지키는 약속:
+
+- 색은 `:root`의 토큰만 갈아끼운다(`src/styles/receipt.css`의 `:root[data-theme='receipt']`).
+  **새 화면을 만들 때 색은 반드시 토큰(`--bg-*`, `--ink-*`, `--glass*`, `--amber`, `--paper*`)으로 쓴다** —
+  직접 색을 박으면 다른 스킨에서 읽히지 않는다.
+- 스킨 전용 모습이 필요하면 `[data-theme='receipt'] .어쩌고`로 `receipt.css`에만 적는다. `global.css`는 밤하늘의 것이다.
+- 영수증 스킨의 글꼴(구글 폰트)은 그 스킨을 고른 뒤에만 불러온다(`Theme.tsx`). 한 번 받으면 서비스 워커가 갖고 있다.
+- `<html data-theme>`은 `Theme.tsx`가 적고, 첫 화면이 깜빡이지 않도록 `index.html`에서도 같은 값을 미리 읽는다.
+
 ## 프로젝트 구조
 
 - `src/main.tsx`, `src/App.tsx` — 앱 진입점, 화면 상태(열린 티켓·입력 시트)
 - `src/components/` — 화면 조각 (`UpdateToast.tsx`: 새 배포 새로고침 안내, `Toast.tsx`: 짧은 안내)
+- `src/components/Theme.tsx` — 스킨 고르기·기억하기. 새 화면은 필요하면 `useTheme()`으로 결을 가른다
+- `src/styles/receipt.css` — 영수증 스킨의 색 토큰과 전용 화면(벽·긴 영수증·영수증 상세)
 - `src/db/db.ts` — IndexedDB(Dexie). `tickets`(목록용, 썸네일 포함) / `posters`(포스터 원본) 분리.
   사진은 서버로 보내지 않고 기기 안에만 저장한다. 스키마를 바꾸면 `version()`을 올린다.
 - `src/lib/image.ts` — 포스터 → WebP 변환(긴 변 2000px), 대표색(별 빛깔) 추출
