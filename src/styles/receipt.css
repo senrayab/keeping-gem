@@ -49,8 +49,12 @@
 
 /* 빛나던 것들은 잉크로 */
 [data-theme='receipt'] .dock {
+  /* 별똥별이 빠져 둘만 남으므로 가운데가 아니라 오른쪽에 붙인다 */
+  left: auto;
+  right: 16px;
   background: rgb(248 245 239 / 0.94);
   box-shadow: 0 8px 22px rgb(35 32 28 / 0.18);
+  transform: none;
 }
 
 [data-theme='receipt'] .dock__add,
