@@ -756,6 +756,29 @@ svg.dock__icon {
   animation: unfold 0.5s cubic-bezier(0.2, 0.9, 0.25, 1.1);
 }
 
+/* 옆으로 밀어 넘어온 티켓은 민 반대쪽에서 미끄러져 들어온다 */
+.detail__ticket.is-next {
+  animation: ticket-in-right 0.26s ease-out;
+}
+
+.detail__ticket.is-prev {
+  animation: ticket-in-left 0.26s ease-out;
+}
+
+@keyframes ticket-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(26%);
+  }
+}
+
+@keyframes ticket-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-26%);
+  }
+}
+
 @keyframes unfold {
   from {
     opacity: 0;
@@ -1184,6 +1207,9 @@ svg.dock__icon {
   display: block;
   width: 100%;
   height: 100%;
+  /* 밀어서 앞뒤로 넘길 때 그림이 끌려 나오지 않게 */
+  -webkit-user-drag: none;
+  user-select: none;
   border-radius: 14px;
   object-fit: cover;
   object-position: center 30%;
