@@ -1,5 +1,5 @@
 import { MapPin } from 'lucide-react'
-import { useMemo } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import type { Ticket } from '@/db/db'
 import { categoryOf } from '@/lib/categories'
 import { formatMoney } from '@/lib/currencies'
@@ -17,9 +17,11 @@ interface ReceiptViewProps {
   posterUrl?: string
   onPosterOpen?: () => void
   onVenueOpen?: () => void
+  /** 포스터 옆 빈 자리에 놓을 것 (그날의 사진 단추) */
+  aside?: ReactNode
 }
 
-export function ReceiptView({ ticket, posterUrl, onPosterOpen, onVenueOpen }: ReceiptViewProps) {
+export function ReceiptView({ ticket, posterUrl, onPosterOpen, onVenueOpen, aside }: ReceiptViewProps) {
   const category = categoryOf(ticket.category)
 
   return (
@@ -30,6 +32,8 @@ export function ReceiptView({ ticket, posterUrl, onPosterOpen, onVenueOpen }: Re
         <p className="rc__mark">{category.label}</p>
 
         <div className="rc__photo">
+          {/* 포스터가 오른쪽을 채우고 남는 왼쪽 자리 — 종류와 그날의 사진이 세로로 놓인다 */}
+          {aside}
           <Paperclip />
           {posterUrl ? (
             <button
