@@ -116,11 +116,27 @@
   border-left: 1px dashed rgb(255 255 255 / 0.22);
 }
 
-/* 가장 자주 쓰는 동작만 주황 잉크로 */
+/* 가장 자주 쓰는 동작은 주황 알약에 흰 글씨로 — 배경이 없으니 이것만은 또렷하게 */
 [data-theme='receipt'] .action--primary {
-  background: none;
-  color: rgb(var(--amber));
+  flex: 0 0 auto;
+  gap: 5px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: rgb(var(--amber));
+  color: #fff;
   font-weight: 700;
+  text-shadow: none;
+  box-shadow: 0 6px 16px rgb(var(--amber) / 0.4);
+}
+
+[data-theme='receipt'] .action--primary svg {
+  color: #fff;
+  filter: none;
+}
+
+/* 알약 옆에는 절취선을 긋지 않는다 */
+[data-theme='receipt'] .action--primary + .action {
+  border-left: 0;
 }
 
 [data-theme='receipt'] .empty__star {
