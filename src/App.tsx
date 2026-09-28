@@ -183,10 +183,13 @@ export function App() {
       </main>
 
       <nav className="dock">
-        <button className="dock__btn" onClick={shootingStar} disabled={!visible?.length}>
-          <span className="dock__icon dock__icon--comet" aria-hidden="true" />
-          별똥별
-        </button>
+        {/* 별똥별은 밤하늘의 말이다 — 영수증 스킨에서는 두지 않고, 대신 도크를 오른쪽으로 붙인다 */}
+        {!paper && (
+          <button className="dock__btn" onClick={shootingStar} disabled={!visible?.length}>
+            <span className="dock__icon dock__icon--comet" aria-hidden="true" />
+            별똥별
+          </button>
+        )}
         <button
           className={`dock__btn dock__btn--icon${searching ? ' is-active' : ''}`}
           onClick={() => setSearching(true)}
