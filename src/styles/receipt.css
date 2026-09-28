@@ -98,6 +98,9 @@
 }
 
 [data-theme='receipt'] .action {
+  /* 칸이 높아도 아이콘과 글씨는 붙어서 가운데에 온다 */
+  align-content: center;
+  gap: 4px;
   border-radius: 0;
   font-family: var(--mono);
   font-size: 10.5px;
@@ -119,7 +122,6 @@
 /* 가장 자주 쓰는 동작은 주황 알약에 흰 글씨로 — 배경이 없으니 이것만은 또렷하게 */
 [data-theme='receipt'] .action--primary {
   flex: 0 0 auto;
-  gap: 5px;
   padding: 0 16px;
   border-radius: 999px;
   background: rgb(var(--amber));
@@ -627,7 +629,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  padding: 0 20px 18px;
+  padding: 0 20px 22px;
   background: var(--paper);
   color: var(--paper-ink);
 }
@@ -749,12 +751,6 @@
   flex: none;
   margin: 14px 0;
   border-top: 1px dashed rgb(35 32 28 / 0.3);
-}
-
-/* 종이의 끝맺음 — 아래로는 더 인쇄되지 않는다 */
-.rc__rule--solid {
-  margin: 14px 0 0;
-  border-top: 1px solid rgb(35 32 28 / 0.42);
 }
 
 .rc__grid {

@@ -86,10 +86,9 @@ export function ReceiptView({ ticket, posterUrl, onPosterOpen, onVenueOpen, asid
         </dl>
 
         {/*
-         * 바코드도 일련번호도 두지 않는다 — 읽히지 않는 장식이라 종이만 빽빽해진다.
+         * 바코드도, 그 위 가로선도 두지 않는다 — 읽히지 않는 장식이라 종이만 빽빽해진다.
          * (밤하늘 티켓도 같은 이유로 화면에서는 반권을 뺐다. 저장 이미지에는 그대로 들어간다)
          */}
-        <div className="rc__rule rc__rule--solid" aria-hidden="true" />
       </div>
 
       <div className="rc__tear" aria-hidden="true" />
