@@ -1,4 +1,4 @@
-import { useMemo, type CSSProperties } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import type { Ticket } from '@/db/db'
 import { useObjectUrl } from '@/hooks/useObjectUrl'
 import { categoryOf } from '@/lib/categories'
@@ -11,7 +11,11 @@ import { barcodeBars, seeded } from '@/lib/seed'
  *
  * 티켓 한 장이 영수증 한 장이고, 그날의 포스터가 클립에 물려 그 위에 얹힌다.
  * 기울기는 티켓 id로 정해 늘 같은 각도로 꽂혀 있게 한다(밤하늘의 별자리와 같은 약속).
+ *
+ * 카드 높이는 제목과 한마디 길이에 따라 제각각이라, 줄을 맞춰 놓으면 짧은 카드 아래가 텅 빈다.
+ * 그래서 벽돌 쌓기로 채운다 — 앞에서부터 그때그때 낮은 칸에 놓는다(사진첩과 같은 방식).
  */
+const COLUMNS = 2
 interface WallProps {
   tickets: Ticket[]
   onOpen: (ticket: Ticket, from: DOMRect) => void
@@ -36,12 +40,63 @@ export function Wall({ tickets, onOpen }: WallProps) {
             <i aria-hidden="true" />
             <span>{list.length}장</span>
           </h2>
-          <div className="wall__grid">
-            {list.map((ticket) => (
-              <Card key={ticket.id} ticket={ticket} onOpen={onOpen} />
-            ))}
-          </div>
+          <Masonry tickets={list} onOpen={onOpen} />
         </section>
+      ))}
+    </div>
+  )
+}
+
+/**
+ * 카드를 두 칸에 나눠 담는다.
+ *
+ * 높이는 글자 수에 따라 달라지므로 한 번 그린 뒤 실제 높이를 재서 다시 나눈다.
+ * (화면에 칠해지기 전에 재고 다시 나누므로 깜빡이지 않는다)
+ */
+function Masonry({ tickets, onOpen }: WallProps) {
+  const host = useRef<HTMLDivElement>(null)
+  const [heights, setHeights] = useState<Map<string, number>>(new Map())
+
+  const measure = () => {
+    const nodes = host.current?.querySelectorAll<HTMLElement>('[data-ticket]')
+    if (!nodes) return
+    const next = new Map<string, number>()
+    for (const node of nodes) next.set(node.dataset.ticket!, node.offsetHeight)
+    setHeights((prev) => {
+      if (prev.size === next.size && [...next].every(([id, h]) => prev.get(id) === h)) return prev
+      return next
+    })
+  }
+
+  useLayoutEffect(measure)
+
+  // 화면을 돌리면 칸 너비가 달라져 높이도 달라진다
+  useEffect(() => {
+    const onResize = () => measure()
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
+  const columns = useMemo(() => {
+    const cols: Ticket[][] = Array.from({ length: COLUMNS }, () => [])
+    const tall = new Array<number>(COLUMNS).fill(0)
+    for (const ticket of tickets) {
+      const shortest = tall.indexOf(Math.min(...tall))
+      cols[shortest].push(ticket)
+      // 아직 재 보지 않았으면 다들 같은 키로 치고 번갈아 놓는다
+      tall[shortest] += heights.get(ticket.id) ?? 260
+    }
+    return cols
+  }, [tickets, heights])
+
+  return (
+    <div className="wall__grid" ref={host}>
+      {columns.map((column, i) => (
+        <div className="wall__col" key={i}>
+          {column.map((ticket) => (
+            <Card key={ticket.id} ticket={ticket} onOpen={onOpen} />
+          ))}
+        </div>
       ))}
     </div>
   )
@@ -56,6 +111,7 @@ function Card({ ticket, onOpen }: { ticket: Ticket; onOpen: (ticket: Ticket, fro
   return (
     <button
       className="clip"
+      data-ticket={ticket.id}
       style={{ '--tilt': `${tilt}deg` } as CSSProperties}
       onClick={(e) => onOpen(ticket, e.currentTarget.getBoundingClientRect())}
       aria-label={`${ticket.title} 티켓 보기`}

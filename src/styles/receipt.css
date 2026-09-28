@@ -163,10 +163,19 @@
   color: var(--ink-faint);
 }
 
+/* 벽돌 쌓기 — 칸마다 카드를 세로로 쌓는다(높이가 제각각이라 줄을 맞추지 않는다) */
 .wall__grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 28px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.wall__col {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 28px;
+  min-width: 0;
 }
 
 /* 카드 한 장 = 영수증 + 클립에 물린 포스터 */
