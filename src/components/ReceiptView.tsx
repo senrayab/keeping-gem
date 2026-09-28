@@ -28,10 +28,8 @@ export function ReceiptView({ ticket, posterUrl, onPosterOpen, onVenueOpen }: Re
       <div className="rc__tear rc__tear--top" aria-hidden="true" />
 
       <div className="rc__body">
-        <p className="rc__mark">
-          <span>@ KEEPING_GEM</span>
-          <span>{category.label}</span>
-        </p>
+        {/* 포스터 옆 빈 자리에 세로로 찍히는 종류 — 홈 카드와 같은 인쇄 */}
+        <p className="rc__mark">{category.label}</p>
 
         <div className="rc__photo">
           <Paperclip />
