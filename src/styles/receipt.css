@@ -76,32 +76,21 @@
 /*
  * 상세보기 아래 단추 줄.
  *
- * 밤하늘에서는 떠 있는 유리 알약이지만, 여기서는 화면 아래에 붙어 뜯겨 나온 종이 띠다.
- * 위 끝은 영수증과 같은 톱니, 칸 사이는 절취선(점선), 글씨는 타자기체로.
+ * 종이를 깔지 않고 뒤 화면 위에 글씨만 얹는다 — 영수증 한 장에 눈이 온전히 가도록.
+ * 대신 뒤가 어두우므로 글씨는 밝은 쪽으로 뒤집고, 옅은 그늘로 어디서든 읽히게 한다.
  */
 [data-theme='receipt'] .detail__actions {
   left: 0;
   right: 0;
   bottom: 0;
   gap: 0;
-  padding: 6px 10px calc(env(safe-area-inset-bottom) + 8px);
+  padding: 6px 10px calc(env(safe-area-inset-bottom) + 10px);
   border: 0;
   border-radius: 0;
-  background: var(--paper);
-  box-shadow: 0 -8px 26px rgb(35 32 28 / 0.28);
+  background: none;
+  box-shadow: none;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-}
-
-/* 뜯긴 자국 — 띠의 위 끝 */
-[data-theme='receipt'] .detail__actions::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: -8px;
-  height: 8px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpolygon points='0,8 12,8 6,0' fill='%23f8f5ef'/%3E%3C/svg%3E") repeat-x;
 }
 
 [data-theme='receipt'] .action {
@@ -110,28 +99,24 @@
   font-size: 10.5px;
   font-weight: 400;
   letter-spacing: -0.02em;
-  color: var(--paper-soft);
+  color: rgb(255 255 255 / 0.82);
+  text-shadow: 0 1px 6px rgb(0 0 0 / 0.5);
+}
+
+[data-theme='receipt'] .action svg {
+  filter: drop-shadow(0 1px 6px rgb(0 0 0 / 0.5));
 }
 
 /* 칸 사이는 절취선 */
 [data-theme='receipt'] .action + .action {
-  border-left: 1px dashed rgb(35 32 28 / 0.22);
-}
-
-[data-theme='receipt'] .action svg {
-  color: var(--paper-ink);
+  border-left: 1px dashed rgb(255 255 255 / 0.22);
 }
 
 /* 가장 자주 쓰는 동작만 주황 잉크로 */
-[data-theme='receipt'] .action--primary,
-[data-theme='receipt'] .action--primary svg {
+[data-theme='receipt'] .action--primary {
   background: none;
   color: rgb(var(--amber));
   font-weight: 700;
-}
-
-[data-theme='receipt'] .action--primary {
-  border-bottom: 2px solid rgb(var(--amber));
 }
 
 [data-theme='receipt'] .empty__star {
