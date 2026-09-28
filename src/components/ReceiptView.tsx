@@ -4,7 +4,7 @@ import type { Ticket } from '@/db/db'
 import { categoryOf } from '@/lib/categories'
 import { formatMoney } from '@/lib/currencies'
 import { formatDate } from '@/lib/format'
-import { barcodeBars, ticketNumber } from '@/lib/seed'
+import { barcodeBars } from '@/lib/seed'
 
 /**
  * 영수증 스킨의 티켓 한 장.
@@ -21,7 +21,6 @@ interface ReceiptViewProps {
 
 export function ReceiptView({ ticket, posterUrl, onPosterOpen, onVenueOpen }: ReceiptViewProps) {
   const category = categoryOf(ticket.category)
-  const number = useMemo(() => ticketNumber(ticket.id, ticket.date), [ticket.id, ticket.date])
 
   return (
     <article className="rc">
@@ -86,9 +85,9 @@ export function ReceiptView({ ticket, posterUrl, onPosterOpen, onVenueOpen }: Re
 
         <div className="rc__rule rc__rule--solid" aria-hidden="true" />
 
+        {/* 일련번호는 두지 않는다 — 뜻이 없는 글자가 한 줄 늘면 종이가 빽빽해진다 */}
         <div className="rc__foot">
           <Barcode seed={ticket.id} />
-          <p>{number}</p>
         </div>
       </div>
 
