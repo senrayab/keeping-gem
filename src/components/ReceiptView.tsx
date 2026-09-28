@@ -24,8 +24,7 @@ export function ReceiptView({ ticket, posterUrl, onPosterOpen, onVenueOpen }: Re
 
   return (
     <article className="rc">
-      <div className="rc__tear rc__tear--top" aria-hidden="true" />
-
+      {/* 위는 곧게 자른 끝, 아래만 뜯긴 자국 — 포스터가 걸친 윗변이 어지럽지 않게 */}
       <div className="rc__body">
         {/* 포스터 옆 빈 자리에 세로로 찍히는 종류 — 홈 카드와 같은 인쇄 */}
         <p className="rc__mark">{category.label}</p>

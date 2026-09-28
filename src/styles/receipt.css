@@ -596,10 +596,6 @@
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpolygon points='0,0 12,0 6,8' fill='%23f8f5ef'/%3E%3C/svg%3E") repeat-x;
 }
 
-.rc__tear--top {
-  transform: scaleY(-1);
-}
-
 .rc__body {
   position: relative;
   display: flex;
