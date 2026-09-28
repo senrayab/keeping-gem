@@ -7,6 +7,7 @@ import { useBackClose } from '@/hooks/useBackClose'
 import { useScrollLock } from '@/hooks/useScrollLock'
 import { useObjectUrl } from '@/hooks/useObjectUrl'
 import { canShareFiles, download, isShareCancel } from '@/lib/download'
+import { renderReceiptImage } from '@/lib/receiptImage'
 import { renderTicketImage, ticketFileName } from '@/lib/ticketImage'
 import { ConfirmDialog } from './ConfirmDialog'
 import { MapViewer } from './MapViewer'
@@ -45,7 +46,9 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
     if (poster === undefined) return
     let alive = true
     setImage(null)
-    renderTicketImage(ticket, poster?.blob)
+    // 스킨에 따라 별에서 펼쳐진 티켓으로도, 영수증 한 장으로도 그린다
+    const draw = theme === 'receipt' ? renderReceiptImage : renderTicketImage
+    draw(ticket, poster?.blob)
       .then((blob) => {
         if (alive) setImage(new File([blob], ticketFileName(ticket), { type: 'image/png' }))
       })
@@ -53,7 +56,7 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
     return () => {
       alive = false
     }
-  }, [ticket, poster])
+  }, [ticket, poster, theme])
 
   const shareable = image !== null && canShareFiles(image)
   const [posterOpen, setPosterOpen] = useState(false)

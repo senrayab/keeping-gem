@@ -1,4 +1,5 @@
 import type { Ticket } from '@/db/db'
+import { drawCover, fitLine, font, MONO, rgba, roundRect, spacing, toPng, wrap, type Ctx } from './canvas'
 import { categoryOf } from './categories'
 import { formatDate } from './format'
 // barcodeBars·ticketNumber는 아래 주석 처리된 바코드 조각이 쓴다
@@ -20,65 +21,9 @@ const PAD = 60 // 티켓 안쪽 여백
 const NOTCH = 36
 const RADIUS = 56
 
-const SANS = "-apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Noto Sans CJK KR', sans-serif"
-const MONO = "ui-monospace, 'SF Mono', 'Roboto Mono', 'Noto Sans Mono', monospace"
-
 const PAPER = '#fbfaf7'
 const INK = '#1b1826'
 const SOFT = '#8a8598'
-
-type Ctx = CanvasRenderingContext2D
-
-/** "r g b" + 투명도 → 캔버스가 어느 기기에서든 읽는 rgba(r,g,b,a) */
-const rgba = (rgb: string, alpha = 1) => `rgba(${rgb.split(' ').join(',')},${alpha})`
-
-function font(ctx: Ctx, weight: number, size: number, family = SANS) {
-  ctx.font = `${weight} ${size}px ${family}`
-}
-
-function spacing(ctx: Ctx, px: number) {
-  // 글자 간격은 크롬 99+/사파리 17+에서만 된다. 없으면 붙여 쓴다.
-  if ('letterSpacing' in ctx) (ctx as Ctx & { letterSpacing: string }).letterSpacing = `${px}px`
-}
-
-/** 폭에 맞춰 줄을 나눈다. 한글은 글자 단위, 나머지는 단어 단위로 끊는다. */
-function wrap(ctx: Ctx, text: string, width: number, maxLines: number): string[] {
-  const lines: string[] = []
-  for (const paragraph of text.split('\n')) {
-    let line = ''
-    for (const token of paragraph.match(/[가-힣]|\S+|\s+/g) ?? []) {
-      const next = line + token
-      if (ctx.measureText(next).width > width && line.trim()) {
-        lines.push(line.trimEnd())
-        line = token.trimStart()
-      } else {
-        line = next
-      }
-    }
-    lines.push(line.trimEnd())
-  }
-  if (lines.length > maxLines) {
-    const kept = lines.slice(0, maxLines)
-    let last = kept[maxLines - 1]
-    while (last && ctx.measureText(`${last}…`).width > width) last = last.slice(0, -1)
-    kept[maxLines - 1] = `${last}…`
-    return kept
-  }
-  return lines
-}
-
-/** 한 줄에 들어가도록 글자 크기를 줄인다. 그래도 넘치면 말줄임. */
-function fitLine(ctx: Ctx, text: string, width: number, weight: number, size: number, min: number): string {
-  let s = size
-  font(ctx, weight, s)
-  while (s > min && ctx.measureText(text).width > width) font(ctx, weight, --s)
-  return wrap(ctx, text, width, 1)[0]
-}
-
-function roundRect(ctx: Ctx, x: number, y: number, w: number, h: number, r: number) {
-  ctx.beginPath()
-  ctx.roundRect(x, y, w, h, r)
-}
 
 /** 모서리는 둥글고, 절취선 자리 양옆에 반원 홈이 파인 티켓 외곽선 */
 function ticketPath(ctx: Ctx, top: number, bottom: number, perfs: number[]) {
@@ -116,13 +61,6 @@ function perforation(ctx: Ctx, y: number) {
   ctx.lineTo(TICKET_X + TICKET_W - NOTCH - 24, y)
   ctx.stroke()
   ctx.restore()
-}
-
-function drawCover(ctx: Ctx, img: ImageBitmap, x: number, y: number, w: number, h: number) {
-  const scale = Math.max(w / img.width, h / img.height)
-  const sw = w / scale
-  const sh = h / scale
-  ctx.drawImage(img, (img.width - sw) / 2, (img.height - sh) / 2, sw, sh, x, y, w, h)
 }
 
 /**
@@ -358,9 +296,7 @@ export async function renderTicketImage(ticket: Ticket, poster?: Blob): Promise<
   ctx.fillText('KEEPING GEM', W / 2, stubY + 84)
   spacing(ctx, 0)
 
-  return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('이미지를 만들지 못했습니다.'))), 'image/png')
-  })
+  return toPng(canvas)
 }
 
 /** 파일 이름에 못 쓰는 글자를 걷어낸다 */
