@@ -114,8 +114,9 @@ export async function renderReceiptImage(ticket: Ticket, poster?: Blob): Promise
   const gridEnd = seatY + 56 + (seatLines.length - 1) * 56
 
   const barY = gridEnd + 90
-  const paperBottom = barY + 190
-  const H = Math.round(paperBottom + TOOTH + 70)
+  // 바코드 아래로도 종이가 넉넉히 남는다 — 위쪽(포스터가 걸친 자리)과 무게를 맞춘다
+  const paperBottom = barY + 260
+  const H = Math.round(paperBottom + TOOTH + 100)
 
   canvas.width = W
   canvas.height = H
