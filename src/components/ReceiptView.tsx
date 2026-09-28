@@ -1,10 +1,9 @@
 import { MapPin } from 'lucide-react'
-import { useMemo, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import type { Ticket } from '@/db/db'
 import { categoryOf } from '@/lib/categories'
 import { formatMoney } from '@/lib/currencies'
 import { formatDate } from '@/lib/format'
-import { barcodeBars } from '@/lib/seed'
 
 /**
  * 영수증 스킨의 티켓 한 장.
@@ -86,12 +85,11 @@ export function ReceiptView({ ticket, posterUrl, onPosterOpen, onVenueOpen, asid
           )}
         </dl>
 
+        {/*
+         * 바코드도 일련번호도 두지 않는다 — 읽히지 않는 장식이라 종이만 빽빽해진다.
+         * (밤하늘 티켓도 같은 이유로 화면에서는 반권을 뺐다. 저장 이미지에는 그대로 들어간다)
+         */}
         <div className="rc__rule rc__rule--solid" aria-hidden="true" />
-
-        {/* 일련번호는 두지 않는다 — 뜻이 없는 글자가 한 줄 늘면 종이가 빽빽해진다 */}
-        <div className="rc__foot">
-          <Barcode seed={ticket.id} />
-        </div>
       </div>
 
       <div className="rc__tear" aria-hidden="true" />
@@ -113,19 +111,6 @@ function Paperclip() {
       </defs>
       <path d="M12 86V20a8 8 0 0 1 16 0v58a14 14 0 0 1-28 0V26" stroke="url(#rc-wire)" strokeWidth="5" fill="none" strokeLinecap="round" />
       <path d="M20 78V28" stroke="url(#rc-wire)" strokeWidth="5" fill="none" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-/** 티켓마다 모양이 다른 바코드. 읽히는 바코드는 아니고 장식이다. */
-function Barcode({ seed }: { seed: string }) {
-  const bars = useMemo(() => barcodeBars(seed), [seed])
-
-  return (
-    <svg className="rc__code" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
-      {bars.map((bar) => (
-        <rect key={bar.x} x={bar.x} y={0} width={bar.w} height={40} />
-      ))}
     </svg>
   )
 }

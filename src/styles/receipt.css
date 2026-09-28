@@ -735,7 +735,9 @@
   border-top: 1px dashed rgb(35 32 28 / 0.3);
 }
 
+/* 종이의 끝맺음 — 아래로는 더 인쇄되지 않는다 */
 .rc__rule--solid {
+  margin: 14px 0 0;
   border-top: 1px solid rgb(35 32 28 / 0.42);
 }
 
@@ -770,16 +772,6 @@
   font-size: 15px;
 }
 
-.rc__foot {
-  flex: none;
-  text-align: center;
-}
-
-.rc__code {
-  width: 160px;
-  height: 26px;
-  fill: var(--paper-ink);
-}
 
 
 /*
