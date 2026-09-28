@@ -114,9 +114,12 @@ export async function renderReceiptImage(ticket: Ticket, poster?: Blob): Promise
   const gridEnd = seatY + 56 + (seatLines.length - 1) * 56
 
   const barY = gridEnd + 90
-  // 바코드 아래로도 종이가 넉넉히 남는다 — 위쪽(포스터가 걸친 자리)과 무게를 맞춘다
-  const paperBottom = barY + 260
-  const H = Math.round(paperBottom + TOOTH + 100)
+  /*
+   * 종이는 일련번호 바로 아래에서 뜯긴다 — 그래야 영수증을 떼어 낸 것처럼 보인다.
+   * 대신 종이 바깥으로 자리를 넉넉히 둬, 아래가 답답해 보이지 않게 한다.
+   */
+  const paperBottom = barY + 190
+  const H = Math.round(paperBottom + TOOTH + 130)
 
   canvas.width = W
   canvas.height = H
