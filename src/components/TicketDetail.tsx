@@ -108,6 +108,15 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
               posterUrl={posterUrl}
               onPosterOpen={() => setPosterOpen(true)}
               onVenueOpen={() => setMapOpen(true)}
+              /* 종이에서는 포스터 옆 빈 자리에 사진첩 아이콘만 둔다 */
+              aside={
+                album && photoCount ? (
+                  <button className="rc__album" onClick={() => setAlbumOpen(true)} aria-label="그날의 사진">
+                    <Images aria-hidden="true" />
+                    <span>{photoCount}</span>
+                  </button>
+                ) : null
+              }
             />
           ) : (
             <TicketView
@@ -118,8 +127,8 @@ export function TicketDetail({ ticket, from, onEdit, onClose }: TicketDetailProp
             />
           )}
 
-          {/* 아래 버튼 줄은 이 티켓을 '다루는' 자리라, 딸린 사진첩은 티켓에 붙은 뱃지로 알린다 */}
-          {album && photoCount ? (
+          {/* 밤하늘에서는 아래 버튼 줄이 '다루는' 자리라, 딸린 사진첩은 티켓에 붙은 뱃지로 알린다 */}
+          {theme !== 'receipt' && album && photoCount ? (
             <button className="detail__album" onClick={() => setAlbumOpen(true)}>
               <Images aria-hidden="true" />
               그날의 사진
