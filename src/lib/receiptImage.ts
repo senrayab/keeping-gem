@@ -16,9 +16,14 @@ import { barcodeBars, ticketNumber } from './seed'
  */
 
 const W = 1080
-const PAPER_X = 60
+/*
+ * 종이 폭은 포스터 폭에 맞춘다.
+ * 상세보기에서 포스터가 종이의 4분의 3쯤을 차지하는데, 종이만 넓히면 그 비율이 깨져
+ * 같은 티켓인데도 이미지 쪽이 펑퍼짐해 보인다.
+ */
+const PAPER_X = 130
 const PAPER_W = W - PAPER_X * 2
-const PAD = 66
+const PAD = 58
 const INNER = PAPER_W - PAD * 2
 const TOOTH = 36 // 뜯긴 톱니 한 칸
 
@@ -39,37 +44,6 @@ const FACES = [
   `400 30px ${TYPE}`,
   `700 42px ${TYPE}`,
 ]
-
-/** 포스터를 종이에 물고 있는 클립 */
-function paperclip(ctx: Ctx, x: number, y: number, w: number, angle: number) {
-  const h = w * 2.6
-  const silver = ctx.createLinearGradient(x, y, x + w, y + h)
-  silver.addColorStop(0, '#fdfdfd')
-  silver.addColorStop(0.35, '#b9bcc2')
-  silver.addColorStop(0.6, '#f2f3f5')
-  silver.addColorStop(1, '#8d9199')
-
-  ctx.save()
-  ctx.translate(x + w / 2, y + h / 2)
-  ctx.rotate(angle)
-  ctx.translate(-w / 2, -h / 2)
-  ctx.strokeStyle = silver
-  ctx.lineWidth = w * 0.18
-  ctx.lineCap = 'round'
-  ctx.shadowColor = 'rgba(35,32,28,0.35)'
-  ctx.shadowBlur = 18
-  ctx.shadowOffsetY = 6
-  // 바깥 고리
-  ctx.beginPath()
-  ctx.roundRect(w * 0.06, 0, w * 0.88, h, w * 0.44)
-  ctx.stroke()
-  // 안쪽 고리 (위가 열린 모양)
-  ctx.shadowColor = 'transparent'
-  ctx.beginPath()
-  ctx.roundRect(w * 0.3, h * 0.12, w * 0.4, h * 0.74, w * 0.2)
-  ctx.stroke()
-  ctx.restore()
-}
 
 /** 위는 곧고 아래만 뜯긴 종이 한 장 */
 function paperPath(ctx: Ctx, top: number, bottom: number) {
@@ -185,7 +159,11 @@ export async function renderReceiptImage(ticket: Ticket, poster?: Blob): Promise
   }
   ctx.restore()
 
-  paperclip(ctx, frameX + frameW * 0.62, frameY - 54, 62, (-7 * Math.PI) / 180)
+  /*
+   * 클립은 그리지 않는다.
+   * 화면에서는 뒤 화면이 비쳐 쇠붙이로 보이지만, 그림 위에서는 흰 아이콘 한 조각처럼 남는다.
+   * 비스듬히 얹힌 인화지만으로도 '꽂아 둔 것'은 충분히 전해진다.
+   */
 
   // ── 5. 종이 왼쪽에 세로로 찍히는 종류 (글자는 눕히지 않고 한 자씩 쌓는다) ──
   ctx.save()

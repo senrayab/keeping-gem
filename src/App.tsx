@@ -118,7 +118,7 @@ export function App() {
           </button>
         </div>
         <p className="app-header__eyebrow">Keeping Gem</p>
-        <h1 className="app-header__title">{paper ? '순간들' : '추억의 밤하늘'}</h1>
+        <h1 className="app-header__title">{paper ? '순간들..' : '추억의 밤하늘'}</h1>
         {tickets && tickets.length > 0 && (
           <p className="app-header__stats">
             {oldest}년부터 {paper ? `티켓 ${tickets.length}장` : `별 ${tickets.length}개`}
