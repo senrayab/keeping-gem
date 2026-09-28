@@ -776,10 +776,31 @@
 }
 
 
-/* 그날의 사진 뱃지도 종이 위에 얹힌 것처럼 */
+/*
+ * 그날의 사진.
+ *
+ * 밤하늘에서는 티켓에 붙은 빛나는 뱃지였지만, 여기서는 영수증 뒤에 끼워 둔 인화지 한 장이
+ * 비스듬히 삐져나온 모습이다. 뒤로 두 장이 더 겹쳐 보여 '여러 장'이라는 것도 같이 알린다.
+ */
 [data-theme='receipt'] .detail__album {
-  background: var(--paper);
-  border-color: rgb(35 32 28 / 0.18);
+  margin-top: -14px;
+  min-height: 36px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 2px;
+  background: #fff;
   color: var(--paper-ink);
-  box-shadow: 0 6px 16px rgb(35 32 28 / 0.3);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  box-shadow:
+    3px 4px 0 0 #f1ede5,
+    6px 8px 0 0 #e4dfd4,
+    0 10px 20px rgb(0 0 0 / 0.3);
+  transform: rotate(-2.2deg);
+}
+
+[data-theme='receipt'] .detail__album svg {
+  color: rgb(var(--amber));
 }
