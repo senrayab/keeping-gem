@@ -3,9 +3,9 @@
  * 티켓 자체는 종이처럼 밝게 두어 하늘과 대비를 준다.
  */
 :root {
-  --night-0: #07060d;
-  --night-1: #110d22;
-  --night-2: #1d1538;
+  --bg-0: #07060d;
+  --bg-1: #110d22;
+  --bg-2: #1d1538;
   --ink: #f4f0ff;
   --ink-soft: rgb(244 240 255 / 0.62);
   --ink-faint: rgb(244 240 255 / 0.34);
@@ -17,6 +17,11 @@
   --paper-soft: #8a8598;
   --mono: ui-monospace, 'SF Mono', 'Roboto Mono', Menlo, monospace;
   color-scheme: dark;
+  /*
+   * 색 이름은 '밤/종이'가 아니라 쓰임으로 지어 둔다(--bg-*, --ink-*, --glass-*).
+   * 스킨을 바꾸면 이 값들만 갈아끼워지고, 아래 규칙은 그대로 두 스킨에서 함께 쓰인다.
+   * 영수증 스킨의 값은 styles/receipt.css에 있다.
+   */
 }
 
 * {
@@ -25,7 +30,7 @@
 
 /* 배경색은 html에만 둔다 — body에도 칠하면 뒤에 깔린 밤하늘(.starfield)을 덮는다 */
 html {
-  background: var(--night-0);
+  background: var(--bg-0);
 }
 
 /* 겹친 화면이 떠 있는 동안 뒤의 밤하늘을 멈춘다 (useScrollLock) */
@@ -58,7 +63,7 @@ button {
   inset: 0;
   z-index: -1;
   overflow: hidden;
-  background: radial-gradient(120% 70% at 50% 0%, var(--night-2) 0%, var(--night-1) 45%, var(--night-0) 100%);
+  background: radial-gradient(120% 70% at 50% 0%, var(--bg-2) 0%, var(--bg-1) 45%, var(--bg-0) 100%);
 }
 
 .dot {
@@ -546,7 +551,7 @@ button {
 }
 
 .rail__year.is-active {
-  color: var(--night-0);
+  color: var(--bg-0);
   background: rgb(var(--amber));
   box-shadow: 0 0 12px rgb(var(--amber) / 0.6);
 }
@@ -627,7 +632,7 @@ svg.dock__icon {
   border: 0;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 30%, #fff3dc, rgb(var(--amber)) 60%);
-  color: var(--night-0);
+  color: var(--bg-0);
   font-size: 28px;
   font-weight: 400;
   line-height: 1;
@@ -868,7 +873,7 @@ svg.dock__icon {
   z-index: 26;
   display: flex;
   flex-direction: column;
-  background: var(--night-0);
+  background: var(--bg-0);
   animation: fade-in 0.2s ease-out;
 }
 
@@ -1387,7 +1392,7 @@ svg.dock__icon {
   z-index: 30;
   overflow-y: auto;
   overscroll-behavior: contain;
-  background: linear-gradient(180deg, var(--night-2), var(--night-0) 60%);
+  background: linear-gradient(180deg, var(--bg-2), var(--bg-0) 60%);
   animation: rise 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
 }
 
@@ -1458,7 +1463,7 @@ svg.dock__icon {
   bottom: 0;
   margin: 0 -20px calc(-1 * (env(safe-area-inset-bottom) + 24px));
   padding: 16px 20px calc(env(safe-area-inset-bottom) + 16px);
-  background: linear-gradient(180deg, rgb(7 6 13 / 0), var(--night-0) 30%);
+  background: linear-gradient(180deg, rgb(7 6 13 / 0), var(--bg-0) 30%);
 }
 
 .poster-pick {
@@ -1836,7 +1841,7 @@ svg.dock__icon {
   width: 14px;
   height: 14px;
   fill: none;
-  stroke: var(--night-0);
+  stroke: var(--bg-0);
   stroke-width: 3.2;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -2013,7 +2018,7 @@ svg.dock__icon {
   width: 15px;
   height: 15px;
   fill: none;
-  stroke: var(--night-0);
+  stroke: var(--bg-0);
   stroke-width: 3;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -2107,7 +2112,7 @@ svg.dock__icon {
   height: 44px;
   border-radius: 50%;
   background: #fff;
-  color: var(--night-0);
+  color: var(--bg-0);
   font-size: 24px;
   line-height: 1;
 }
@@ -2125,7 +2130,7 @@ svg.dock__icon {
   border: 0;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 30%, #fff3dc, rgb(var(--amber)) 62%);
-  color: var(--night-0);
+  color: var(--bg-0);
   box-shadow: 0 10px 26px rgb(0 0 0 / 0.5), 0 0 24px rgb(var(--amber) / 0.5);
 }
 
@@ -2212,7 +2217,7 @@ svg.dock__icon {
    */
   overflow-y: auto;
   overscroll-behavior: contain;
-  background: linear-gradient(180deg, var(--night-2), var(--night-0) 60%);
+  background: linear-gradient(180deg, var(--bg-2), var(--bg-0) 60%);
   animation: rise 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
 }
 
@@ -2225,7 +2230,7 @@ svg.dock__icon {
   gap: 8px;
   /* 머리말 아이콘과 같은 높이에 오도록 */
   padding: calc(env(safe-area-inset-top) + 24px) 16px 10px;
-  background: linear-gradient(180deg, var(--night-2) 70%, transparent);
+  background: linear-gradient(180deg, var(--bg-2) 70%, transparent);
 }
 
 .album-view__head > div {
@@ -2379,7 +2384,7 @@ svg.dock__icon {
   width: 13px;
   height: 13px;
   fill: none;
-  stroke: var(--night-0);
+  stroke: var(--bg-0);
   stroke-width: 3.4;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -2497,7 +2502,7 @@ svg.dock__icon {
   width: 100%;
   min-height: 54px;
   background: radial-gradient(circle at 30% 20%, #fff3dc, rgb(var(--amber)) 70%);
-  color: var(--night-0);
+  color: var(--bg-0);
   font-size: 16px;
   box-shadow: 0 0 26px rgb(var(--amber) / 0.45);
 }
@@ -2588,7 +2593,7 @@ svg.dock__icon {
   padding: 0 14px;
   border: 0;
   border-radius: 12px;
-  background: var(--night-1);
+  background: var(--bg-1);
   color: #fff;
   font-weight: 700;
 }

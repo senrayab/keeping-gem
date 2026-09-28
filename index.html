@@ -12,6 +12,16 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 </head>
 <body>
+  <!-- 고른 스킨을 그리기 전에 적어 둔다 — 영수증 스킨인데 첫 화면만 까맣게 뜨는 일을 막는다 -->
+  <script>
+    try {
+      var skin = localStorage.getItem('keeping-gem:theme')
+      if (skin === 'receipt') {
+        document.documentElement.dataset.theme = skin
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', '#e9e6e0')
+      }
+    } catch (e) {}
+  </script>
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
 </body>
