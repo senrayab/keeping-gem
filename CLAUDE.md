@@ -58,7 +58,8 @@
 - `src/components/DbNotice.tsx` — 저장소가 옛 버전에 막혔을 때/새 버전이 열렸을 때 안내.
   **DB 스키마(`version()`)를 올리면 다른 탭의 옛 버전이 막을 수 있다** — 이 안내가 그 경우를 다룬다
 - `src/styles/global.css` — 전역 스타일(밤하늘 테마 토큰은 `:root`)
-- `public/` — 그대로 복사되는 파일 (아이콘)
+- `public/` — 그대로 복사되는 파일. 앱 아이콘(`icon-192/512`, 마스커블, `apple-touch-icon`)과 `favicon.ico`.
+  **원본 그림은 `icons/`에 둔다** — 아이콘을 바꿀 때는 원본에서 네 가지 크기를 다시 만든다
 - `vite.config.ts` — 빌드·PWA(manifest, 서비스 워커) 설정
 - `.github/workflows/deploy.yml` — `main`에 푸시되면 빌드 후 GitHub Pages에 배포
 

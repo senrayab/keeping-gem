@@ -18,7 +18,7 @@ export default defineConfig(({ command, isPreview }) => ({
     VitePWA({
       // 새 버전을 받아 두기만 하고, 바꿔 끼우는 건 사용자가 토스트에서 고른다
       registerType: 'prompt',
-      includeAssets: ['apple-touch-icon.png'],
+      includeAssets: ['apple-touch-icon.png', 'favicon.ico'],
       manifest: {
         name: 'Keeping Gem - 추억의 밤하늘',
         short_name: 'Keeping Gem',
