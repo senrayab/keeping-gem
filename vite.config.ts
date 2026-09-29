@@ -37,12 +37,23 @@ export default defineConfig(({ command, isPreview }) => ({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,png,svg,woff2}'],
+        // 이모지 글꼴은 1MB쯤 된다 — 설치할 때 미리 받지 않고, 이모지를 처음 그릴 때 받아 둔다
+        globIgnores: ['**/tossface-*.woff2'],
         // 영수증 스킨의 글꼴(구글 폰트)은 한 번 받아 두고 계속 쓴다 — 비행기 모드에서도 같은 모습
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\//,
             handler: 'StaleWhileRevalidate',
             options: { cacheName: 'skin-fonts-css', cacheableResponse: { statuses: [0, 200] } },
+          },
+          {
+            urlPattern: /tossface-.*\.woff2$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'emoji-font',
+              expiration: { maxEntries: 2, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
           },
           {
             urlPattern: /^https:\/\/fonts\.gstatic\.com\//,

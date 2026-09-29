@@ -20,9 +20,9 @@
   --paper: #f8f5ef;
   --paper-ink: #23201c;
   --paper-soft: #6f6a62;
-  --mono: 'Courier Prime', ui-monospace, 'SF Mono', Menlo, monospace;
-  --serif: 'Instrument Serif', 'Noto Serif KR', Georgia, serif;
-  --hand: 'Nanum Pen Script', 'Caveat', cursive;
+  --mono: 'Tossface', 'Courier Prime', ui-monospace, 'SF Mono', Menlo, monospace;
+  --serif: 'Tossface', 'Instrument Serif', 'Noto Serif KR', Georgia, serif;
+  --hand: 'Tossface', 'Nanum Pen Script', 'Caveat', cursive;
 }
 
 /* ───────── 공용 화면을 종이에 맞추기 ───────── */

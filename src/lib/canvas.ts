@@ -6,9 +6,13 @@
  */
 export type Ctx = CanvasRenderingContext2D
 
+/*
+ * 이모지는 화면과 같은 글꼴(토스페이스)로 그린다.
+ * 화면에 이모지가 한 번이라도 그려졌다면 글꼴이 이미 받아져 있어 캔버스도 같은 모양을 쓴다.
+ */
 export const SANS =
-  "-apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Noto Sans CJK KR', sans-serif"
-export const MONO = "ui-monospace, 'SF Mono', 'Roboto Mono', 'Noto Sans Mono', monospace"
+  "'Tossface', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Noto Sans CJK KR', sans-serif"
+export const MONO = "'Tossface', ui-monospace, 'SF Mono', 'Roboto Mono', 'Noto Sans Mono', monospace"
 
 /** "r g b" + 투명도 → 캔버스가 어느 기기에서든 읽는 rgba(r,g,b,a) */
 export const rgba = (rgb: string, alpha = 1) => `rgba(${rgb.split(' ').join(',')},${alpha})`
