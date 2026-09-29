@@ -33,9 +33,9 @@ const INK = '#23201c'
 const SOFT = '#6f6a62'
 const AMBER = '#e4742c'
 
-const SERIF = "'Instrument Serif', 'Noto Serif KR', Georgia, serif"
-const HAND = "'Nanum Pen Script', 'Segoe Script', cursive"
-const TYPE = "'Courier Prime', ui-monospace, 'Roboto Mono', monospace"
+const SERIF = "'Tossface', 'Instrument Serif', 'Noto Serif KR', Georgia, serif"
+const HAND = "'Tossface', 'Nanum Pen Script', 'Segoe Script', cursive"
+const TYPE = "'Tossface', 'Courier Prime', ui-monospace, 'Roboto Mono', monospace"
 
 /** 캔버스에 쓸 글꼴을 미리 받아 둔다 (못 받으면 기본 글꼴로 그려진다) */
 const FACES = [

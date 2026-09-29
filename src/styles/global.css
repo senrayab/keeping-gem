@@ -15,7 +15,7 @@
   --paper: #fbfaf7;
   --paper-ink: #1b1826;
   --paper-soft: #8a8598;
-  --mono: ui-monospace, 'SF Mono', 'Roboto Mono', Menlo, monospace;
+  --mono: 'Tossface', ui-monospace, 'SF Mono', 'Roboto Mono', Menlo, monospace;
   color-scheme: dark;
   /*
    * 색 이름은 '밤/종이'가 아니라 쓰임으로 지어 둔다(--bg-*, --ink-*, --glass-*).
@@ -26,6 +26,23 @@
 
 * {
   box-sizing: border-box;
+}
+
+/*
+ * 이모지 글꼴 — 토스페이스(https://toss.im/tossface).
+ *
+ * 기기마다 제각각인 이모지 모양을 한 벌로 맞춘다. 글자는 건드리지 않는다:
+ * unicode-range로 이모지 칸만 집어 두었고(숫자·#·*는 일부러 뺐다 — 날짜와 금액까지 바뀐다),
+ * 이모지가 한 자도 없는 화면에서는 글꼴을 받아 오지도 않는다.
+ * 라이선스 고지는 public/tossface-license.txt에 함께 싣는다.
+ */
+@font-face {
+  font-family: 'Tossface';
+  src: url('../assets/tossface.woff2') format('woff2');
+  font-display: swap;
+  unicode-range: U+00A9, U+00AE, U+203C, U+2049, U+2122, U+2139, U+2194-2199, U+21A9-21AA, U+20E3,
+    U+231A-231B, U+2328, U+23CF-23FA, U+24C2, U+25AA-25FE, U+2600-27BF, U+2934-2935, U+2B00-2BFF,
+    U+3030, U+303D, U+3297, U+3299, U+FE0F, U+1F000-1FAFF, U+E0020-E007F;
 }
 
 /* 배경색은 html에만 둔다 — body에도 칠하면 뒤에 깔린 밤하늘(.starfield)을 덮는다 */
@@ -45,7 +62,8 @@ body {
   margin: 0;
   min-height: 100%;
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard', 'Noto Sans KR', sans-serif;
+  font-family: 'Tossface', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard', 'Noto Sans KR',
+    sans-serif;
   -webkit-tap-highlight-color: transparent;
   -webkit-font-smoothing: antialiased;
 }
